@@ -1,6 +1,7 @@
 package com.ebelemgnegre.ProductService.service;
 
 import com.ebelemgnegre.ProductService.entity.Product;
+import com.ebelemgnegre.ProductService.exception.ProductServiceCustomException;
 import com.ebelemgnegre.ProductService.model.ProductRequest;
 import com.ebelemgnegre.ProductService.model.ProductResponse;
 import com.ebelemgnegre.ProductService.repository.ProductRepository;
@@ -38,7 +39,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Getting product by id: {}", productId);
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ProductServiceCustomException("Product not found", "404"));
 
         ProductResponse productResponse = new ProductResponse();
         copyProperties(product, productResponse);
