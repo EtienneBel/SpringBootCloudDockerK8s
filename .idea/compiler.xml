@@ -7,10 +7,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="ProductService" />
+        <module name="ServiceRegistry" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="ProductService" target="17" />
+      <module name="service-registry" target="1.5" />
+      <module name="ServiceRegistry" target="1.5" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

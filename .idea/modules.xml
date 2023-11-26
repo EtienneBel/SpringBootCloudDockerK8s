@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ProductService/ProductService.iml" filepath="$PROJECT_DIR$/ProductService/ProductService.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ServiceRegistry/ServiceRegistry.iml" filepath="$PROJECT_DIR$/ServiceRegistry/ServiceRegistry.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/SpringBootCloudDockerK8s.iml" filepath="$PROJECT_DIR$/.idea/SpringBootCloudDockerK8s.iml" />
     </modules>
   </component>
