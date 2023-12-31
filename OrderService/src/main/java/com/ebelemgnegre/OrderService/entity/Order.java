@@ -22,7 +22,7 @@ public class Order {
     private long id;
     private long productId;
     private long quantity;
-    private Instant orderData;
+    private Instant orderDate;
     private String orderStatus;
     private long amount;
 }
