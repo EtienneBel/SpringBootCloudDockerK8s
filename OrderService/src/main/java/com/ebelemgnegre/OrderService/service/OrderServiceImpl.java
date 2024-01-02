@@ -1,6 +1,7 @@
 package com.ebelemgnegre.OrderService.service;
 
 import com.ebelemgnegre.OrderService.entity.Order;
+import com.ebelemgnegre.OrderService.external.client.ProductService;
 import com.ebelemgnegre.OrderService.model.OrderRequest;
 import com.ebelemgnegre.OrderService.repository.OrderRepository;
 import lombok.extern.log4j.Log4j2;
@@ -16,10 +17,15 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private ProductService productService;
+
     @Override
     public long placeOrder(OrderRequest orderRequest) {
         log.info("Placing order Request: {}", orderRequest);
-        log.info(orderRequest.toString());
+
+        productService.reduceQuantity(orderRequest.getProductId(), orderRequest.getQuantity());
+
         Order order = Order.builder()
                 .productId(orderRequest.getProductId())
                 .quantity(orderRequest.getQuantity())
@@ -28,10 +34,10 @@ public class OrderServiceImpl implements OrderService {
                 .amount(orderRequest.getTotalAmount())
                 .build();
 
-        order =orderRepository.save(order);
+        order = orderRepository.save(order);
 
         log.info("Order placed successfully with orderId: {}", order.getId());
-        
+
         return 0;
     }
 }
