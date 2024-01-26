@@ -1,14 +1,18 @@
 package com.ebelemgnegre.OrderService.service;
 
 import com.ebelemgnegre.OrderService.entity.Order;
+import com.ebelemgnegre.OrderService.exception.CustomException;
 import com.ebelemgnegre.OrderService.external.client.PaymentService;
 import com.ebelemgnegre.OrderService.external.client.ProductService;
 import com.ebelemgnegre.OrderService.external.request.PaymentRequest;
+import com.ebelemgnegre.OrderService.external.response.ProductResponse;
 import com.ebelemgnegre.OrderService.model.OrderRequest;
+import com.ebelemgnegre.OrderService.model.OrderResponse;
 import com.ebelemgnegre.OrderService.repository.OrderRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
 
@@ -24,6 +28,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Override
     public long placeOrder(OrderRequest orderRequest) {
@@ -50,13 +57,13 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         String orderStatus = null;
-        try{
+        try {
             paymentService.doPayment(paymentRequest);
             log.info("Payment done Successfully. Changing the order status to PLACED");
             orderStatus = "PLACED";
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Error occurred in payment. Changing order status to PAYMENT_FAILED");
-            orderStatus ="PAYMENT_FAILED";
+            orderStatus = "PAYMENT_FAILED";
         }
 
         order.setOrderStatus(orderStatus);
@@ -65,5 +72,32 @@ public class OrderServiceImpl implements OrderService {
         log.info("Order placed successfully with orderId: {}", order.getId());
 
         return order.getId();
+    }
+
+    @Override
+    public OrderResponse getOrderDetails(long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(
+                () -> new CustomException("Order not found for this id: " + orderId, "NOT_FOUND", 404));
+
+        log.info("Invoking product service to fetch the product for id: {}", order.getProductId());
+
+        ProductResponse productResponse = restTemplate.getForObject(
+                "http://PRODUCT-SERVICE/product/" + order.getProductId(),
+                ProductResponse.class
+        );
+
+        OrderResponse.ProductDetails productDetails = OrderResponse.ProductDetails.builder()
+                .productName(productResponse.getProductName())
+                .productId(productResponse.getProductId())
+                .build();
+
+        OrderResponse orderResponse = OrderResponse.builder()
+                .orderId(order.getId())
+                .orderStatus(order.getOrderStatus())
+                .orderDate(order.getOrderDate())
+                .amount(order.getAmount())
+                .productDetails(productDetails).build();
+
+        return orderResponse;
     }
 }
