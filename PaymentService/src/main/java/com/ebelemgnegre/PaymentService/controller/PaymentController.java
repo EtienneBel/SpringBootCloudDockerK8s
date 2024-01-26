@@ -1,6 +1,7 @@
 package com.ebelemgnegre.PaymentService.controller;
 
 import com.ebelemgnegre.PaymentService.model.PaymentRequest;
+import com.ebelemgnegre.PaymentService.model.PaymentResponse;
 import com.ebelemgnegre.PaymentService.service.PaymentService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,15 @@ public class PaymentController {
     PaymentService paymentService;
 
     @PostMapping
-    public ResponseEntity<Long> doPayment(@RequestBody PaymentRequest paymentRequest){
+    public ResponseEntity<Long> doPayment(@RequestBody PaymentRequest paymentRequest) {
         log.info("PaymentRequest : {}", paymentRequest);
         return new ResponseEntity<>(paymentService.doPayment(paymentRequest),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<PaymentResponse> getPaymentDetailsByOrderId(@PathVariable Long orderId) {
+        return new ResponseEntity<>(paymentService.getPaymentDetailsByOrderId(orderId),
                 HttpStatus.OK);
     }
 }

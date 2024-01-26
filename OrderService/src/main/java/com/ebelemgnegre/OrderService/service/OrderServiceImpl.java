@@ -5,6 +5,7 @@ import com.ebelemgnegre.OrderService.exception.CustomException;
 import com.ebelemgnegre.OrderService.external.client.PaymentService;
 import com.ebelemgnegre.OrderService.external.client.ProductService;
 import com.ebelemgnegre.OrderService.external.request.PaymentRequest;
+import com.ebelemgnegre.OrderService.external.response.PaymentResponse;
 import com.ebelemgnegre.OrderService.external.response.ProductResponse;
 import com.ebelemgnegre.OrderService.model.OrderRequest;
 import com.ebelemgnegre.OrderService.model.OrderResponse;
@@ -86,17 +87,32 @@ public class OrderServiceImpl implements OrderService {
                 ProductResponse.class
         );
 
+        PaymentResponse paymentResponse = restTemplate.getForObject(
+                "http://PAYMENT-SERVICE/payment/order/" + order.getId(),
+                PaymentResponse.class
+        );
+
         OrderResponse.ProductDetails productDetails = OrderResponse.ProductDetails.builder()
                 .productName(productResponse.getProductName())
                 .productId(productResponse.getProductId())
                 .build();
+
+        OrderResponse.PaymentDetails paymentDetails = OrderResponse.PaymentDetails.builder()
+                .paymentId(paymentResponse.getPaymentId())
+                .status(paymentResponse.getStatus())
+                .paymentDate(paymentResponse.getPaymentDate())
+                .paymentMode(paymentResponse.getPaymentMode())
+                .build();
+
 
         OrderResponse orderResponse = OrderResponse.builder()
                 .orderId(order.getId())
                 .orderStatus(order.getOrderStatus())
                 .orderDate(order.getOrderDate())
                 .amount(order.getAmount())
-                .productDetails(productDetails).build();
+                .productDetails(productDetails)
+                .paymentDetails(paymentDetails)
+                .build();
 
         return orderResponse;
     }
