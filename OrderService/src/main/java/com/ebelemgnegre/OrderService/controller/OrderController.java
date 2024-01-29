@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/order")
@@ -28,5 +30,11 @@ public class OrderController {
     @GetMapping("{orderId}")
     public ResponseEntity<OrderResponse> getOrderDetails(@PathVariable long orderId){
         return new ResponseEntity<>(orderService.getOrderDetails(orderId), HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<OrderResponse>> getAllOrders(){
+        return new ResponseEntity<>(orderService.getAllOrders(),
+                HttpStatus.OK);
     }
 }

@@ -61,8 +61,6 @@
     <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-el:10.1.16" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-websocket:10.1.16" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-web:6.1.1" level="project" />
-    <orderEntry type="library" name="Maven: io.micrometer:micrometer-observation:1.12.0" level="project" />
-    <orderEntry type="library" name="Maven: io.micrometer:micrometer-commons:1.12.0" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:6.1.1" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-expression:6.1.1" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-starter:4.1.0-RC1" level="project" />
@@ -155,6 +153,8 @@
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.11.0" level="project" />
     <orderEntry type="library" name="Maven: io.github.openfeign:feign-core:12.5" level="project" />
     <orderEntry type="library" name="Maven: io.github.openfeign:feign-slf4j:12.5" level="project" />
+    <orderEntry type="library" name="Maven: io.micrometer:micrometer-observation:1.12.0" level="project" />
+    <orderEntry type="library" name="Maven: io.micrometer:micrometer-commons:1.12.0" level="project" />
     <orderEntry type="library" name="Maven: io.micrometer:micrometer-tracing-bridge-brave:1.2.0" level="project" />
     <orderEntry type="library" name="Maven: io.micrometer:micrometer-tracing:1.2.0" level="project" />
     <orderEntry type="library" name="Maven: io.micrometer:context-propagation:1.1.0" level="project" />
@@ -167,5 +167,12 @@
     <orderEntry type="library" name="Maven: io.zipkin.reporter2:zipkin-reporter-brave:2.16.3" level="project" />
     <orderEntry type="library" name="Maven: io.zipkin.reporter2:zipkin-reporter:2.16.3" level="project" />
     <orderEntry type="library" name="Maven: io.zipkin.zipkin2:zipkin:2.23.2" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-actuator:3.2.0" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-actuator-autoconfigure:3.2.0" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-actuator:3.2.0" level="project" />
+    <orderEntry type="library" name="Maven: io.micrometer:micrometer-jakarta9:1.12.0" level="project" />
+    <orderEntry type="library" name="Maven: io.micrometer:micrometer-core:1.12.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.hdrhistogram:HdrHistogram:2.1.12" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.latencyutils:LatencyUtils:2.0.3" level="project" />
   </component>
 </module>

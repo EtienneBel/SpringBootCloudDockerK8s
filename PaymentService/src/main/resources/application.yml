@@ -17,3 +17,7 @@ spring:
   config:
     import: configserver:http://localhost:9296
 
+management:
+  tracing:
+    sampling:
+      probability: 1.0

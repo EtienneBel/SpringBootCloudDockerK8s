@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Log4j2
@@ -115,5 +117,22 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         return orderResponse;
+    }
+
+    @Override
+    public List<OrderResponse> getAllOrders(){
+        List<OrderResponse> orderResponses = new ArrayList<>();
+        for (Order order: orderRepository.findAll()) {
+            OrderResponse orderResponse = OrderResponse.builder()
+                    .orderId(order.getId())
+                    .orderStatus(order.getOrderStatus())
+                    .orderDate(order.getOrderDate())
+                    .amount(order.getAmount())
+//                    .productDetails(productDetails)
+//                    .paymentDetails(paymentDetails)
+                    .build();
+            orderResponses.add(orderResponse);
+        }
+        return orderResponses;
     }
 }
