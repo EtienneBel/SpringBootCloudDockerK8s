@@ -36,3 +36,36 @@ spring:
               args:
                 name: PRODUCT-SERVICE
                 fallbackuri: forward:/productServiceFallback
+okta:
+  oauth2:
+    issuer: https://dev-84928916.okta.com/oauth2/default
+    audience: api://default
+    client-id: 0oaezuf0meAwuh0F25d7
+    client-secret: GO953Yi1FyJQsSMpSHagq6SEMEiQ9Z77JkHph9e0aYPbdTKavTQWqiLi94Ze94JI
+    scopes: openid, profile, email, offline_access
+
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          okta:
+#            client-id: 0oaezuf0meAwuh0F25d7
+#            client-secret: GO953Yi1FyJQsSMpSHagq6SEMEiQ9Z77JkHph9e0aYPbdTKavTQWqiLi94Ze94JI
+#            client-name: Okta
+#            authorization-grant-type: authorization_code
+#        provider:
+#          okta:
+#            issuer-uri: https://dev-84928916.okta.com/oauth2/default
+
+#  spring:
+#    security:
+#      oauth2:
+#        client:
+#          registration:
+#            okta:
+#              client-id: 0oaezuf0meAwuh0F25d7
+#              client-secret: GO953Yi1FyJQsSMpSHagq6SEMEiQ9Z77JkHph9e0
+#              scope: openid, profile, email, offline_access
+#          provider:
+#            okta:
+#              issuer-uri: https://dev-84928916.okta.com/oauth2/default
