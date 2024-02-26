@@ -36,14 +36,14 @@ public class OrderServiceApplication {
     public RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setInterceptors(
-				Arrays.asList(
-						new RestTemplateInterceptor(
-								clientManager(clientRegistrationRepository, oAuth2AuthorizedClientRepository)
-						)
-				)
+                Arrays.asList(
+                        new RestTemplateInterceptor(
+                                clientManager(clientRegistrationRepository, oAuth2AuthorizedClientRepository)
+                        )
+                )
         );
 
-        return new RestTemplate();
+        return restTemplate;
     }
 
     @Bean
