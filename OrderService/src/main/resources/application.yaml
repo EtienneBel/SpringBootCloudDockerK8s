@@ -15,6 +15,19 @@ spring:
     name: ORDER-SERVICE
   config:
     import: configserver:http://localhost:9296
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: https://dev-84928916.okta.com/oauth2/default
+      client:
+        registration:
+          internal-client:
+            provider: okta
+            authorization-grant-type: client_credentials
+            scope: internal
+            client-id: 0oaezuf0meAwuh0F25d7
+            client-secret: GO953Yi1FyJQsSMpSHagq6SEMEiQ9Z77JkHph9e0aYPbdTKavTQWqiLi94Ze94JI
 
 management:
   tracing:
