@@ -1,6 +1,7 @@
 package com.ebelemgnegre.CloudGateway.controller;
 
 import com.ebelemgnegre.CloudGateway.model.AuthenticationResponse;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.stream.Collectors;
 
+@Log4j2
 @RestController
 @RequestMapping("/authenticate")
 public class AuthenticationController {
@@ -34,6 +36,7 @@ public class AuthenticationController {
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toList()))
                 .build();
+        oidcUser.getAuthorities().forEach(authority -> log.info("Authority: {}", authority.getAuthority()));
 
         return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
     }
