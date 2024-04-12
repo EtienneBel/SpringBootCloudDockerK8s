@@ -1,37 +1,68 @@
-version: "3.7"
+version: "2.1"
 
 services:
-  productDb:
-    container_name: productDb
-    image: mysql:latest
-    volumes:
-      - mysql_data:/var/lib/mysql
-    environment:
-      MYSQL_USER: root
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: productDb
+  serviceregistry:
+    image: 'ebelemgnegre/serviceregistry:0.0.2'
+    container_name: serviceregistry
     ports:
-      - "3306:3306"
-  paymentDb:
-    container_name: paymentDb
-    image: mysql:latest
-    volumes:
-      - mysql_data:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: paymentDb
+      - '8761:8761'
+  configserver:
+    image: 'ebelemgnegre/configserver:0.0.2'
+    container_name: configserver
     ports:
-      - "3307:3306"
-  orderDb:
-    container_name: orderDb
-    image: mysql:latest
-    volumes:
-      - mysql_data:/var/lib/mysql
+      - '9296:9296'
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: orderDb
+      - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://configserver:9296/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - serviceregistry
+  cloudgateway:
+    image: 'ebelemgnegre/cloudgateway:0.0.2'
+    container_name: cloudgateway
     ports:
-      - "3308:3306"
+      - '9090:9090'
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      configserver:
+        condition: service_healthy
 
-volumes:
-  mysql_data:
+#  productDb:
+#    container_name: productDb
+#    image: mysql:latest
+#    volumes:
+#      - mysql_data:/var/lib/mysql
+#    environment:
+#      MYSQL_USER: root
+#      MYSQL_ROOT_PASSWORD: root
+#      MYSQL_DATABASE: productDb
+#    ports:
+#      - "3306:3306"
+#  paymentDb:
+#    container_name: paymentDb
+#    image: mysql:latest
+#    volumes:
+#      - mysql_data:/var/lib/mysql
+#    environment:
+#      MYSQL_ROOT_PASSWORD: root
+#      MYSQL_DATABASE: paymentDb
+#    ports:
+#      - "3307:3306"
+#  orderDb:
+#    container_name: orderDb
+#    image: mysql:latest
+#    volumes:
+#      - mysql_data:/var/lib/mysql
+#    environment:
+#      MYSQL_ROOT_PASSWORD: root
+#      MYSQL_DATABASE: orderDb
+#    ports:
+#      - "3308:3306"
+
+#volumes:
+#  mysql_data:
