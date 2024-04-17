@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class OrderServiceImplTest {
@@ -40,8 +41,9 @@ class OrderServiceImplTest {
     void test_When_Order_Success(){
         //Mocking
         Order order = getMockOrder();
-        Mockito.when(orderRepository.findById((anyLong())))
+        when(orderRepository.findById((anyLong())))
                 .thenReturn(Optional.of(order));
+        when(restTemplate.)
     }
 
     private Order getMockOrder() {
