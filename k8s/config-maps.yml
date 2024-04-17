@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eureka-cm
+data:
+  eureka_service_address: "http://localhost:8761/eureka"
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-cm
+data:
+  config-url: "http://config-server-svc"

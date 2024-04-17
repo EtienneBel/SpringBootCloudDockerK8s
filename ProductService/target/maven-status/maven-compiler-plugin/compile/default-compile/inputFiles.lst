@@ -1,0 +1,12 @@
+C:\Users\EtienneWend-KuuniBel\Desktop\Git\deployed\SpringBootCloudDockerK8s\ProductService\src\main\java\com\ebelemgnegre\ProductService\exception\RestResponseEntityExceptionHandler.java
+C:\Users\EtienneWend-KuuniBel\Desktop\Git\deployed\SpringBootCloudDockerK8s\ProductService\src\main\java\com\ebelemgnegre\ProductService\ProductServiceApplication.java
+C:\Users\EtienneWend-KuuniBel\Desktop\Git\deployed\SpringBootCloudDockerK8s\ProductService\src\main\java\com\ebelemgnegre\ProductService\service\ProductService.java
+C:\Users\EtienneWend-KuuniBel\Desktop\Git\deployed\SpringBootCloudDockerK8s\ProductService\src\main\java\com\ebelemgnegre\ProductService\entity\Product.java
+C:\Users\EtienneWend-KuuniBel\Desktop\Git\deployed\SpringBootCloudDockerK8s\ProductService\src\main\java\com\ebelemgnegre\ProductService\model\ProductRequest.java
+C:\Users\EtienneWend-KuuniBel\Desktop\Git\deployed\SpringBootCloudDockerK8s\ProductService\src\main\java\com\ebelemgnegre\ProductService\exception\ProductServiceCustomException.java
+C:\Users\EtienneWend-KuuniBel\Desktop\Git\deployed\SpringBootCloudDockerK8s\ProductService\src\main\java\com\ebelemgnegre\ProductService\controller\ProductController.java
+C:\Users\EtienneWend-KuuniBel\Desktop\Git\deployed\SpringBootCloudDockerK8s\ProductService\src\main\java\com\ebelemgnegre\ProductService\service\ProductServiceImpl.java
+C:\Users\EtienneWend-KuuniBel\Desktop\Git\deployed\SpringBootCloudDockerK8s\ProductService\src\main\java\com\ebelemgnegre\ProductService\model\ProductResponse.java
+C:\Users\EtienneWend-KuuniBel\Desktop\Git\deployed\SpringBootCloudDockerK8s\ProductService\src\main\java\com\ebelemgnegre\ProductService\repository\ProductRepository.java
+C:\Users\EtienneWend-KuuniBel\Desktop\Git\deployed\SpringBootCloudDockerK8s\ProductService\src\main\java\com\ebelemgnegre\ProductService\security\WebSecurityConfig.java
+C:\Users\EtienneWend-KuuniBel\Desktop\Git\deployed\SpringBootCloudDockerK8s\ProductService\src\main\java\com\ebelemgnegre\ProductService\model\ErrorResponse.java

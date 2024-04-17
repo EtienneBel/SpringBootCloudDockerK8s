@@ -97,10 +97,6 @@
 					</from>
 					<to>
 						<image>registry.hub.docker.com/etiennebel/cloudgateway</image>
-						<auth>
-							<username>"etiennebel"</username>
-							<password>"Ui?fGfz8@L#aAtL"</password>
-						</auth>
 					</to>
 				</configuration>
 			</plugin>

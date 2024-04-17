@@ -1,0 +1,15 @@
+com\ebelemgnegre\ProductService\exception\RestResponseEntityExceptionHandler.class
+com\ebelemgnegre\ProductService\model\ProductRequest.class
+com\ebelemgnegre\ProductService\entity\Product.class
+com\ebelemgnegre\ProductService\service\ProductService.class
+com\ebelemgnegre\ProductService\exception\ProductServiceCustomException.class
+com\ebelemgnegre\ProductService\entity\Product$ProductBuilder.class
+com\ebelemgnegre\ProductService\security\WebSecurityConfig.class
+com\ebelemgnegre\ProductService\ProductServiceApplication.class
+com\ebelemgnegre\ProductService\repository\ProductRepository.class
+com\ebelemgnegre\ProductService\controller\ProductController.class
+com\ebelemgnegre\ProductService\model\ErrorResponse$ErrorResponseBuilder.class
+com\ebelemgnegre\ProductService\model\ErrorResponse.class
+com\ebelemgnegre\ProductService\service\ProductServiceImpl.class
+com\ebelemgnegre\ProductService\model\ProductResponse$ProductResponseBuilder.class
+com\ebelemgnegre\ProductService\model\ProductResponse.class

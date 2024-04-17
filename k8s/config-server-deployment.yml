@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-server-app
+spec:
+  selector:
+    matchLabels:
+      app: config-server-app
+  template:
+    metadata:
+      labels:
+        app: config-server-app
+    spec:
+      containers:
+      - name: config-server-app
+        image: etiennebel/configserver
+        ports:
+        - containerPort: 9296
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        env:
+        - name: EUREKA_SERVER_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: eureka-cm
+              key: eureka_service_address
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: config-service-svc
+spec:
+  selector:
+    app: config-service-app
+  ports:
+  - port: 80
+    targetPort: 9296
+
