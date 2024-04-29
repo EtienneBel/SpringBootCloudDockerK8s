@@ -33,9 +33,6 @@ out/
 ###########
 .vscode/
 
-# Kubernetes #
-##############
-**/k8s/
 
 # Operating System Files #
 ##########################
@@ -57,9 +54,7 @@ HELP.md
 
 # Docker #
 ##########
-**/docker-compose*.yml
 **/.docker/
-**/Dockerfile
 
 # Specific to your structure #
 ##############################
