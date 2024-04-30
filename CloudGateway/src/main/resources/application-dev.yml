@@ -9,7 +9,7 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: ORDER-SERVICE
+        - id: ORDER-SERVICEs
           uri: lb://ORDER-SERVICE
           predicates:
             - Path=/order/**
@@ -40,6 +40,6 @@ okta:
   oauth2:
     issuer: https://dev-84928916.okta.com/oauth2/default
     audience: api://default
-    client-id: 0oaezuf0meAwuh0F25d7
-    client-secret: GO953Yi1FyJQsSMpSHagq6SEMEiQ9Z77JkHph9e0aYPbdTKavTQWqiLi94Ze94JI
+    client-id: xxxx
+    client-secret: xxxxxx
     scopes: openid, profile, email, offline_access
