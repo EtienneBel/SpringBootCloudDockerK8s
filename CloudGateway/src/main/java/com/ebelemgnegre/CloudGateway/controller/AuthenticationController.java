@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.stream.Collectors;
 
-@Log4j2
 @RestController
 @RequestMapping("/authenticate")
 public class AuthenticationController {
@@ -24,20 +23,21 @@ public class AuthenticationController {
     @GetMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(
             @AuthenticationPrincipal OidcUser oidcUser,
-            @RegisteredOAuth2AuthorizedClient("okta") OAuth2AuthorizedClient client,
-            Model model){
-        AuthenticationResponse authenticationResponse = AuthenticationResponse.builder()
+            Model model,
+            @RegisteredOAuth2AuthorizedClient("okta")
+             OAuth2AuthorizedClient client
+    ) {
+        AuthenticationResponse authenticationResponse
+                = AuthenticationResponse.builder()
                 .userId(oidcUser.getEmail())
                 .accessToken(client.getAccessToken().getTokenValue())
                 .refreshToken(client.getRefreshToken().getTokenValue())
                 .expiresAt(client.getAccessToken().getExpiresAt().getEpochSecond())
-                .auhorityList(oidcUser.getAuthorities()
+                .authorityList(oidcUser.getAuthorities()
                         .stream()
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toList()))
                 .build();
-        oidcUser.getAuthorities().forEach(authority -> log.info("Authority: {}", authority.getAuthority()));
-
         return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
     }
 }
