@@ -1,84 +1,36 @@
 # Compiled source #
 ###################
-target/
 **/target/
 **/build/
+!**/src/main/**/target/
+!**/src/test/**/target/
 
 # Maven #
 #########
-**/.mvn/
-**/mvnw
-**/mvnw.cmd
-**/pom.xml.tag
-**/pom.xml.releaseBackup
-**/pom.xml.versionsBackup
-**/pom.xml.next
-**/release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
+**/.mvn
+**/.mvn/timing.properties
+!**/.mvn/wrapper/maven-wrapper.jar
+!**/.mvn/wrapper/maven-wrapper.properties
+!**/.mvn/wrapper/mvnw
+!**/.mvn/wrapper/mvnw.cmd
 
 # IntelliJ IDEA #
 #################
-.idea/
-*.iml
-*.iws
-*.ipr
-*.ids
-*.idb
-out/
-*.idea_modules/
+.idea
+**/.idea
+**/*.iws
+**/*.iml
+**/*.ipr
 
 # VS Code #
 ###########
 .vscode/
 
-# Kubernetes #
-##############
-**/k8s/
-
-# Operating System Files #
-##########################
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Other files and folders to ignore #
-####################################
-HELP.md
-**/*.log
-**/*.bak
-**/*.tmp
-**/*.swp
-
-# Docker #
-##########
-**/docker-compose*.yml
-**/.docker/
-**/Dockerfile
-
-# Specific to your structure #
-##############################
-CloudGateway/
-ConfigServer/
-OrderService/
-PaymentService/
-ProductService/
-ServiceRegistry/
-
 # If you're using git submodules, you might want to include #
 ############################################################
-.gitmodules
+**/.gitignore
 **/modules/
 
-# Add environment-specific files/folders #
+# Application configuration #
 ##########################################
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+**/src/main/resources/application.yml
