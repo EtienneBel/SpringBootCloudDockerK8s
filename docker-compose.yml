@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   order-db:
     image: mysql
@@ -11,7 +9,7 @@ services:
       - "3306:3306"
     volumes:
       - ./data/order-db/create-database.sql:/docker-entrypoint-initdb.d/create-database.sql
-      - order-db-data:/var/lib/mysql
+      - order-db-data:/var/lib/mysql-order-db
 
   product-db:
     image: mysql
@@ -23,7 +21,7 @@ services:
       - "3307:3306"  # Host port 3307 -> Container port 3306
     volumes:
       - ./data/product-db/create-database.sql:/docker-entrypoint-initdb.d/create-database.sql
-      - product-db-data:/var/lib/mysql
+      - product-db-data:/var/lib/mysql-product-db
 
   payment-db:
     image: mysql
@@ -35,7 +33,7 @@ services:
       - "3308:3306"  # Host port 3308 -> Container port 3306
     volumes:
       - ./data/payment-db/create-database.sql:/docker-entrypoint-initdb.d/create-database.sql
-      - payment-db-data:/var/lib/mysql
+      - payment-db-data:/var/lib/mysql-payment-db
 
 volumes:
   order-db-data:
