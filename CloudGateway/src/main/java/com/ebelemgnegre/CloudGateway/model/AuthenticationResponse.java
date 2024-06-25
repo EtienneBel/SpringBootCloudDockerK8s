@@ -16,6 +16,6 @@ public class AuthenticationResponse {
     private String accessToken;
     private String refreshToken;
     private long expiresAt;
-    private Collection<String> auhorityList;
+    private Collection<String> authorityList;
 
 }
