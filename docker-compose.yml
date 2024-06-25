@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  order-db:
+    image: mysql
+    restart: always
+    container_name: orderDb
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/order-db/create-database.sql:/docker-entrypoint-initdb.d/create-database.sql
+      - order-db-data:/var/lib/mysql
+
+  product-db:
+    image: mysql
+    restart: always
+    container_name: productDb
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - "3307:3306"  # Host port 3307 -> Container port 3306
+    volumes:
+      - ./data/product-db/create-database.sql:/docker-entrypoint-initdb.d/create-database.sql
+      - product-db-data:/var/lib/mysql
+
+  payment-db:
+    image: mysql
+    restart: always
+    container_name: paymentDb
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - "3308:3306"  # Host port 3308 -> Container port 3306
+    volumes:
+      - ./data/payment-db/create-database.sql:/docker-entrypoint-initdb.d/create-database.sql
+      - payment-db-data:/var/lib/mysql
+
+volumes:
+  order-db-data:
+  product-db-data:
+  payment-db-data:
