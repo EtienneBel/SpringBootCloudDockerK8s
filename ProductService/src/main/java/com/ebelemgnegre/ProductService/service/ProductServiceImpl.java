@@ -30,7 +30,7 @@ public class ProductServiceImpl implements ProductService{
         productRepository.save(product);
 
         log.info("Product Created");
-        return product.getProductId();
+        return product.getId();
     }
 
     @Override

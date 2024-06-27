@@ -6,7 +6,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 'root'
     ports:
-      - "3306:3306"
+      - "3309:3306"
     volumes:
       - ./data/order-db/create-database.sql:/docker-entrypoint-initdb.d/create-database.sql
       - order-db-data:/var/lib/mysql-order-db
