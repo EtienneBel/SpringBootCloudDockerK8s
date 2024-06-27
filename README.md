@@ -1,119 +1,99 @@
 
-![img_3.png](img_3.png)
+# Spring Boot Cloud Docker Kubernetes Project
 
+This repository demonstrates a microservices architecture using Spring Boot, Docker, and Kubernetes (Minikube). The project includes multiple microservices, a configuration server, a service registry, and a cloud gateway and MySQL as database. The project illustrates how to containerize and orchestrate these services using Docker and Kubernetes.
 
+## Prerequisites
 
-# API Documentation
+- JDK 17
+- Docker
+- Minikube
+- kubectl
 
-This documentation provides an overview of the API endpoints for creating products, fetching product details by ID, placing orders, and retrieving order details. Each section includes the necessary `curl` commands to interact with the API.
+## Project Structure
 
-## Base URL
-The base URL for all API requests is:
-```
-http://localhost:9090
-```
+- **CloudGateway/**: Contains the Cloud Gateway microservice.
+- **ConfigServer/**: Contains the Config Server microservice.
+- **OrderService/**: Contains the Order Service microservice.
+- **PaymentService/**: Contains the Payment Service microservice.
+- **ProductService/**: Contains the Product Service microservice.
+- **ServiceRegistry/**: Contains the Service Registry microservice.
+- **k8s/**: Kubernetes manifests for deploying the microservices and MySQL databases.
 
-## Authentication
-All API requests require an Authorization header with a Bearer token:
-```
---header 'Authorization: Bearer xxxx'
-```
+## Getting Started
 
-Replace `xxxx` with your actual token.
+### Step 1: Clone the Repository
 
-## Endpoints
-
-### 1. Create a Product
-Creates a new product in the system.
-
-**Endpoint:**
-```
-POST /product
-```
-
-**Request:**
-```bash
-curl --location 'http://localhost:9090/product' \
---header 'Content-Type: application/json' \
---header 'Authorization: Bearer xxxx' \
---data '{
-    "name": "iPhone 15",
-    "price": 2000,
-    "quantity": 2
-}'
+```sh
+git clone https://github.com/EtienneBel/SpringBootCloudDockerK8s.git
+cd SpringBootCloudDockerK8s
+git checkout k8s
 ```
 
-**Request Body:**
-- `name` (string): The name of the product.
-- `price` (number): The price of the product.
-- `quantity` (number): The quantity of the product in stock.
+### Step 2: Build the Docker Images
 
-### 2. Fetch Product by ID
-Fetches details of a product by its ID.
+Navigate to each microservice directory and build the Docker images:
 
-**Endpoint:**
-```
-GET /product/{id}
-```
+```sh
+cd CloudGateway
+mvn clean install jib:build
 
-**Request:**
-```bash
-curl --location --request GET 'http://localhost:9090/product/103' \
---header 'Content-Type: application/json' \
---header 'Authorization: Bearer xxxx'
-```
+cd ../ConfigServer
+mvn clean install jib:build
 
-**Path Parameter:**
-- `id` (number): The ID of the product to fetch.
+cd ../OrderService
+mvn clean install jib:build
 
-**Note:** The request body is not required for GET requests.
+cd ../PaymentService
+mvn clean install jib:build
 
-### 3. Place an Order
-Places an order for a product.
+cd ../ProductService
+mvn clean install jib:build.
 
-**Endpoint:**
-```
-POST /order/placeOrder
+cd ../ServiceRegistry
+mvn clean install jib:build
 ```
 
-**Request:**
-```bash
-curl --location 'http://localhost:9090/order/placeOrder' \
---header 'Content-Type: application/json' \
---header 'Authorization: Bearer xxxx' \
---data '{
-    "productId": 103,
-    "totalAmount": 10000,
-    "quantity": 1,
-    "paymentMode": "CASH"
-}'
+### Step 3: Start Minikube
+
+Set up a local Kubernetes cluster using Minikube. Then, once installed, ensure it is running by executing:
+
+```sh
+minikube start
 ```
 
-**Request Body:**
-- `productId` (number): The ID of the product to order.
-- `totalAmount` (number): The total amount for the order.
-- `quantity` (number): The quantity of the product to order.
-- `paymentMode` (string): The payment mode for the order (e.g., "CASH").
 
-### 4. Get Order Details
-Fetches details of an order by its ID.
+### Step 5: Deploy Microservices
 
-**Endpoint:**
-```
-GET /order/{id}
+Apply the Kubernetes manifests for the microservices:
+
+```sh
+kubectl apply -f k8s
 ```
 
-**Request:**
-```bash
-curl --location 'http://localhost:9090/order/2' \
---header 'Authorization: Bearer xxxx'
+### Step 6: Verify Deployments
+
+Check the status of your deployments and services:
+
+```sh
+kubectl get deployments
+kubectl get services
 ```
 
-**Path Parameter:**
-- `id` (number): The ID of the order to fetch.
+### Step 7: Accessing the Minikube Dashboard
 
-**Note:** The request body is not required for GET requests.
+You can access the Kubernetes dashboard using Minikube for a visual overview of your cluster:
 
----
+```sh
+minikube dashboard
+```
 
-For any questions or issues, contact me.
+## Cleaning Up
+
+To delete all resources created by this project, run:
+
+```sh
+kubectl delete -f k8s/
+minikube stop
+minikube delete
+```
