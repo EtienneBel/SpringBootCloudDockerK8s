@@ -11,6 +11,7 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
+    show-sql: true
   application:
     name: ORDER-SERVICE
   config:

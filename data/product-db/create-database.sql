@@ -10,14 +10,14 @@ DROP TABLE IF EXISTS products;
 -- Create the products table
 CREATE TABLE products (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    productName VARCHAR(255) NOT NULL,
+    product_name VARCHAR(255) NOT NULL,
     price BIGINT NOT NULL,
     quantity BIGINT NOT NULL
 );
 
 -- Insert data into the products table
-INSERT INTO products (productName, price, quantity) VALUES
+INSERT INTO products (product_name, price, quantity) VALUES
 ('iPhone 15', 250, 10),
 ('Dermaroller', 250, 5),
 ('Tesla Motor', 250, 20),
-('Keyboard', 250, 15),
+('Keyboard', 250, 15);
