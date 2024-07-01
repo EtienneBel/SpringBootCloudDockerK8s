@@ -2,10 +2,13 @@ server:
   port: 9090
 
 spring:
+  redis:
+    host: redis
+    port: 6379
   application:
     name: API-GATEWAY
   config:
-    import: configserver:http://${CONFIG_SERVER_URL:localhost}:9296
+    import: configserver:${CONFIG_SERVER_URL:http://localhost:9296}
   cloud:
     gateway:
       routes:
@@ -18,6 +21,10 @@ spring:
               args:
                 name: ORDER-SERVICE
                 fallbackuri: forward:/orderServiceFallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
         - id: PAYMENT-SERVICE
           uri: lb://PAYMENT-SERVICE
           predicates:
@@ -27,6 +34,10 @@ spring:
               args:
                 name: PAYMENT-SERVICE
                 fallbackuri: forward:/paymentServiceFallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
         - id: PRODUCT-SERVICE
           uri: lb://PRODUCT-SERVICE
           predicates:
@@ -36,6 +47,11 @@ spring:
               args:
                 name: PRODUCT-SERVICE
                 fallbackuri: forward:/productServiceFallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
+
 okta:
   oauth2:
     issuer: https://dev-xxxx.okta.com/oauth2/default

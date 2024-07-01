@@ -12,12 +12,8 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
+    show-sql: true
   application:
     name: PAYMENT-SERVICE
   config:
     import: configserver:http://${CONFIG_SERVER_URL:localhost}:9296
-
-management:
-  tracing:
-    sampling:
-      probability: 1.0
