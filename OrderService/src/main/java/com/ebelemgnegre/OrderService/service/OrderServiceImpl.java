@@ -14,6 +14,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Instant;
 
@@ -32,6 +33,12 @@ public class OrderServiceImpl implements OrderService{
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Value("${microservice.product}")
+    private String productServiceUrl;
+
+    @Value("${microservice.payment}")
+    private String paymentServiceUrl;
 
     @Override
     public long placeOrder(OrderRequest orderRequest) {
@@ -94,14 +101,14 @@ public class OrderServiceImpl implements OrderService{
         log.info("Invoking Product service to fetch the product for id: {}", order.getProductId());
         ProductResponse productResponse
                 = restTemplate.getForObject(
-                        "http://PRODUCT-SERVICE/product/" + order.getProductId(),
+                productServiceUrl + order.getProductId(),
                 ProductResponse.class
         );
 
         log.info("Getting payment information form the payment Service");
         PaymentResponse paymentResponse
                 = restTemplate.getForObject(
-                        "http://PAYMENT-SERVICE/payment/order/" + order.getId(),
+                paymentServiceUrl + "order/"  + order.getId(),
                 PaymentResponse.class
                 );
 
