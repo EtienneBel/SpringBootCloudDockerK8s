@@ -57,5 +57,9 @@ okta:
     issuer: https://dev-xxxx.okta.com/oauth2/default
     audience: api://default
     client-id: xxxx
-    client-secret: xxxxx
+    client-secret: xxxx
     scopes: openid, profile, email, offline_access
+    roles-claim: groups
+    claims:
+      - name: groups
+        value: groups
