@@ -7,6 +7,8 @@ RUN mvn dependency:go-offline -B
 
 COPY src ./src
 
-ENTRYPOINT ["mvn", "spring-boot:run"]
+# Run with Spring Boot DevTools enabled for hot reload
+# fork=false enables better hot reload with DevTools
+ENTRYPOINT ["mvn", "spring-boot:run", "-Dspring-boot.run.fork=false"]
 
 EXPOSE 8761

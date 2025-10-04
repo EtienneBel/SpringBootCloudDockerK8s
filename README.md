@@ -96,6 +96,10 @@ This project implements a microservices architecture with the following componen
   - OAuth2 authentication
   - Request routing to appropriate microservices
   - Fallback mechanisms
+  - **API Documentation Aggregation:** Uses `springdoc-openapi-starter-webflux-ui` to aggregate OpenAPI docs from all backend microservices into a single Swagger UI interface
+- **Centralized Swagger UI:** http://localhost:9090/swagger-ui.html
+
+**Note:** OpenAPI is not required for the gateway's routing functionality, but is useful for providing centralized API documentation and testing interface for all services.
 
 ### 4. Product Service
 - **Purpose:** Product catalog management
@@ -126,10 +130,14 @@ This project implements a microservices architecture with the following componen
 ## Key Features
 
 ### Security
-- OAuth2 authentication with Okta integration
-- Bearer token authorization for all API endpoints
-- RestTemplate interceptor for OAuth2 client credentials flow
-- Spring Security configuration across all services
+- **OAuth2 Authentication:** Okta integration for industry-standard authentication
+- **JWT Token Validation:** All API requests validated through Cloud Gateway
+- **Bearer Token Authorization:** Secure API endpoints with OAuth2 tokens
+- **Client Credentials Flow:** Automated service-to-service authentication
+- **RestTemplate Interceptor:** Automatic token injection for inter-service calls
+- **Spring Security:** Comprehensive security configuration across all services
+
+For detailed Okta setup instructions, see [Configure OAuth2 (Okta)](#2-configure-oauth2-okta)
 
 ### Resilience & Fault Tolerance
 - Circuit breaker pattern implemented for all gateway routes
@@ -246,17 +254,160 @@ cd SpringBoot
 
 ### 2. Configure OAuth2 (Okta)
 
-Update the Okta configuration in `CloudGateway/src/main/resources/application-dev.yml`:
+This application uses **Okta** for OAuth2 authentication and authorization. Okta provides:
+- **API Gateway Authentication:** Validates JWT tokens for all incoming requests
+- **Inter-Service Communication:** OAuth2 Client Credentials flow for service-to-service calls
+- **Swagger UI Authentication:** Bearer token support in API documentation
+
+#### Why Okta?
+- Industry-standard OAuth2/OIDC provider
+- Easy integration with Spring Security
+- Supports multiple authentication flows (Authorization Code, Client Credentials, etc.)
+- Free developer accounts available
+
+#### Setting Up Okta
+
+1. **Create a Free Okta Account:**
+   - Go to https://developer.okta.com/signup/
+   - Sign up for a free developer account
+   - Note your Okta domain (e.g., `https://dev-12345678.okta.com`)
+
+2. **Create an Application:**
+   - Navigate to **Applications** → **Create App Integration**
+   - Choose **OIDC - OpenID Connect**
+   - Select **Web Application**
+   - Configure:
+     - **App Name:** Spring Boot Microservices
+     - **Grant Types:**
+       - ✅ Authorization Code
+       - ✅ Client Credentials
+       - ✅ Refresh Token
+     - **Sign-in redirect URIs:** `http://localhost:9090/login/oauth2/code/okta`
+     - **Sign-out redirect URIs:** `http://localhost:9090`
+   - Click **Save**
+   - **Copy** the **Client ID** and **Client Secret**
+
+3. **Configure Authorization Server:**
+   - Navigate to **Security** → **API** → **Authorization Servers**
+   - Select the **default** authorization server
+   - Note the **Issuer URI** (e.g., `https://dev-12345678.okta.com/oauth2/default`)
+   - Ensure scopes include: `openid`, `profile`, `email`, `offline_access`
+
+#### Update Configuration Files
+
+**Cloud Gateway** (`CloudGateway/src/main/resources/application-dev.yml`):
 
 ```yaml
 okta:
   oauth2:
-    issuer: https://your-okta-domain/oauth2/default
+    issuer: https://dev-YOUR-OKTA-DOMAIN.okta.com/oauth2/default
     audience: api://default
-    client-id: your-client-id
-    client-secret: your-client-secret
+    client-id: YOUR_CLIENT_ID
+    client-secret: YOUR_CLIENT_SECRET
     scopes: openid, profile, email, offline_access
 ```
+
+**Order Service** (`OrderService/src/main/resources/application-dev.yaml`):
+
+```yaml
+spring:
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: https://dev-YOUR-OKTA-DOMAIN.okta.com/oauth2/default
+      client:
+        registration:
+          internal-client:
+            provider: okta
+            authorization-grant-type: client_credentials
+            scope: openid, profile, email, offline_access
+            client-id: YOUR_CLIENT_ID
+            client-secret: YOUR_CLIENT_SECRET
+
+okta:
+  oauth2:
+    issuer: https://dev-YOUR-OKTA-DOMAIN.okta.com/oauth2/default
+    audience: api://default
+    client-id: YOUR_CLIENT_ID
+    client-secret: YOUR_CLIENT_SECRET
+```
+
+**⚠️ Security Best Practice:**
+- Never commit real credentials to version control
+- Use environment variables in production:
+  ```yaml
+  okta:
+    oauth2:
+      client-id: ${OKTA_CLIENT_ID}
+      client-secret: ${OKTA_CLIENT_SECRET}
+  ```
+
+#### Getting an Access Token
+
+**Using Okta API:**
+
+```bash
+curl --request POST \
+  --url https://dev-YOUR-OKTA-DOMAIN.okta.com/oauth2/default/v1/token \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --data 'grant_type=client_credentials&scope=openid profile email&client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET'
+```
+
+**Response:**
+```json
+{
+  "access_token": "eyJraWQiOiJ...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "openid profile email"
+}
+```
+
+**Using the Token:**
+
+```bash
+curl --location 'http://localhost:9090/product/1' \
+  --header 'Authorization: Bearer eyJraWQiOiJ...'
+```
+
+#### How Authentication Works
+
+1. **Client Request:**
+   - Client sends request to Cloud Gateway with `Authorization: Bearer <token>` header
+
+2. **Gateway Validation:**
+   - Cloud Gateway validates JWT token with Okta
+   - Extracts user claims and permissions
+   - Routes request to appropriate microservice
+
+3. **Inter-Service Communication:**
+   - OrderService uses OAuth2 Client Credentials to call ProductService/PaymentService
+   - Automatically obtains and refreshes tokens
+   - Configured via `RestTemplateInterceptor` (see `OrderService/src/.../config/`)
+
+4. **Swagger UI:**
+   - Access http://localhost:9090/swagger-ui.html
+   - Click **Authorize** button
+   - Enter: `Bearer <your-access-token>`
+   - Test APIs interactively
+
+#### Troubleshooting Okta
+
+**401 Unauthorized:**
+- Check token is not expired
+- Verify issuer URI matches Okta domain
+- Ensure client ID/secret are correct
+
+**403 Forbidden:**
+- Check token has required scopes
+- Verify user has necessary permissions
+
+**Services can't communicate:**
+- Check OrderService client credentials configuration
+- Verify network connectivity to Okta
+- Review logs: `docker-compose logs -f orderservice`
 
 ### 3. Build and Run with Docker Compose
 
@@ -982,6 +1133,15 @@ Pre-built images are available on Docker Hub:
 | Product Service OpenAPI | http://localhost:9090/product/api-docs | OpenAPI JSON spec |
 | Order Service OpenAPI | http://localhost:9090/order/api-docs | OpenAPI JSON spec |
 | Payment Service OpenAPI | http://localhost:9090/payment/api-docs | OpenAPI JSON spec |
+
+### Okta Resources
+
+| Resource | URL | Description |
+|----------|-----|-------------|
+| Okta Developer | https://developer.okta.com | Sign up for free account |
+| Okta Dashboard | https://dev-YOUR-DOMAIN.okta.com/admin/dashboard | Manage applications |
+| Token Endpoint | https://dev-YOUR-DOMAIN.okta.com/oauth2/default/v1/token | Get access tokens |
+| Authorization Server | https://dev-YOUR-DOMAIN.okta.com/oauth2/default | OAuth2 metadata |
 
 ### Complete Setup Commands
 
