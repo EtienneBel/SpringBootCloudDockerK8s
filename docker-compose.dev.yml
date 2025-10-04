@@ -1,17 +1,25 @@
 version: "2.1"
 
+# Development Docker Compose
+# This setup is optimized for local development with volume mounts for hot reload
+
 services:
   # ======================================
   # Infrastructure Services
   # ======================================
 
   serviceregistry:
-    image: 'ebelemgnegre/serviceregistry:0.0.2'
-    container_name: serviceregistry
+    build:
+      context: ./ServiceRegistry
+      dockerfile: Dockerfile.dev
+    container_name: serviceregistry-dev
     ports:
       - '8761:8761'
+    volumes:
+      - ./ServiceRegistry/src:/app/src
+      - maven-repo:/root/.m2
     networks:
-      - microservices-network
+      - dev-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
       interval: 10s
@@ -19,14 +27,19 @@ services:
       retries: 10
 
   configserver:
-    image: 'ebelemgnegre/configserver:0.0.2'
-    container_name: configserver
+    build:
+      context: ./ConfigServer
+      dockerfile: Dockerfile.dev
+    container_name: configserver-dev
     ports:
       - '9296:9296'
     environment:
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
+    volumes:
+      - ./ConfigServer/src:/app/src
+      - maven-repo:/root/.m2
     networks:
-      - microservices-network
+      - dev-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9296/actuator/health"]
       interval: 10s
@@ -37,15 +50,20 @@ services:
         condition: service_healthy
 
   cloudgateway:
-    image: 'ebelemgnegre/cloudgateway:0.0.2'
-    container_name: cloudgateway
+    build:
+      context: ./CloudGateway
+      dockerfile: Dockerfile.dev
+    container_name: cloudgateway-dev
     ports:
       - '9090:9090'
     environment:
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
       - CONFIG_SERVER_URL=configserver
+    volumes:
+      - ./CloudGateway/src:/app/src
+      - maven-repo:/root/.m2
     networks:
-      - microservices-network
+      - dev-network
     depends_on:
       configserver:
         condition: service_healthy
@@ -55,7 +73,7 @@ services:
   # ======================================
 
   productDb:
-    container_name: productDb
+    container_name: productDb-dev
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -63,9 +81,9 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - product_db_data:/var/lib/mysql
+      - product_db_dev_data:/var/lib/mysql
     networks:
-      - microservices-network
+      - dev-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
       interval: 10s
@@ -73,7 +91,7 @@ services:
       retries: 5
 
   orderDb:
-    container_name: orderDb
+    container_name: orderDb-dev
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -81,9 +99,9 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      - order_db_data:/var/lib/mysql
+      - order_db_dev_data:/var/lib/mysql
     networks:
-      - microservices-network
+      - dev-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
       interval: 10s
@@ -91,7 +109,7 @@ services:
       retries: 5
 
   paymentDb:
-    container_name: paymentDb
+    container_name: paymentDb-dev
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -99,9 +117,9 @@ services:
     ports:
       - "3308:3306"
     volumes:
-      - payment_db_data:/var/lib/mysql
+      - payment_db_dev_data:/var/lib/mysql
     networks:
-      - microservices-network
+      - dev-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
       interval: 10s
@@ -110,25 +128,28 @@ services:
 
   # ======================================
   # Business Services
-  # NOTE: Built from Dockerfile
-  # Run: mvn clean package -DskipTests before docker-compose build
+  # Comment out services you're actively developing locally
+  # to run them with `mvn spring-boot:run` for hot reload
   # ======================================
 
   productservice:
     build:
       context: ./ProductService
-      dockerfile: Dockerfile
-    image: 'productservice:latest'
-    container_name: productservice
+      dockerfile: Dockerfile.dev
+    container_name: productservice-dev
     ports:
       - '8081:8081'
+      - '5005:5005'  # Debug port
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
       - CONFIG_SERVER_URL=configserver
       - DB_HOST=productDb
+    volumes:
+      - ./ProductService/src:/app/src
+      - maven-repo:/root/.m2
     networks:
-      - microservices-network
+      - dev-network
     depends_on:
       productDb:
         condition: service_healthy
@@ -139,18 +160,21 @@ services:
   orderservice:
     build:
       context: ./OrderService
-      dockerfile: Dockerfile
-    image: 'orderservice:latest'
-    container_name: orderservice
+      dockerfile: Dockerfile.dev
+    container_name: orderservice-dev
     ports:
       - '8082:8082'
+      - '5006:5006'  # Debug port
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
       - CONFIG_SERVER_URL=configserver
       - DB_HOST=orderDb
+    volumes:
+      - ./OrderService/src:/app/src
+      - maven-repo:/root/.m2
     networks:
-      - microservices-network
+      - dev-network
     depends_on:
       orderDb:
         condition: service_healthy
@@ -161,18 +185,21 @@ services:
   paymentservice:
     build:
       context: ./PaymentService
-      dockerfile: Dockerfile
-    image: 'paymentservice:latest'
-    container_name: paymentservice
+      dockerfile: Dockerfile.dev
+    container_name: paymentservice-dev
     ports:
       - '8083:8083'
+      - '5007:5007'  # Debug port
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
       - CONFIG_SERVER_URL=configserver
       - DB_HOST=paymentDb
+    volumes:
+      - ./PaymentService/src:/app/src
+      - maven-repo:/root/.m2
     networks:
-      - microservices-network
+      - dev-network
     depends_on:
       paymentDb:
         condition: service_healthy
@@ -181,10 +208,11 @@ services:
     restart: on-failure
 
 networks:
-  microservices-network:
+  dev-network:
     driver: bridge
 
 volumes:
-  product_db_data:
-  order_db_data:
-  payment_db_data:
+  product_db_dev_data:
+  order_db_dev_data:
+  payment_db_dev_data:
+  maven-repo:  # Shared Maven repository for faster builds

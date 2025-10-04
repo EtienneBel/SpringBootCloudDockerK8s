@@ -1,0 +1,16 @@
+FROM maven:3.9-eclipse-temurin-17
+
+WORKDIR /app
+
+# Copy pom.xml first for dependency caching
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Copy source code
+COPY src ./src
+
+# Run with Spring Boot DevTools enabled for hot reload
+ENTRYPOINT ["mvn", "spring-boot:run", "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006"]
+
+EXPOSE 8082
+EXPOSE 5006
