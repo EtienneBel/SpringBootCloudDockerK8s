@@ -153,32 +153,32 @@ This project implements a microservices architecture with the following componen
 SpringBoot/
 ├── ServiceRegistry/              # Eureka Server
 │   ├── src/
-│   ├── Dockerfile               # Production Dockerfile
+│   ├── Dockerfile.prod          # Production Dockerfile
 │   ├── Dockerfile.dev           # Development Dockerfile (hot reload)
 │   └── pom.xml
 ├── ConfigServer/                 # Configuration Server
 │   ├── src/
-│   ├── Dockerfile               # Production Dockerfile
+│   ├── Dockerfile.prod          # Production Dockerfile
 │   ├── Dockerfile.dev           # Development Dockerfile (hot reload)
 │   └── pom.xml
 ├── CloudGateway/                 # API Gateway
 │   ├── src/
-│   ├── Dockerfile               # Production Dockerfile
+│   ├── Dockerfile.prod          # Production Dockerfile
 │   ├── Dockerfile.dev           # Development Dockerfile (hot reload)
 │   └── pom.xml
 ├── ProductService/               # Product Microservice
 │   ├── src/
-│   ├── Dockerfile               # Production Dockerfile
+│   ├── Dockerfile.prod          # Production Dockerfile
 │   ├── Dockerfile.dev           # Development Dockerfile (hot reload + debug)
 │   └── pom.xml
 ├── OrderService/                 # Order Microservice
 │   ├── src/
-│   ├── Dockerfile               # Production Dockerfile
+│   ├── Dockerfile.prod          # Production Dockerfile
 │   ├── Dockerfile.dev           # Development Dockerfile (hot reload + debug)
 │   └── pom.xml
 ├── PaymentService/               # Payment Microservice
 │   ├── src/
-│   ├── Dockerfile               # Production Dockerfile
+│   ├── Dockerfile.prod          # Production Dockerfile
 │   ├── Dockerfile.dev           # Development Dockerfile (hot reload + debug)
 │   └── pom.xml
 ├── k8s/                          # Kubernetes Manifests
@@ -190,8 +190,8 @@ SpringBoot/
 │   ├── payment-service-deployment.yml
 │   ├── mysql-deployment.yml
 │   └── config-maps.yml
-├── docker-compose.yml            # Production stack
-├── docker-compose.dev.yml        # Development stack (with hot reload)
+├── docker-compose.yml            # Production stack (uses Dockerfile.prod)
+├── docker-compose.dev.yml        # Development stack (uses Dockerfile.dev)
 └── README.md
 ```
 
@@ -567,19 +567,23 @@ cd PaymentService && mvn spring-boot:run
 
 **Note:** You'll also need to run MySQL locally on ports 3306, 3307, 3308.
 
-### Development Dockerfiles Explained
+### Dockerfiles Explained
 
-The project has **two sets of Dockerfiles**:
+The project has **two Dockerfiles per service** for different environments:
 
-#### `Dockerfile` (Production)
+#### `Dockerfile.prod` (Production)
 ```dockerfile
 FROM openjdk:17-jdk-alpine
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} productservice.jar
 ENTRYPOINT ["java", "-jar", "/productservice.jar"]
 ```
-- ✅ Small image size (Alpine)
+**Used by:** `docker-compose.yml`
+
+**Features:**
+- ✅ Small image size (~150MB with Alpine)
 - ✅ Fast startup
+- ✅ Optimized for production
 - ❌ No hot reload
 - ❌ Requires rebuild on code changes
 
@@ -592,11 +596,15 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 ENTRYPOINT ["mvn", "spring-boot:run"]
 ```
+**Used by:** `docker-compose.dev.yml`
+
+**Features:**
 - ✅ **Hot reload** with Spring Boot DevTools
 - ✅ **Volume mounts** for instant code changes
 - ✅ **Remote debugging** enabled
 - ✅ No rebuild needed for code changes
-- ⚠️ Larger image, slower initial build
+- ⚠️ Larger image (~700MB)
+- ⚠️ Slower initial build
 
 ### Development Tips
 

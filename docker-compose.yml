@@ -117,7 +117,7 @@ services:
   productservice:
     build:
       context: ./ProductService
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     image: 'productservice:latest'
     container_name: productservice
     ports:
@@ -139,7 +139,7 @@ services:
   orderservice:
     build:
       context: ./OrderService
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     image: 'orderservice:latest'
     container_name: orderservice
     ports:
@@ -161,7 +161,7 @@ services:
   paymentservice:
     build:
       context: ./PaymentService
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     image: 'paymentservice:latest'
     container_name: paymentservice
     ports:

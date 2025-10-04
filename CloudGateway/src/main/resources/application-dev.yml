@@ -43,3 +43,17 @@ okta:
     client-id: xxxx
     client-secret: xxxxxx
     scopes: openid, profile, email, offline_access
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    urls:
+      - name: Product Service
+        url: /product/api-docs
+      - name: Order Service
+        url: /order/api-docs
+      - name: Payment Service
+        url: /payment/api-docs
