@@ -10,7 +10,8 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 
 # Run with Spring Boot DevTools enabled for hot reload
-ENTRYPOINT ["mvn", "spring-boot:run", "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007"]
+# fork=false enables better hot reload with DevTools
+ENTRYPOINT ["mvn", "spring-boot:run", "-Dspring-boot.run.fork=false", "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007"]
 
 EXPOSE 8083
 EXPOSE 5007
