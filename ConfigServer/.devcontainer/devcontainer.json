@@ -1,0 +1,30 @@
+{
+  "name": "ConfigServer",
+  "dockerComposeFile": "../../docker-compose.dev.yml",
+  "service": "configserver",
+  "workspaceFolder": "/app",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-spring-boot-dashboard",
+        "vmware.vscode-spring-boot",
+        "vscjava.vscode-spring-initializr",
+        "redhat.java",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "java.configuration.updateBuildConfiguration": "automatic",
+        "java.saveActions.organizeImports": true,
+        "spring-boot.ls.checkJVM": false
+      }
+    }
+  },
+
+  "forwardPorts": [9296, 8761],
+
+  "postCreateCommand": "mvn dependency:go-offline -B || true",
+
+  "remoteUser": "root"
+}

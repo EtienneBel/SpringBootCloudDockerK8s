@@ -127,6 +127,8 @@ services:
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
       - CONFIG_SERVER_URL=configserver
       - DB_HOST=productDb
+    volumes:
+      - maven_cache:/root/.m2
     networks:
       - microservices-network
     depends_on:
@@ -149,6 +151,8 @@ services:
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
       - CONFIG_SERVER_URL=configserver
       - DB_HOST=orderDb
+    volumes:
+      - maven_cache:/root/.m2
     networks:
       - microservices-network
     depends_on:
@@ -171,6 +175,8 @@ services:
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
       - CONFIG_SERVER_URL=configserver
       - DB_HOST=paymentDb
+    volumes:
+      - maven_cache:/root/.m2
     networks:
       - microservices-network
     depends_on:
@@ -188,3 +194,4 @@ volumes:
   product_db_data:
   order_db_data:
   payment_db_data:
+  maven_cache:

@@ -15,6 +15,8 @@ services:
     container_name: serviceregistry-dev
     ports:
       - '8761:8761'
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
     volumes:
       - ./ServiceRegistry/src:/app/src
       - maven-repo:/root/.m2
@@ -34,6 +36,7 @@ services:
     ports:
       - '9296:9296'
     environment:
+      - SPRING_PROFILES_ACTIVE=dev
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
     volumes:
       - ./ConfigServer/src:/app/src
@@ -57,6 +60,7 @@ services:
     ports:
       - '9090:9090'
     environment:
+      - SPRING_PROFILES_ACTIVE=dev
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
       - CONFIG_SERVER_URL=configserver
     volumes:

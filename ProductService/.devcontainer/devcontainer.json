@@ -1,0 +1,30 @@
+{
+  "name": "ProductService",
+  "dockerComposeFile": "../../docker-compose.dev.yml",
+  "service": "productservice",
+  "workspaceFolder": "/app",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-spring-boot-dashboard",
+        "vmware.vscode-spring-boot",
+        "vscjava.vscode-spring-initializr",
+        "redhat.java",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "java.configuration.updateBuildConfiguration": "automatic",
+        "java.saveActions.organizeImports": true,
+        "spring-boot.ls.checkJVM": false
+      }
+    }
+  },
+
+  "forwardPorts": [8081, 5005, 8761, 9090, 9296, 3306],
+
+  "postCreateCommand": "mvn dependency:go-offline -B || true",
+
+  "remoteUser": "root"
+}

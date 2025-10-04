@@ -1,0 +1,30 @@
+{
+  "name": "CloudGateway",
+  "dockerComposeFile": "../../docker-compose.dev.yml",
+  "service": "cloudgateway",
+  "workspaceFolder": "/app",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-spring-boot-dashboard",
+        "vmware.vscode-spring-boot",
+        "vscjava.vscode-spring-initializr",
+        "redhat.java",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "java.configuration.updateBuildConfiguration": "automatic",
+        "java.saveActions.organizeImports": true,
+        "spring-boot.ls.checkJVM": false
+      }
+    }
+  },
+
+  "forwardPorts": [9090, 8761, 9296],
+
+  "postCreateCommand": "mvn dependency:go-offline -B || true",
+
+  "remoteUser": "root"
+}
