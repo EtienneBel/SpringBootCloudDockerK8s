@@ -17,6 +17,8 @@ public class WebSecurityConfig {
         http
                 .authorizeHttpRequests(
                         authorizeRequest -> authorizeRequest
+                                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**")
+                                .permitAll()
                                 .requestMatchers("/payment/**")
                                 .hasAuthority("SCOPE_internal")
                                 .anyRequest()

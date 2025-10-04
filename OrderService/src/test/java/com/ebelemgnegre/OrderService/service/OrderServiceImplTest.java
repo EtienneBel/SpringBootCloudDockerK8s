@@ -48,7 +48,7 @@ class OrderServiceImplTest {
     void test_When_Order_Success(){
         //Mocking
         Order order = getMockOrder();
-        when(orderRepository.findById((anyLong()))
+        when(orderRepository.findById(anyLong()))
                 .thenReturn(Optional.of(order));
         when(restTemplate.getForObject("http://PRODUCT-SERVICE/product/" + order.getProductId(),
                 ProductResponse.class)).thenReturn(getMockProductResponse());

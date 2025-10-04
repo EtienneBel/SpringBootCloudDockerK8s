@@ -64,6 +64,9 @@ This project implements a microservices architecture with the following componen
   - Micrometer
   - Zipkin (Distributed Tracing)
   - Spring Boot Actuator
+- **API Documentation:**
+  - Springdoc OpenAPI 3
+  - Swagger UI (Interactive API Testing)
 - **Build Tools:**
   - Maven
   - Jib (Container Image Build)
@@ -147,36 +150,55 @@ This project implements a microservices architecture with the following componen
 - Zipkin integration for distributed tracing
 - Health and info endpoints
 
+### API Documentation
+- Springdoc OpenAPI 3 integration across all services
+- Centralized Swagger UI through Cloud Gateway
+- Interactive API testing and exploration
+- Auto-generated API specifications from code
+- OAuth2 authentication support in Swagger UI
+
 ## Project Structure
 
 ```
 SpringBoot/
 ├── ServiceRegistry/              # Eureka Server
+│   ├── .devcontainer/           # VS Code/Cursor dev container config
+│   │   └── devcontainer.json
 │   ├── src/
 │   ├── Dockerfile.prod          # Production Dockerfile
 │   ├── Dockerfile.dev           # Development Dockerfile (hot reload)
 │   └── pom.xml
 ├── ConfigServer/                 # Configuration Server
+│   ├── .devcontainer/           # VS Code/Cursor dev container config
+│   │   └── devcontainer.json
 │   ├── src/
 │   ├── Dockerfile.prod          # Production Dockerfile
 │   ├── Dockerfile.dev           # Development Dockerfile (hot reload)
 │   └── pom.xml
 ├── CloudGateway/                 # API Gateway
+│   ├── .devcontainer/           # VS Code/Cursor dev container config
+│   │   └── devcontainer.json
 │   ├── src/
 │   ├── Dockerfile.prod          # Production Dockerfile
 │   ├── Dockerfile.dev           # Development Dockerfile (hot reload)
 │   └── pom.xml
 ├── ProductService/               # Product Microservice
+│   ├── .devcontainer/           # VS Code/Cursor dev container config
+│   │   └── devcontainer.json
 │   ├── src/
 │   ├── Dockerfile.prod          # Production Dockerfile
 │   ├── Dockerfile.dev           # Development Dockerfile (hot reload + debug)
 │   └── pom.xml
 ├── OrderService/                 # Order Microservice
+│   ├── .devcontainer/           # VS Code/Cursor dev container config
+│   │   └── devcontainer.json
 │   ├── src/
 │   ├── Dockerfile.prod          # Production Dockerfile
 │   ├── Dockerfile.dev           # Development Dockerfile (hot reload + debug)
 │   └── pom.xml
 ├── PaymentService/               # Payment Microservice
+│   ├── .devcontainer/           # VS Code/Cursor dev container config
+│   │   └── devcontainer.json
 │   ├── src/
 │   ├── Dockerfile.prod          # Production Dockerfile
 │   ├── Dockerfile.dev           # Development Dockerfile (hot reload + debug)
@@ -197,12 +219,21 @@ SpringBoot/
 
 ## Prerequisites
 
+### For Dev Container Development (Recommended)
+- **Docker** and **Docker Compose**
+- **VS Code** or **Cursor** with [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+- **Okta Account** (for OAuth2 authentication)
+
+### For Local Development
 - **Java 17** or higher
 - **Maven 3.6+**
 - **Docker** and **Docker Compose**
-- **Kubernetes** cluster (for K8s deployment)
+- **MySQL 8.0+** (optional - can use Docker)
 - **Okta Account** (for OAuth2 authentication)
-- **MySQL 8.0+** (for production deployment)
+
+### For Kubernetes Deployment
+- **Kubernetes** cluster (Minikube, GKE, EKS, AKS, etc.)
+- **kubectl** configured
 
 ## Getting Started
 
@@ -276,6 +307,9 @@ This will start:
 # Check Eureka Dashboard - You should see all services registered
 open http://localhost:8761
 
+# Check API Documentation (Swagger UI)
+open http://localhost:9090/swagger-ui.html
+
 # Check service health
 curl http://localhost:8761/actuator/health  # Service Registry
 curl http://localhost:9296/actuator/health  # Config Server
@@ -312,15 +346,62 @@ docker-compose stats
 
 ## API Documentation
 
-This section provides an overview of the API endpoints for creating products, fetching product details by ID, placing orders, and retrieving order details. Each section includes the necessary `curl` commands to interact with the API.
+### Interactive API Documentation (Swagger UI)
 
-## Base URL
+The project uses **Springdoc OpenAPI** for interactive API documentation. All services expose OpenAPI documentation that can be accessed through the Cloud Gateway.
+
+#### Centralized Swagger UI (Recommended)
+
+Access all microservices APIs from a single interface through the Cloud Gateway:
+
+**URL:** http://localhost:9090/swagger-ui.html
+
+This provides:
+- ✅ **All services in one place**: Product, Order, and Payment services
+- ✅ **Try it out**: Interactive API testing directly from the browser
+- ✅ **OAuth2 authentication**: Pre-configured with bearer token support
+- ✅ **Request/Response examples**: Auto-generated from code
+- ✅ **Schema definitions**: Complete data models
+
+**Service Selection:**
+- Use the dropdown in the top-right corner to switch between:
+  - Product Service API
+  - Order Service API
+  - Payment Service API
+
+#### Individual Service Documentation
+
+Each service also exposes its own OpenAPI endpoints:
+
+| Service | Swagger UI | OpenAPI JSON |
+|---------|-----------|--------------|
+| Product Service | http://localhost:8081/swagger-ui.html | http://localhost:8081/api-docs |
+| Order Service | http://localhost:8082/swagger-ui.html | http://localhost:8082/api-docs |
+| Payment Service | http://localhost:8083/swagger-ui.html | http://localhost:8083/api-docs |
+
+**Note:** When accessing individual service UIs, you may need to configure OAuth2 authentication manually.
+
+#### Via Cloud Gateway
+
+All service APIs are also available through the gateway:
+
+| Service | OpenAPI JSON via Gateway |
+|---------|-------------------------|
+| Product Service | http://localhost:9090/product/api-docs |
+| Order Service | http://localhost:9090/order/api-docs |
+| Payment Service | http://localhost:9090/payment/api-docs |
+
+### Manual API Testing
+
+This section provides example `curl` commands for testing the APIs manually.
+
+#### Base URL
 The base URL for all API requests is:
 ```
 http://localhost:9090
 ```
 
-## Authentication
+#### Authentication
 All API requests require an Authorization header with a Bearer token:
 ```
 --header 'Authorization: Bearer xxxx'
@@ -423,11 +504,61 @@ curl --location 'http://localhost:9090/order/2' \
 
 ## Local Development
 
-The project includes a dedicated development environment using `docker-compose.dev.yml` that makes local development much easier.
+The project includes multiple development environment options to suit different workflows.
 
 ### Development Modes
 
-#### Mode 1: Hybrid Development (Recommended)
+#### Mode 0: Dev Containers (VS Code/Cursor) - **Easiest Setup** ⭐
+
+Each service has its own `.devcontainer` configuration for seamless container-based development:
+
+```
+SpringBoot/
+├── ProductService/.devcontainer/       # ProductService dev container
+├── OrderService/.devcontainer/         # OrderService dev container
+├── PaymentService/.devcontainer/       # PaymentService dev container
+├── ServiceRegistry/.devcontainer/      # ServiceRegistry dev container
+├── ConfigServer/.devcontainer/         # ConfigServer dev container
+└── CloudGateway/.devcontainer/         # CloudGateway dev container
+```
+
+**How to use:**
+
+1. **Install:** [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) in VS Code/Cursor
+
+2. **Open a service folder** (e.g., `ProductService/`)
+
+3. **Reopen in Container:** VS Code will detect `.devcontainer/devcontainer.json` and prompt you to reopen in container
+
+4. **Start coding!** All dependencies and services run automatically:
+   - ✅ Your service runs in its container with hot reload
+   - ✅ All other services (ServiceRegistry, ConfigServer, databases) run as dependencies
+   - ✅ Full Java tooling, IntelliJ IDEA keybindings, Spring Boot support
+   - ✅ Debug ports exposed and ready to use
+   - ✅ Code changes reload automatically
+
+**Benefits:**
+- 🚀 **Zero setup**: No local Java, Maven, or MySQL installation required
+- 🔥 **Hot reload**: Code changes reload automatically
+- 🐛 **Debugging**: Remote debugging pre-configured
+- 🎯 **Focused**: Work on one service at a time
+- 📦 **Consistent**: Same environment for all developers
+- 🔄 **Isolated**: Each service in its own container
+
+**Service-specific ports forwarded:**
+
+| Service | Main Port | Debug Port | Database Port |
+|---------|-----------|------------|---------------|
+| ProductService | 8081 | 5005 | 3306 |
+| OrderService | 8082 | 5006 | 3307 |
+| PaymentService | 8083 | 5007 | 3308 |
+| ServiceRegistry | 8761 | - | - |
+| ConfigServer | 9296 | - | - |
+| CloudGateway | 9090 | - | - |
+
+**All containers also forward**: 8761 (Eureka), 9090 (Gateway), 9296 (Config)
+
+#### Mode 1: Hybrid Development
 
 Run infrastructure in Docker, code business services locally for hot reload:
 
@@ -644,6 +775,7 @@ mysql -h 127.0.0.1 -P 3308 -u root -proot paymentDb
 - Code changes in `/src` automatically reload
 - Dependency changes (pom.xml) require rebuild: `docker-compose -f docker-compose.dev.yml up -d --build`
 - Maven dependencies cached in shared volume for faster builds
+- All services automatically use `dev` profile (configured via `SPRING_PROFILES_ACTIVE=dev` in `docker-compose.dev.yml`)
 
 ## Deployment
 
@@ -782,6 +914,8 @@ The application is configured with Zipkin for distributed tracing. When enabled:
 - **Database:** Three separate MySQL 8.0 instances with dedicated volumes for data persistence
 - **Networking:** All services communicate via a dedicated Docker bridge network
 - **Tracing:** Some tracing dependencies are commented out in `OrderService/pom.xml`
+- **Dev Containers:** Each service has its own `.devcontainer` configuration for VS Code/Cursor
+- **Spring Profiles:** `docker-compose.dev.yml` automatically activates `dev` profile for all services via `SPRING_PROFILES_ACTIVE=dev`
 
 ### Known Issues & Recommendations
 
@@ -837,6 +971,18 @@ Pre-built images are available on Docker Hub:
 | Order DB (MySQL) | 3307 | localhost:3307 |
 | Payment DB (MySQL) | 3308 | localhost:3308 |
 
+### API Documentation URLs
+
+| Resource | URL | Description |
+|----------|-----|-------------|
+| **Centralized Swagger UI** | http://localhost:9090/swagger-ui.html | All services in one interface (Recommended) |
+| Product Service Swagger | http://localhost:8081/swagger-ui.html | Product Service only |
+| Order Service Swagger | http://localhost:8082/swagger-ui.html | Order Service only |
+| Payment Service Swagger | http://localhost:8083/swagger-ui.html | Payment Service only |
+| Product Service OpenAPI | http://localhost:9090/product/api-docs | OpenAPI JSON spec |
+| Order Service OpenAPI | http://localhost:9090/order/api-docs | OpenAPI JSON spec |
+| Payment Service OpenAPI | http://localhost:9090/payment/api-docs | OpenAPI JSON spec |
+
 ### Complete Setup Commands
 
 **Option 1: Automated (Recommended)**
@@ -852,8 +998,9 @@ cd SpringBoot
 
 # 4. Verify
 open http://localhost:8761  # Check Eureka - all services should be registered
+open http://localhost:9090/swagger-ui.html  # Interactive API documentation
 
-# 5. Test API (see API Documentation section for detailed examples)
+# 5. Test API (use Swagger UI or curl - see API Documentation section)
 curl http://localhost:9090/product/1 \
   -H 'Authorization: Bearer <your-token>'
 ```
@@ -876,8 +1023,9 @@ docker-compose up -d
 # 5. Verify
 docker-compose ps
 open http://localhost:8761  # Check Eureka - all services should be registered
+open http://localhost:9090/swagger-ui.html  # Interactive API documentation
 
-# 6. Test API (see API Documentation section for detailed examples)
+# 6. Test API (use Swagger UI or curl - see API Documentation section)
 curl http://localhost:9090/product/1 \
   -H 'Authorization: Bearer <your-token>'
 ```
