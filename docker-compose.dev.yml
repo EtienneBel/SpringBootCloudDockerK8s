@@ -159,6 +159,7 @@ services:
       - AUTH0_M2M_CLIENT_ID=${AUTH0_M2M_CLIENT_ID}
       - AUTH0_M2M_CLIENT_SECRET=${AUTH0_M2M_CLIENT_SECRET}
       - AUTH0_ISSUER_URI=${AUTH0_ISSUER_URI}
+      - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
     volumes:
       - ./ProductService/src:/app/src
       - ./ProductService/target:/app/target
@@ -188,6 +189,7 @@ services:
       - AUTH0_M2M_CLIENT_ID=${AUTH0_M2M_CLIENT_ID}
       - AUTH0_M2M_CLIENT_SECRET=${AUTH0_M2M_CLIENT_SECRET}
       - AUTH0_ISSUER_URI=${AUTH0_ISSUER_URI}
+      - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
     volumes:
       - ./OrderService/src:/app/src
       - ./OrderService/target:/app/target
@@ -217,6 +219,7 @@ services:
       - AUTH0_M2M_CLIENT_ID=${AUTH0_M2M_CLIENT_ID}
       - AUTH0_M2M_CLIENT_SECRET=${AUTH0_M2M_CLIENT_SECRET}
       - AUTH0_ISSUER_URI=${AUTH0_ISSUER_URI}
+      - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
     volumes:
       - ./PaymentService/src:/app/src
       - ./PaymentService/target:/app/target

@@ -91,6 +91,12 @@ resilience4j:
       PAYMENT-SERVICE:
         timeout-duration: 10s
 
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
+    org.springframework.security: DEBUG
+
 springdoc:
   api-docs:
     enabled: true

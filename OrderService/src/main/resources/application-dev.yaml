@@ -11,6 +11,7 @@ spring:
       resource-server:
         jwt:
           issuer-uri: ${AUTH0_ISSUER_URI}
+          audiences: ${AUTH0_AUDIENCE:http://springboot-microservices-api}
       client:
         registration:
           internal-client:
@@ -22,6 +23,17 @@ spring:
         provider:
           auth0:
             issuer-uri: ${AUTH0_ISSUER_URI}
+            token-uri: ${AUTH0_ISSUER_URI}oauth/token
+      resourceserver:
+        opaquetoken:
+          client-id: ${AUTH0_M2M_CLIENT_ID}
+          client-secret: ${AUTH0_M2M_CLIENT_SECRET}
+          introspection-uri: ${AUTH0_ISSUER_URI}oauth/introspect
+    cloud:
+      openfeign:
+        oauth2:
+          clientRegistrationId: internal-client
+          audience: ${AUTH0_AUDIENCE:http://springboot-microservices-api}
     allow-bean-definition-overriding: true
 
 springdoc:

@@ -20,6 +20,7 @@ spring:
       resource-server:
         jwt:
           issuer-uri: ${AUTH0_ISSUER_URI}
+          audiences: ${AUTH0_AUDIENCE:http://springboot-microservices-api}
 
 #management:
 #  tracing:
