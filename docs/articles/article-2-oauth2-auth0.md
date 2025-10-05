@@ -499,7 +499,7 @@ public class SecurityConfig {
 
 ## Service-to-Service Authentication
 
-OrderService needs to call ProductService and PaymentService. We'll use **Client Credentials flow** with automatic token injection.
+OrderService needs to call ProductService and PaymentService using **OpenFeign** with **Client Credentials flow** for automatic token injection.
 
 ### Architecture
 
@@ -509,7 +509,7 @@ OrderService
      ├─ Need to call ProductService
      │
      ▼
-RestTemplateInterceptor
+OpenFeign Client (with OAuth2 interceptor)
      │
      ├─ Check if token exists and is valid
      │
@@ -561,93 +561,79 @@ spring:
         provider:
           auth0:
             issuer-uri: ${AUTH0_ISSUER_URI}
+            token-uri: ${AUTH0_ISSUER_URI}oauth/token
+
+  # Configure OpenFeign to use OAuth2
+  cloud:
+    openfeign:
+      oauth2:
+        clientRegistrationId: internal-client
+        audience: ${AUTH0_AUDIENCE}
 ```
 
-### Step 2: Create OAuth2 Interceptor
+### Step 2: Configure OpenFeign Clients
 
-**OrderService/external/intercept/RestTemplateInterceptor.java**
+OpenFeign automatically handles OAuth2 token injection when configured properly.
+
+**OrderService/external/client/ProductService.java**
 ```java
-package com.ebelemgnegre.OrderService.external.intercept;
+package com.ebelemgnegre.OrderService.external.client;
 
-import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.OAuth2Error;
+import com.ebelemgnegre.OrderService.external.response.ProductResponse;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.IOException;
+@FeignClient(name = "PRODUCT-SERVICE")
+public interface ProductService {
 
-@Log4j2
-public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
+    @PutMapping("/api/products/reduceQuantity/{id}")
+    ResponseEntity<Void> reduceQuantity(
+        @PathVariable("id") long productId,
+        @RequestParam long quantity
+    );
 
-    private final OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
-
-    public RestTemplateInterceptor(OAuth2AuthorizedClientManager manager) {
-        this.oAuth2AuthorizedClientManager = manager;
-    }
-
-    @Override
-    public ClientHttpResponse intercept(
-        HttpRequest request,
-        byte[] body,
-        ClientHttpRequestExecution execution
-    ) throws IOException {
-
-        // Request OAuth2 token using Client Credentials flow
-        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
-                .withClientRegistrationId("internal-client")
-                .principal("internal")
-                .build();
-
-        OAuth2AuthorizedClient authorizedClient =
-                oAuth2AuthorizedClientManager.authorize(authorizeRequest);
-
-        if (authorizedClient != null && authorizedClient.getAccessToken() != null) {
-            String accessToken = authorizedClient.getAccessToken().getTokenValue();
-
-            // Add Authorization header with Bearer token
-            request.getHeaders().add("Authorization", "Bearer " + accessToken);
-
-            log.debug("Successfully added OAuth2 access token to request");
-        } else {
-            log.error("Failed to obtain OAuth2 access token");
-            throw new OAuth2AuthenticationException(
-                new OAuth2Error("access_token_unavailable",
-                    "Unable to obtain access token from Auth0", null)
-            );
-        }
-
-        return execution.execute(request, body);
-    }
+    @GetMapping("/api/products/{id}")
+    ResponseEntity<ProductResponse> getProductById(@PathVariable("id") long productId);
 }
 ```
 
-### Step 3: Configure RestTemplate with Interceptor
+**OrderService/external/client/PaymentService.java**
+```java
+package com.ebelemgnegre.OrderService.external.client;
+
+import com.ebelemgnegre.OrderService.external.request.PaymentRequest;
+import com.ebelemgnegre.OrderService.external.response.PaymentResponse;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+@FeignClient(name = "PAYMENT-SERVICE")
+public interface PaymentService {
+
+    @PostMapping("/api/payments")
+    ResponseEntity<Long> doPayment(@RequestBody PaymentRequest paymentRequest);
+
+    @GetMapping("/api/payments/order/{orderId}")
+    ResponseEntity<PaymentResponse> getPaymentDetailsByOrderId(@PathVariable("orderId") long orderId);
+}
+```
+
+### Step 3: Enable Feign Clients
 
 **OrderService/OrderServiceApplication.java**
 ```java
 package com.ebelemgnegre.OrderService;
 
-import com.ebelemgnegre.OrderService.external.intercept.RestTemplateInterceptor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.Arrays;
 
 @SpringBootApplication
 @EnableFeignClients
@@ -656,74 +642,29 @@ public class OrderServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(OrderServiceApplication.class, args);
     }
-
-    @Bean
-    @LoadBalanced  // Enables Eureka service discovery
-    public RestTemplate restTemplate(
-        ClientRegistrationRepository clientRegistrationRepository,
-        OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository
-    ) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        // Add OAuth2 interceptor
-        restTemplate.setInterceptors(
-            Arrays.asList(
-                new RestTemplateInterceptor(
-                    clientManager(
-                        clientRegistrationRepository,
-                        oAuth2AuthorizedClientRepository
-                    )
-                )
-            )
-        );
-
-        return restTemplate;
-    }
-
-    @Bean
-    public OAuth2AuthorizedClientManager clientManager(
-        ClientRegistrationRepository clientRegistrationRepository,
-        OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository
-    ) {
-        // Configure OAuth2 provider with client credentials + refresh token
-        OAuth2AuthorizedClientProvider provider =
-                OAuth2AuthorizedClientProviderBuilder
-                        .builder()
-                        .clientCredentials()  // Service-to-service flow
-                        .refreshToken()       // Auto token refresh
-                        .build();
-
-        DefaultOAuth2AuthorizedClientManager manager =
-                new DefaultOAuth2AuthorizedClientManager(
-                        clientRegistrationRepository,
-                        oAuth2AuthorizedClientRepository
-                );
-
-        manager.setAuthorizedClientProvider(provider);
-
-        return manager;
-    }
 }
 ```
 
 ### How It Works
 
-1. **OrderService** needs to call ProductService
-2. **RestTemplateInterceptor** intercepts the HTTP request
-3. **OAuth2AuthorizedClientManager** checks if token exists and is valid
+1. **OrderService** needs to call ProductService via Feign client
+2. **OpenFeign OAuth2 interceptor** automatically intercepts the HTTP request
+3. Checks if token exists and is valid using configured `clientRegistrationId`
 4. If token is expired:
-   - Manager requests new token from Auth0
+   - Requests new token from Auth0
    - Uses M2M credentials (client_id + client_secret)
    - Receives new access token
-5. **Interceptor** adds `Authorization: Bearer <token>` header
+5. **Interceptor** automatically adds `Authorization: Bearer <token>` header
 6. **ProductService** receives request with valid JWT token
 7. **ProductService** validates token and processes request
 
 **Benefits:**
-- ✅ Automatic token management (no manual handling)
-- ✅ Token caching (reuses valid tokens)
-- ✅ Automatic refresh (requests new token when expired)
-- ✅ Transparent to business logic
+- ✅ **Declarative** - No manual interceptor code needed
+- ✅ **Automatic token management** - Built-in token handling
+- ✅ **Token caching** - Reuses valid tokens
+- ✅ **Automatic refresh** - Requests new token when expired
+- ✅ **Type-safe** - Compile-time checking with Feign interfaces
+- ✅ **Transparent** - Business logic doesn't handle auth
 
 ---
 

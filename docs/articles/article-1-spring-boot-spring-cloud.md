@@ -13,7 +13,7 @@ In this comprehensive guide, we'll build a cloud-native e-commerce application u
 - ✅ Service discovery with Netflix Eureka
 - ✅ API Gateway with Spring Cloud Gateway
 - ✅ Circuit breaker pattern for fault tolerance
-- ✅ Inter-service communication with OpenFeign & RestTemplate
+- ✅ Inter-service communication with OpenFeign
 - ✅ Centralized configuration management
 - ✅ Database per service pattern
 
@@ -89,14 +89,14 @@ Our e-commerce application follows a microservices architecture with the followi
 
 | Category | Technology | Version | Purpose |
 |----------|-----------|---------|---------|
-| **Framework** | Spring Boot | 3.2.0 | Core framework |
+| **Framework** | Spring Boot | 3.2.2 | Core framework |
 | **Language** | Java | 17+ | Programming language |
 | **Cloud** | Spring Cloud | 2023.0.0 | Cloud-native patterns |
 | **Service Discovery** | Netflix Eureka | Latest | Service registration |
 | **API Gateway** | Spring Cloud Gateway | Latest | Routing & filtering |
 | **Resilience** | Resilience4j | Latest | Circuit breaker |
 | **Database** | MySQL | 8.0 | Relational database |
-| **Communication** | OpenFeign + RestTemplate | Latest | HTTP clients |
+| **Communication** | OpenFeign | Latest | HTTP client |
 | **Build Tool** | Maven | 3.9+ | Dependency management |
 | **API Docs** | Springdoc OpenAPI | 2.2.0 | Swagger UI |
 | **Containerization** | Docker | Latest | Container platform |
@@ -243,13 +243,13 @@ spring:
     name: PRODUCT-SERVICE
 
 eureka:
+  instance:
+    preferIpAddress: true
   client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka
     register-with-eureka: true
     fetch-registry: true
-  instance:
-    prefer-ip-address: true
+    service-url:
+      defaultZone: ${EUREKA_SERVER_ADDRESS:http://localhost:8761/eureka}
 ```
 
 **Enable Discovery Client**
@@ -454,9 +454,9 @@ public class FallbackController {
 
 ## Service-to-Service Communication
 
-Our application uses **two approaches** for inter-service communication:
+Our application uses **OpenFeign** for all inter-service communication:
 
-### 1. OpenFeign (Declarative - for Write Operations)
+### OpenFeign (Declarative HTTP Client)
 
 **Add Dependency**
 ```xml
@@ -480,14 +480,17 @@ public class OrderServiceApplication {
 
 **Create Feign Client Interface**
 ```java
-@FeignClient(name = "PRODUCT-SERVICE/product")
+@FeignClient(name = "PRODUCT-SERVICE")
 public interface ProductService {
 
-    @PutMapping("/reduceQuantity/{id}")
+    @PutMapping("/api/products/reduceQuantity/{id}")
     ResponseEntity<Void> reduceQuantity(
         @PathVariable("id") long productId,
         @RequestParam long quantity
     );
+
+    @GetMapping("/api/products/{id}")
+    ResponseEntity<ProductResponse> getProductById(@PathVariable("id") long productId);
 }
 ```
 
@@ -500,6 +503,9 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private ProductService productService;  // Feign client
 
+    @Autowired
+    private PaymentService paymentService;  // Feign client
+
     @Override
     public long placeOrder(OrderRequest orderRequest) {
         log.info("Placing order: {}", orderRequest);
@@ -510,48 +516,21 @@ public class OrderServiceImpl implements OrderService {
             orderRequest.getQuantity()
         );
 
-        // Save order...
+        // Save order and process payment
+        paymentService.doPayment(paymentRequest);
+
         return order.getId();
     }
-}
-```
-
-### 2. RestTemplate (Imperative - for Read Operations)
-
-**Configure RestTemplate with Load Balancing**
-```java
-@SpringBootApplication
-public class OrderServiceApplication {
-
-    @Bean
-    @LoadBalanced  // Enables Eureka service discovery
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-}
-```
-
-**Usage in Service**
-```java
-@Service
-public class OrderServiceImpl implements OrderService {
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     @Override
     public OrderResponse getOrderDetails(long orderId) {
-        // Fetch product details
-        ProductResponse product = restTemplate.getForObject(
-            "http://PRODUCT-SERVICE/product/" + order.getProductId(),
-            ProductResponse.class
-        );
+        Order order = orderRepository.findById(orderId).orElseThrow();
 
-        // Fetch payment details
-        PaymentResponse payment = restTemplate.getForObject(
-            "http://PAYMENT-SERVICE/payment/order/" + order.getId(),
-            PaymentResponse.class
-        );
+        // Fetch product details via Feign
+        ProductResponse product = productService.getProductById(order.getProductId()).getBody();
+
+        // Fetch payment details via Feign
+        PaymentResponse payment = paymentService.getPaymentDetailsByOrderId(order.getId()).getBody();
 
         // Build response
         return OrderResponse.builder()
@@ -563,16 +542,13 @@ public class OrderServiceImpl implements OrderService {
 }
 ```
 
-**Why Two Approaches?**
+**Why OpenFeign?**
 
-| Feature | OpenFeign | RestTemplate |
-|---------|-----------|--------------|
-| **Syntax** | Declarative (interface) | Imperative (code) |
-| **Use Case** | Write operations | Read operations |
-| **Type Safety** | ✅ Compile-time | ❌ Runtime |
-| **Boilerplate** | Low | Higher |
-| **Debugging** | Harder | Easier |
-| **Best For** | POST, PUT, DELETE | GET, complex logic |
+✅ **Declarative** - Interface-based, minimal boilerplate
+✅ **Type-Safe** - Compile-time checking
+✅ **Load Balanced** - Automatic Eureka integration
+✅ **Consistent** - Same approach for all HTTP operations
+✅ **OAuth2 Integration** - Built-in support for token propagation
 
 ---
 
@@ -795,7 +771,7 @@ You've successfully built a production-ready microservices application with:
 - ✅ 6 microservices with clear responsibilities
 - ✅ Service discovery and registration
 - ✅ API Gateway with routing and circuit breaker
-- ✅ Inter-service communication with OpenFeign & RestTemplate
+- ✅ Inter-service communication with OpenFeign
 - ✅ Fault tolerance and resilience
 - ✅ Interactive API documentation
 

@@ -22,6 +22,15 @@ spring:
           issuer-uri: ${AUTH0_ISSUER_URI}
           audiences: ${AUTH0_AUDIENCE:http://springboot-microservices-api}
 
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_SERVER_ADDRESS:http://localhost:8761/eureka}
+
 #management:
 #  tracing:
 #    sampling:
