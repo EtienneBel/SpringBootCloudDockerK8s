@@ -6,31 +6,23 @@ spring:
     name: ORDER-SERVICE
   config:
     import: configserver:http://${CONFIG_SERVER_URL:localhost}:9296
-
-
-
   security:
     oauth2:
       resource-server:
         jwt:
-          issuer-uri: https://dev-16235276.okta.com/oauth2/default
+          issuer-uri: ${AUTH0_ISSUER_URI}
       client:
         registration:
           internal-client:
-            provider: okta
+            provider: auth0
             authorization-grant-type: client_credentials
-            scope: openid, profile, email, offline_access
-            client-id: xxxx
-            client-secret: xxxxx
+            scope: openid,profile,email
+            client-id: ${AUTH0_M2M_CLIENT_ID}
+            client-secret: ${AUTH0_M2M_CLIENT_SECRET}
+        provider:
+          auth0:
+            issuer-uri: ${AUTH0_ISSUER_URI}
     allow-bean-definition-overriding: true
-
-
-okta:
-  oauth2:
-    issuer: https://dev-16235276.okta.com/oauth2/default
-    audience: api://default
-    client-id: xxxxx
-    client-secret: xxxxx
 
 springdoc:
   api-docs:

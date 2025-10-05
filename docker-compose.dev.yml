@@ -65,6 +65,10 @@ services:
       - SPRING_PROFILES_ACTIVE=dev
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
       - CONFIG_SERVER_URL=configserver
+      - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+      - AUTH0_CLIENT_SECRET=${AUTH0_CLIENT_SECRET}
+      - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
+      - AUTH0_ISSUER_URI=${AUTH0_ISSUER_URI}
     volumes:
       - ./CloudGateway/src:/app/src
       - ./CloudGateway/target:/app/target
@@ -152,6 +156,7 @@ services:
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
       - CONFIG_SERVER_URL=configserver
       - DB_HOST=productDb
+      - AUTH0_ISSUER_URI=${AUTH0_ISSUER_URI}
     volumes:
       - ./ProductService/src:/app/src
       - ./ProductService/target:/app/target
@@ -178,6 +183,9 @@ services:
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
       - CONFIG_SERVER_URL=configserver
       - DB_HOST=orderDb
+      - AUTH0_M2M_CLIENT_ID=${AUTH0_M2M_CLIENT_ID}
+      - AUTH0_M2M_CLIENT_SECRET=${AUTH0_M2M_CLIENT_SECRET}
+      - AUTH0_ISSUER_URI=${AUTH0_ISSUER_URI}
     volumes:
       - ./OrderService/src:/app/src
       - ./OrderService/target:/app/target
@@ -204,6 +212,7 @@ services:
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
       - CONFIG_SERVER_URL=configserver
       - DB_HOST=paymentDb
+      - AUTH0_ISSUER_URI=${AUTH0_ISSUER_URI}
     volumes:
       - ./PaymentService/src:/app/src
       - ./PaymentService/target:/app/target

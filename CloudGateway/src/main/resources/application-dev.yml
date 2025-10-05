@@ -14,6 +14,7 @@ spring:
           predicates:
             - Path=/order/**
           filters:
+            - StripPrefix=1
             - name: CircuitBreaker
               args:
                 name: ORDER-SERVICE
@@ -23,6 +24,7 @@ spring:
           predicates:
             - Path=/payment/**
           filters:
+            - StripPrefix=1
             - name: CircuitBreaker
               args:
                 name: PAYMENT-SERVICE
@@ -32,25 +34,37 @@ spring:
           predicates:
             - Path=/product/**
           filters:
+            - StripPrefix=1
             - name: CircuitBreaker
               args:
                 name: PRODUCT-SERVICE
                 fallbackuri: forward:/productServiceFallback
-okta:
-  oauth2:
-    issuer: https://dev-84928916.okta.com/oauth2/default
-    audience: api://default
-    client-id: xxxx
-    client-secret: xxxxxx
-    scopes: openid, profile, email, offline_access
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: ${AUTH0_ISSUER_URI}
+          audiences: ${AUTH0_AUDIENCE}
+      client:
+        registration:
+          auth0:
+            client-id: ${AUTH0_CLIENT_ID}
+            client-secret: ${AUTH0_CLIENT_SECRET}
+            scope: openid,profile,email,offline_access
+        provider:
+          auth0:
+            issuer-uri: ${AUTH0_ISSUER_URI}
 
 springdoc:
   api-docs:
     enabled: true
+    path: /api-docs
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
     urls:
+      - name: Cloud Gateway
+        url: /api-docs
       - name: Product Service
         url: /product/api-docs
       - name: Order Service

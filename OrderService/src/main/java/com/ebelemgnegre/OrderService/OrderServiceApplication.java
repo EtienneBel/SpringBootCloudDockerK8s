@@ -51,9 +51,11 @@ public class OrderServiceApplication {
             ClientRegistrationRepository clientRegistrationRepository,
             OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository
     ) {
+        // Add refresh token support for automatic token renewal
         OAuth2AuthorizedClientProvider oAuth2AuthorizedClientProvider = OAuth2AuthorizedClientProviderBuilder
                 .builder()
                 .clientCredentials()
+                .refreshToken()  // Enable automatic token refresh
                 .build();
 
         DefaultOAuth2AuthorizedClientManager defaultOAuth2AuthorizedClientManager = new DefaultOAuth2AuthorizedClientManager(

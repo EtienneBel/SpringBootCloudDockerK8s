@@ -23,7 +23,9 @@ public class WebSecurityConfig {
         http
                 .authorizeHttpRequests(
                         authorizeRequest -> authorizeRequest
-                                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**")
+                                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**", "/api-docs")
+                                .permitAll()
+                                .requestMatchers("/actuator/**")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
@@ -37,12 +39,17 @@ public class WebSecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*")); // Specify the allowed origins
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE")); // Allow specific HTTP methods
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type")); // Allow headers
-        configuration.setAllowCredentials(true); // Allow credentials
+        // Specific allowed origins (cannot use "*" with credentials)
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:9090",  // Cloud Gateway
+                "http://localhost:3000",  // Frontend (if any)
+                "http://localhost:8080"   // Additional frontend port
+        ));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Apply CORS configuration to all paths
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 

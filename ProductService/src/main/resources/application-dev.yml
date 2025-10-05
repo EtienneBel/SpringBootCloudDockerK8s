@@ -15,6 +15,11 @@ spring:
     name: PRODUCT-SERVICE
   config:
     import: configserver:http://${CONFIG_SERVER_URL:localhost}:9296
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: ${AUTH0_ISSUER_URI}
 
 #management:
 #  tracing:

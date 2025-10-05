@@ -8,6 +8,8 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 
 import java.io.IOException;
 
@@ -31,9 +33,15 @@ public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
         if (authorizedClient != null && authorizedClient.getAccessToken() != null) {
             String accessTokenValue = authorizedClient.getAccessToken().getTokenValue();
             request.getHeaders().add("Authorization", "Bearer " + accessTokenValue);
+            log.debug("Successfully added OAuth2 access token to request");
         } else {
-            log.error("Failed to obtain access token");
-            // Handle the error appropriately
+            log.error("Failed to obtain OAuth2 access token for service-to-service communication");
+            OAuth2Error error = new OAuth2Error(
+                    "access_token_unavailable",
+                    "Unable to obtain access token from OAuth2 authorization server",
+                    null
+            );
+            throw new OAuth2AuthenticationException(error);
         }
 
         return execution.execute(request, body);

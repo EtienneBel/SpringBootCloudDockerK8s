@@ -53,7 +53,7 @@ This project implements a microservices architecture with the following componen
   - H2 (Testing)
 - **Security:**
   - Spring Security
-  - OAuth2 with Okta
+  - OAuth2 with Auth0
 - **Service Discovery:** Netflix Eureka
 - **API Gateway:** Spring Cloud Gateway
 - **Resilience:** Circuit Breaker Pattern
@@ -130,14 +130,14 @@ This project implements a microservices architecture with the following componen
 ## Key Features
 
 ### Security
-- **OAuth2 Authentication:** Okta integration for industry-standard authentication
+- **OAuth2 Authentication:** Auth0 integration for industry-standard authentication
 - **JWT Token Validation:** All API requests validated through Cloud Gateway
 - **Bearer Token Authorization:** Secure API endpoints with OAuth2 tokens
 - **Client Credentials Flow:** Automated service-to-service authentication
 - **RestTemplate Interceptor:** Automatic token injection for inter-service calls
 - **Spring Security:** Comprehensive security configuration across all services
 
-For detailed Okta setup instructions, see [Configure OAuth2 (Okta)](#2-configure-oauth2-okta)
+For detailed Auth0 setup instructions, see [Configure OAuth2 (Auth0)](#2-configure-oauth2-auth0)
 
 ### Resilience & Fault Tolerance
 - Circuit breaker pattern implemented for all gateway routes
@@ -230,14 +230,14 @@ SpringBoot/
 ### For Dev Container Development (Recommended)
 - **Docker** and **Docker Compose**
 - **VS Code** or **Cursor** with [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-- **Okta Account** (for OAuth2 authentication)
+- **Auth0 Account** (for OAuth2 authentication)
 
 ### For Local Development
 - **Java 17** or higher
 - **Maven 3.6+**
 - **Docker** and **Docker Compose**
 - **MySQL 8.0+** (optional - can use Docker)
-- **Okta Account** (for OAuth2 authentication)
+- **Auth0 Account** (for OAuth2 authentication)
 
 ### For Kubernetes Deployment
 - **Kubernetes** cluster (Minikube, GKE, EKS, AKS, etc.)
@@ -252,116 +252,258 @@ git clone <repository-url>
 cd SpringBoot
 ```
 
-### 2. Configure OAuth2 (Okta)
+### 2. Configure OAuth2 (Auth0)
 
-This application uses **Okta** for OAuth2 authentication and authorization. Okta provides:
+This application uses **Auth0** for OAuth2 authentication and authorization. Auth0 provides:
 - **API Gateway Authentication:** Validates JWT tokens for all incoming requests
 - **Inter-Service Communication:** OAuth2 Client Credentials flow for service-to-service calls
+- **Frontend User Login:** Authorization Code flow for browser-based authentication
 - **Swagger UI Authentication:** Bearer token support in API documentation
 
-#### Why Okta?
+#### Why Auth0?
 - Industry-standard OAuth2/OIDC provider
 - Easy integration with Spring Security
 - Supports multiple authentication flows (Authorization Code, Client Credentials, etc.)
-- Free developer accounts available
+- Free tier with generous limits
+- Excellent documentation and developer experience
 
-#### Setting Up Okta
+#### Understanding Auth0 Application Types
 
-1. **Create a Free Okta Account:**
-   - Go to https://developer.okta.com/signup/
-   - Sign up for a free developer account
-   - Note your Okta domain (e.g., `https://dev-12345678.okta.com`)
+⚠️ **IMPORTANT:** This microservices architecture requires **TWO different Auth0 applications**:
 
-2. **Create an Application:**
-   - Navigate to **Applications** → **Create App Integration**
-   - Choose **OIDC - OpenID Connect**
-   - Select **Web Application**
-   - Configure:
-     - **App Name:** Spring Boot Microservices
-     - **Grant Types:**
-       - ✅ Authorization Code
-       - ✅ Client Credentials
-       - ✅ Refresh Token
-     - **Sign-in redirect URIs:** `http://localhost:9090/login/oauth2/code/okta`
-     - **Sign-out redirect URIs:** `http://localhost:9090`
-   - Click **Save**
-   - **Copy** the **Client ID** and **Client Secret**
+| Application Type | Used By | Purpose | Grant Types |
+|-----------------|---------|---------|-------------|
+| **Regular Web Application** | CloudGateway | Frontend user login (browser) | Authorization Code, Refresh Token |
+| **Machine-to-Machine (M2M)** | OrderService, PaymentService, ProductService | Service-to-service API calls | Client Credentials |
 
-3. **Configure Authorization Server:**
-   - Navigate to **Security** → **API** → **Authorization Servers**
-   - Select the **default** authorization server
-   - Note the **Issuer URI** (e.g., `https://dev-12345678.okta.com/oauth2/default`)
-   - Ensure scopes include: `openid`, `profile`, `email`, `offline_access`
+**Why two applications?**
+- **Regular Web Apps** support Authorization Code flow for user login but typically don't support Client Credentials
+- **M2M Apps** support Client Credentials for service-to-service calls but don't support user login
+- Using separate apps follows security best practices and principle of least privilege
 
-#### Update Configuration Files
+#### Setting Up Auth0
 
-**Cloud Gateway** (`CloudGateway/src/main/resources/application-dev.yml`):
+##### Step 1: Create a Free Auth0 Account
 
-```yaml
-okta:
-  oauth2:
-    issuer: https://dev-YOUR-OKTA-DOMAIN.okta.com/oauth2/default
-    audience: api://default
-    client-id: YOUR_CLIENT_ID
-    client-secret: YOUR_CLIENT_SECRET
-    scopes: openid, profile, email, offline_access
+1. Go to https://auth0.com/signup
+2. Sign up for a free account
+3. Note your Auth0 domain (e.g., `https://dev-xxxxxxxx.us.auth0.com`)
+
+##### Step 2: Create API Resource
+
+1. Navigate to **Applications** → **APIs** → **Create API**
+2. Configure:
+   - **Name:** SpringBoot Microservices API
+   - **Identifier:** `http://springboot-microservices-api` (this is your audience)
+   - **Signing Algorithm:** RS256
+3. Click **Create**
+
+##### Step 3: Create Regular Web Application (for CloudGateway)
+
+1. Navigate to **Applications** → **Create Application**
+2. Choose **Regular Web Applications**
+3. Configure:
+   - **Name:** SpringBoot Microservices Web
+   - **Allowed Callback URLs:** `http://localhost:9090/login/oauth2/code/auth0`
+   - **Allowed Logout URLs:** `http://localhost:9090`
+   - **Allowed Web Origins:** `http://localhost:3000,http://localhost:4200,http://localhost:5173`
+4. Go to **Settings** → **Advanced Settings** → **Grant Types**
+   - Ensure enabled: ✅ Authorization Code, ✅ Refresh Token
+   - **Optional:** ✅ Client Credentials (if you want to use ONE app for everything - see note below)
+5. **Copy** the **Client ID** and **Client Secret** (you'll use these in CloudGateway)
+
+##### Step 4: Create Machine-to-Machine Application (for Backend Services)
+
+**Note:** Skip this if you enabled Client Credentials grant in Step 3
+
+1. Navigate to **Applications** → **Create Application**
+2. Choose **Machine to Machine Applications**
+3. Configure:
+   - **Name:** SpringBoot Microservices M2M
+   - **Authorize:** Select "SpringBoot Microservices API"
+   - **Permissions:** Select all scopes you need
+4. **Copy** the **Client ID** and **Client Secret** (you'll use these in OrderService)
+
+##### Step 5: Configure Environment Variables
+
+Create a `.env` file (copy from `.env.example`):
+
+**Option A: Using ONE Regular Web App (if Client Credentials is enabled):**
+```bash
+AUTH0_CLIENT_ID=<your_web_app_client_id>
+AUTH0_CLIENT_SECRET=<your_web_app_client_secret>
+AUTH0_AUDIENCE=http://springboot-microservices-api
+AUTH0_ISSUER_URI=https://dev-xxxxxxxx.us.auth0.com/
 ```
 
-**Order Service** (`OrderService/src/main/resources/application-dev.yaml`):
+**Option B: Using TWO separate apps (recommended for better security):**
+```bash
+# CloudGateway (Regular Web App)
+AUTH0_CLIENT_ID=<your_web_app_client_id>
+AUTH0_CLIENT_SECRET=<your_web_app_client_secret>
 
+# Backend Services (M2M App) - if using separate app
+AUTH0_M2M_CLIENT_ID=<your_m2m_client_id>
+AUTH0_M2M_CLIENT_SECRET=<your_m2m_client_secret>
+
+# Shared
+AUTH0_AUDIENCE=http://springboot-microservices-api
+AUTH0_ISSUER_URI=https://dev-xxxxxxxx.us.auth0.com/
+```
+
+**If using Option B,** OrderService must use `AUTH0_M2M_CLIENT_ID` instead of `AUTH0_CLIENT_ID` (already configured in this project).
+
+##### Which Service Uses Which Auth0 Application?
+
+| Service | Auth0 Application Type | Environment Variables | Purpose |
+|---------|----------------------|----------------------|---------|
+| **CloudGateway** | Regular Web Application | `AUTH0_CLIENT_ID`<br>`AUTH0_CLIENT_SECRET` | Frontend user login (Authorization Code flow) |
+| **OrderService** | Machine-to-Machine | `AUTH0_M2M_CLIENT_ID`<br>`AUTH0_M2M_CLIENT_SECRET` | Service-to-service calls (Client Credentials flow) |
+| **ProductService** | N/A (resource server only) | `AUTH0_ISSUER_URI` | JWT token validation only |
+| **PaymentService** | N/A (resource server only) | `AUTH0_ISSUER_URI` | JWT token validation only |
+
+**Note:** All services share `AUTH0_ISSUER_URI` and `AUTH0_AUDIENCE` for consistent JWT validation.
+
+#### Application Configuration
+
+All sensitive credentials are externalized to environment variables. The configuration files already use environment variable placeholders:
+
+**Cloud Gateway** (`CloudGateway/src/main/resources/application-dev.yml`):
 ```yaml
 spring:
   security:
     oauth2:
       resource-server:
         jwt:
-          issuer-uri: https://dev-YOUR-OKTA-DOMAIN.okta.com/oauth2/default
+          issuer-uri: ${AUTH0_ISSUER_URI}
+          audiences: ${AUTH0_AUDIENCE}
+      client:
+        registration:
+          auth0:
+            client-id: ${AUTH0_CLIENT_ID}
+            client-secret: ${AUTH0_CLIENT_SECRET}
+            scope: openid,profile,email
+        provider:
+          auth0:
+            issuer-uri: ${AUTH0_ISSUER_URI}
+```
+
+**Order Service** (`OrderService/src/main/resources/application-dev.yaml`):
+```yaml
+spring:
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: ${AUTH0_ISSUER_URI}
       client:
         registration:
           internal-client:
-            provider: okta
+            provider: auth0
             authorization-grant-type: client_credentials
-            scope: openid, profile, email, offline_access
-            client-id: YOUR_CLIENT_ID
-            client-secret: YOUR_CLIENT_SECRET
-
-okta:
-  oauth2:
-    issuer: https://dev-YOUR-OKTA-DOMAIN.okta.com/oauth2/default
-    audience: api://default
-    client-id: YOUR_CLIENT_ID
-    client-secret: YOUR_CLIENT_SECRET
+            scope: openid,profile,email
+            client-id: ${AUTH0_M2M_CLIENT_ID}      # Uses M2M app for service-to-service calls
+            client-secret: ${AUTH0_M2M_CLIENT_SECRET}
+        provider:
+          auth0:
+            issuer-uri: ${AUTH0_ISSUER_URI}
 ```
 
-**⚠️ Security Best Practice:**
-- Never commit real credentials to version control
-- Use environment variables in production:
-  ```yaml
-  okta:
+**Product Service & Payment Service** (`application-dev.yml`):
+```yaml
+spring:
+  security:
     oauth2:
-      client-id: ${OKTA_CLIENT_ID}
-      client-secret: ${OKTA_CLIENT_SECRET}
-  ```
+      resource-server:
+        jwt:
+          issuer-uri: ${AUTH0_ISSUER_URI}
+```
+
+**⚠️ Security Best Practices:**
+- ✅ All credentials use environment variables (no hardcoded values)
+- ✅ `.env` file is in `.gitignore` (never committed)
+- ✅ `.env.example` provides template without real credentials
+- ✅ Docker Compose automatically loads `.env` file
+- ✅ Separate applications for user login vs service-to-service (Option B)
+
+#### Verifying Your Setup
+
+After configuring `.env` and restarting services, verify both Auth0 applications are working correctly:
+
+**1. Verify Environment Variables Are Loaded:**
+```bash
+# Check CloudGateway has Regular Web App credentials
+docker-compose -f docker-compose.dev.yml exec cloudgateway env | grep AUTH0_CLIENT_ID
+
+# Check OrderService has M2M credentials
+docker-compose -f docker-compose.dev.yml exec orderservice env | grep AUTH0_M2M_CLIENT_ID
+
+# Verify shared configuration
+docker-compose -f docker-compose.dev.yml exec cloudgateway env | grep AUTH0_ISSUER_URI
+```
+
+**2. Test User Login (Regular Web App):**
+```bash
+# Open in browser - should redirect to Auth0 login
+open http://localhost:9090/authenticate/login
+```
+
+**3. Test Service-to-Service Authentication (M2M App):**
+```bash
+# OrderService should automatically use M2M credentials when calling other services
+# Check logs for successful token acquisition
+docker-compose -f docker-compose.dev.yml logs orderservice | grep -i "oauth\|token"
+```
+
+**4. Check Service Health:**
+```bash
+# All services should be registered with Eureka
+open http://localhost:8761
+
+# Swagger UI should be accessible
+open http://localhost:9090/swagger-ui.html
+```
 
 #### Getting an Access Token
 
-**Using Okta API:**
+**Method 1: User Login (Browser-based - using Regular Web App)**
+
+```bash
+# Open in browser (redirects to Auth0 login page):
+http://localhost:9090/authenticate/login
+```
+
+After successful login, you'll receive a JSON response with:
+```json
+{
+  "userId": "user@example.com",
+  "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "v1.MRrT...",
+  "expiresAt": 1759598400,
+  "auhorityList": ["ROLE_USER", "SCOPE_openid", "SCOPE_profile", "SCOPE_email"]
+}
+```
+
+**Method 2: Client Credentials (API-to-API - using M2M App)**
 
 ```bash
 curl --request POST \
-  --url https://dev-YOUR-OKTA-DOMAIN.okta.com/oauth2/default/v1/token \
-  --header 'Accept: application/json' \
-  --header 'Content-Type: application/x-www-form-urlencoded' \
-  --data 'grant_type=client_credentials&scope=openid profile email&client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET'
+  --url https://dev-xxxxxxxx.us.auth0.com/oauth/token \
+  --header 'content-type: application/json' \
+  --data '{
+    "client_id":"YOUR_M2M_CLIENT_ID",
+    "client_secret":"YOUR_M2M_CLIENT_SECRET",
+    "audience":"http://springboot-microservices-api",
+    "grant_type":"client_credentials"
+  }'
 ```
 
 **Response:**
 ```json
 {
-  "access_token": "eyJraWQiOiJ...",
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
   "token_type": "Bearer",
-  "expires_in": 3600,
-  "scope": "openid profile email"
+  "expires_in": 86400
 }
 ```
 
@@ -369,45 +511,429 @@ curl --request POST \
 
 ```bash
 curl --location 'http://localhost:9090/product/1' \
-  --header 'Authorization: Bearer eyJraWQiOiJ...'
+  --header 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...'
 ```
 
 #### How Authentication Works
 
-1. **Client Request:**
-   - Client sends request to Cloud Gateway with `Authorization: Bearer <token>` header
+**Flow 1: Frontend User Login (Authorization Code Flow)**
 
-2. **Gateway Validation:**
-   - Cloud Gateway validates JWT token with Okta
-   - Extracts user claims and permissions
-   - Routes request to appropriate microservice
+1. **User visits:** `http://localhost:9090/authenticate/login`
+2. **CloudGateway redirects** to Auth0 login page
+3. **User authenticates** with Auth0 (email/password, social login, etc.)
+4. **Auth0 redirects back** to CloudGateway with authorization code
+5. **CloudGateway exchanges** code for access token, refresh token, and ID token
+6. **Response returned** to user with tokens and user information
 
-3. **Inter-Service Communication:**
-   - OrderService uses OAuth2 Client Credentials to call ProductService/PaymentService
-   - Automatically obtains and refreshes tokens
-   - Configured via `RestTemplateInterceptor` (see `OrderService/src/.../config/`)
+**Flow 2: API Request with Token**
 
-4. **Swagger UI:**
-   - Access http://localhost:9090/swagger-ui.html
-   - Click **Authorize** button
-   - Enter: `Bearer <your-access-token>`
-   - Test APIs interactively
+1. **Client sends request** to CloudGateway: `Authorization: Bearer <access_token>`
+2. **CloudGateway validates** JWT token signature using Auth0's public keys
+3. **CloudGateway extracts** user claims (email, roles, scopes) from token
+4. **CloudGateway routes** request to appropriate backend service
+5. **Backend service validates** token independently (stateless)
 
-#### Troubleshooting Okta
+**Flow 3: Service-to-Service Communication (Client Credentials Flow)**
 
-**401 Unauthorized:**
-- Check token is not expired
-- Verify issuer URI matches Okta domain
-- Ensure client ID/secret are correct
+1. **OrderService needs** to call ProductService/PaymentService
+2. **RestTemplateInterceptor** intercepts outgoing HTTP request
+3. **Automatically obtains** access token from Auth0 using Client Credentials grant
+4. **Adds** `Authorization: Bearer <token>` header to request
+5. **Token cached** and automatically refreshed when expired
 
-**403 Forbidden:**
-- Check token has required scopes
-- Verify user has necessary permissions
+**Architecture Diagram:**
+```
+Frontend (React/Vue)
+    ↓ (1) GET /authenticate/login
+CloudGateway (Port 9090)
+    ↓ (2) Redirect to Auth0
+Auth0 (dev-xxxxxxxx.us.auth0.com)
+    ↓ (3) User authenticates
+CloudGateway
+    ↓ (4) Exchange code for tokens
+CloudGateway → Frontend (returns tokens)
+    ↓
+Frontend → CloudGateway (API requests with Bearer token)
+    ↓
+CloudGateway → ProductService/OrderService/PaymentService
+    ↓
+OrderService → ProductService/PaymentService (with auto-injected OAuth2 token)
+```
 
-**Services can't communicate:**
-- Check OrderService client credentials configuration
-- Verify network connectivity to Okta
-- Review logs: `docker-compose logs -f orderservice`
+**Testing with Swagger UI:**
+
+1. Access: http://localhost:9090/swagger-ui.html
+2. Click **Authorize** button
+3. Enter: `Bearer <your-access-token>` (from `/authenticate/login` response)
+4. Test APIs interactively
+
+#### Troubleshooting Auth0
+
+**Common Issues and Solutions:**
+
+##### 1. "Callback URL mismatch" Error
+
+**Problem:** When accessing `/authenticate/login`, you see:
+```
+Oops!, something went wrong
+Callback URL mismatch.
+The provided redirect_uri is not in the list of allowed callback URLs.
+```
+
+**Solution:**
+1. Go to: https://manage.auth0.com/dashboard/us/dev-5nw6367bfpr277ec/applications
+2. Click on your application
+3. In **"Allowed Callback URLs"** add:
+   ```
+   http://localhost:9090/login/oauth2/code/auth0
+   ```
+4. In **"Allowed Logout URLs"** add:
+   ```
+   http://localhost:9090
+   ```
+5. In **"Allowed Web Origins"** add:
+   ```
+   http://localhost:9090
+   ```
+6. Click **"Save Changes"**
+
+---
+
+##### 2. "Service not enabled within domain" Error
+
+**Problem:** When requesting a token:
+```json
+{
+  "error": "access_denied",
+  "error_description": "Service not enabled within domain: http://localhost:9090"
+}
+```
+
+**Root Cause:** `AUTH0_AUDIENCE` is set to your app URL instead of your API Identifier.
+
+**Solution:**
+1. Go to: https://manage.auth0.com/dashboard/us/dev-5nw6367bfpr277ec/apis
+2. **If you have an API:** Click it and copy the **"Identifier"**
+3. **If no API exists:** Create one:
+   - Click **"Create API"**
+   - **Name:** `Spring Boot Microservices API`
+   - **Identifier:** `https://api.springboot.example.com` (can be any URI)
+   - **Signing Algorithm:** `RS256`
+   - Click **"Create"**
+   - Copy the **"Identifier"**
+4. Update `.env`:
+   ```bash
+   # WRONG:
+   AUTH0_AUDIENCE=http://localhost:9090
+
+   # CORRECT:
+   AUTH0_AUDIENCE=https://api.springboot.example.com
+   ```
+5. Restart services:
+   ```bash
+   docker-compose -f docker-compose.dev.yml restart cloudgateway orderservice
+   ```
+
+---
+
+##### 3. "Oops! Something went wrong" on /authenticate/login
+
+**Problem:** Generic error on Auth0 login page.
+
+**Root Cause:** You're using a **Machine-to-Machine (M2M)** application, which doesn't support interactive browser login.
+
+**Solution A - Use M2M with Client Credentials (Recommended for APIs):**
+
+The `/authenticate/login` endpoint is for user login. For API-to-API communication, use Client Credentials flow:
+
+```bash
+# Get access token
+curl -s -X POST https://dev-5nw6367bfpr277ec.us.auth0.com/oauth/token \
+  -H 'content-type: application/json' \
+  -d '{
+    "client_id":"YOUR_CLIENT_ID",
+    "client_secret":"YOUR_CLIENT_SECRET",
+    "audience":"https://api.springboot.example.com",
+    "grant_type":"client_credentials"
+  }'
+```
+
+Response:
+```json
+{
+  "access_token": "eyJ...",
+  "token_type": "Bearer",
+  "expires_in": 86400
+}
+```
+
+Use the token:
+```bash
+curl http://localhost:9090/product/1 \
+  -H "Authorization: Bearer eyJ..."
+```
+
+**Solution B - Create Web Application (For user login):**
+
+Only if you need interactive browser login:
+
+1. Go to: https://manage.auth0.com/dashboard/us/dev-5nw6367bfpr277ec/applications
+2. Click **"Create Application"**
+3. **Name:** `Spring Boot Gateway Web`
+4. **Type:** Select **"Regular Web Applications"**
+5. Click **"Create"**
+6. Configure:
+   - **Allowed Callback URLs:** `http://localhost:9090/login/oauth2/code/auth0`
+   - **Allowed Logout URLs:** `http://localhost:9090`
+   - **Allowed Web Origins:** `http://localhost:9090`
+   - **Grant Types:** ✅ Authorization Code, ✅ Refresh Token
+7. Click **"Save Changes"**
+8. Update `.env` with the new Client ID and Secret
+
+---
+
+##### 4. 401 Unauthorized on API Requests
+
+**Causes:**
+- Token is expired (check `expires_in` from token response)
+- Wrong audience in token request
+- Issuer URI mismatch
+- Client ID/Secret incorrect
+
+**Check token validity:**
+```bash
+# Decode JWT (header and payload only)
+echo "YOUR_TOKEN" | cut -d. -f2 | base64 -d 2>/dev/null | jq
+```
+
+**Verify configuration:**
+```bash
+# Check environment variables are loaded
+docker-compose -f docker-compose.dev.yml exec cloudgateway env | grep AUTH0
+```
+
+**Review logs:**
+```bash
+docker-compose -f docker-compose.dev.yml logs --tail=100 cloudgateway | grep -i error
+```
+
+---
+
+##### 5. "Failed to load API definition" in Swagger UI
+
+**Problem:** Swagger UI loads at http://localhost:9090/swagger-ui.html but shows:
+```
+Failed to load API definition.
+Errors: Unauthorized /order/api-docs
+```
+
+**Root Cause:** Gateway routes require authentication, blocking Swagger UI from fetching API docs.
+
+**Workaround - Use Direct Service URLs:**
+
+Instead of the centralized Swagger UI, access each service directly:
+
+- **OrderService:** http://localhost:8082/swagger-ui.html
+- **ProductService:** http://localhost:8081/swagger-ui.html
+- **PaymentService:** http://localhost:8083/swagger-ui.html
+
+These work without authentication because each service permits `/swagger-ui/**` and `/api-docs/**` paths.
+
+**Full Solution (Advanced):**
+
+Update CloudGateway to pass API docs requests without authentication (requires modifying security filters).
+
+---
+
+##### 6. Services Can't Communicate (Service-to-Service)
+
+**Problem:** OrderService fails when calling ProductService/PaymentService.
+
+**Check:**
+1. **Environment variables set:**
+   ```bash
+   docker-compose -f docker-compose.dev.yml exec orderservice env | grep AUTH0
+   ```
+
+2. **Logs show token errors:**
+   ```bash
+   docker-compose -f docker-compose.dev.yml logs orderservice | grep -i "oauth\|token\|auth"
+   ```
+
+3. **Client credentials configured:**
+   - Check `OrderService/src/main/resources/application-dev.yaml`
+   - Verify `internal-client` registration exists
+   - Confirm `AUTH0_CLIENT_ID` and `AUTH0_CLIENT_SECRET` are set
+
+4. **API authorized for M2M app:**
+   - Go to: https://manage.auth0.com/dashboard/us/dev-5nw6367bfpr277ec/applications
+   - Click your M2M application
+   - Go to **"APIs" tab**
+   - Ensure your API is listed and authorized
+
+---
+
+##### 7. Environment Variables Not Loading
+
+**Problem:** Services start but Auth0 variables are `${AUTH0_CLIENT_ID}` (not resolved).
+
+**Cause:** Docker Compose needs to be recreated (not just restarted) to pick up new `.env` variables.
+
+**Solution:**
+```bash
+# Stop and remove containers
+docker-compose -f docker-compose.dev.yml down
+
+# Recreate with updated .env
+docker-compose -f docker-compose.dev.yml up -d
+
+# Or force recreate specific service
+docker-compose -f docker-compose.dev.yml up -d --force-recreate cloudgateway
+```
+
+**Verify variables loaded:**
+```bash
+docker-compose -f docker-compose.dev.yml config | grep AUTH0
+```
+
+---
+
+##### 8. "Do I Need to Change My M2M App?" - Understanding Application Types
+
+**Problem:** You have a Machine-to-Machine (M2M) application, but frontend login (`/authenticate/login`) doesn't work.
+
+**Explanation:**
+
+M2M applications **only support Client Credentials flow** (service-to-service API calls). They **do NOT support Authorization Code flow** (browser-based user login).
+
+**Your system needs BOTH authentication flows:**
+
+| Flow | Use Case | Auth0 App Type Required |
+|------|----------|------------------------|
+| **Authorization Code** | Frontend user login via browser | Regular Web Application |
+| **Client Credentials** | Backend service-to-service calls | Machine-to-Machine Application |
+
+**Solution - Choose One Option:**
+
+**Option A: Enable Client Credentials on Regular Web App (Simpler)**
+
+1. Go to your Regular Web Application in Auth0 Dashboard
+2. Navigate to **Settings** → **Advanced Settings** → **Grant Types**
+3. Enable: ✅ **Client Credentials** (in addition to Authorization Code, Refresh Token)
+4. **Save Changes**
+5. Use this **single app** for both CloudGateway AND OrderService
+
+**Pros:**
+- Only one application to manage
+- Simpler `.env` configuration (single `AUTH0_CLIENT_ID`)
+
+**Cons:**
+- Less secure (same credentials used for user login and service calls)
+- Violates principle of least privilege
+
+**Option B: Use TWO Separate Applications (Recommended)**
+
+1. **Keep** your Regular Web Application for CloudGateway (user login)
+2. **Keep or create** your M2M Application for OrderService (service calls)
+3. Update `.env` to include both:
+   ```bash
+   # CloudGateway uses Regular Web App
+   AUTH0_CLIENT_ID=<web_app_client_id>
+   AUTH0_CLIENT_SECRET=<web_app_client_secret>
+
+   # OrderService uses M2M App
+   AUTH0_M2M_CLIENT_ID=<m2m_client_id>
+   AUTH0_M2M_CLIENT_SECRET=<m2m_client_secret>
+   ```
+4. Update OrderService configuration files to use `AUTH0_M2M_CLIENT_ID`:
+   ```yaml
+   # OrderService/src/main/resources/application-dev.yaml
+   spring:
+     security:
+       oauth2:
+         client:
+           registration:
+             internal-client:
+               client-id: ${AUTH0_M2M_CLIENT_ID}
+               client-secret: ${AUTH0_M2M_CLIENT_SECRET}
+   ```
+
+**Pros:**
+- Better security (separate credentials for different purposes)
+- Follows security best practices
+- Easier to audit and revoke access
+
+**Cons:**
+- Two applications to manage
+- Slightly more complex configuration
+
+**Recommendation:** Use **Option B** for production deployments
+
+#### Security Best Practices Implemented
+
+This project implements several OAuth2 security best practices:
+
+✅ **Environment Variable Configuration**
+- All Auth0 credentials use environment variables (no hardcoded secrets)
+- Configuration: `${AUTH0_CLIENT_ID}`, `${AUTH0_CLIENT_SECRET}`, etc.
+- Set via `.env` file (automatically loaded by Docker Compose)
+- No fallback defaults to prevent accidental exposure
+
+✅ **Scope-Based Authorization**
+- All services require `SCOPE_internal` for API access
+- ProductService: `/product/**` endpoints
+- OrderService: `/order/**` endpoints
+- PaymentService: `/payment/**` endpoints
+- Configuration: `WebSecurityConfig.java` in each service
+
+✅ **Automatic Token Refresh**
+- OrderService configured with `.refreshToken()` support
+- Tokens automatically renewed before expiration
+- No manual token management required
+- Implementation: `OrderServiceApplication.java:58`
+
+✅ **Proper Error Handling**
+- OAuth2 interceptors throw exceptions on token failure
+- No silent failures - all auth errors logged and reported
+- Implementation: `RestTemplateInterceptor.java:38-44`
+
+✅ **CORS Configuration**
+- No wildcard origins with credentials
+- Specific allowed origins for security
+- Supports Gateway, frontend ports
+- Configuration: `WebSecurityConfig.java` (OrderService)
+
+✅ **Standardized Auth0 Domain**
+- All services use same Auth0 tenant via `AUTH0_ISSUER_URI` environment variable
+- Consistent JWT validation across microservices
+- Single source of truth for authentication
+
+#### Using Environment Variables
+
+**Method 1: Create .env file** (Recommended)
+
+```bash
+# Copy example file
+cp .env.example .env
+
+# Edit .env with your values
+OKTA_CLIENT_ID=your_actual_client_id
+OKTA_CLIENT_SECRET=your_actual_client_secret
+```
+
+**Method 2: Export variables**
+
+```bash
+export OKTA_CLIENT_ID=your_actual_client_id
+export OKTA_CLIENT_SECRET=your_actual_client_secret
+docker-compose -f docker-compose.dev.yml up -d
+```
+
+**Method 3: Inline with docker-compose**
+
+```bash
+OKTA_CLIENT_ID=xxx OKTA_CLIENT_SECRET=yyy docker-compose -f docker-compose.dev.yml up -d
+```
 
 ### 3. Build and Run with Docker Compose
 
@@ -1134,14 +1660,17 @@ Pre-built images are available on Docker Hub:
 | Order Service OpenAPI | http://localhost:9090/order/api-docs | OpenAPI JSON spec |
 | Payment Service OpenAPI | http://localhost:9090/payment/api-docs | OpenAPI JSON spec |
 
-### Okta Resources
+### Auth0 Resources
 
 | Resource | URL | Description |
 |----------|-----|-------------|
-| Okta Developer | https://developer.okta.com | Sign up for free account |
-| Okta Dashboard | https://dev-YOUR-DOMAIN.okta.com/admin/dashboard | Manage applications |
-| Token Endpoint | https://dev-YOUR-DOMAIN.okta.com/oauth2/default/v1/token | Get access tokens |
-| Authorization Server | https://dev-YOUR-DOMAIN.okta.com/oauth2/default | OAuth2 metadata |
+| Auth0 Signup | https://auth0.com/signup | Sign up for free account |
+| Auth0 Dashboard | https://manage.auth0.com/dashboard | Manage applications, APIs, users |
+| Token Endpoint | https://YOUR-DOMAIN.auth0.com/oauth/token | Get access tokens (Client Credentials) |
+| User Info Endpoint | https://YOUR-DOMAIN.auth0.com/userinfo | Get user profile information |
+| JWKS Endpoint | https://YOUR-DOMAIN.auth0.com/.well-known/jwks.json | Public keys for JWT verification |
+| OpenID Configuration | https://YOUR-DOMAIN.auth0.com/.well-known/openid-configuration | OAuth2/OIDC metadata |
+| Auth0 Documentation | https://auth0.com/docs | Complete developer documentation |
 
 ### Complete Setup Commands
 
@@ -1151,7 +1680,7 @@ Pre-built images are available on Docker Hub:
 git clone <repository-url>
 cd SpringBoot
 
-# 2. Configure Okta OAuth2 (edit CloudGateway/src/main/resources/application-dev.yml)
+# 2. Configure Auth0 OAuth2 (create .env file - see "Configure OAuth2 (Auth0)" section)
 
 # 3. Build and start everything with one command
 ./build-and-start.sh
@@ -1171,7 +1700,7 @@ curl http://localhost:9090/product/1 \
 git clone <repository-url>
 cd SpringBoot
 
-# 2. Configure Okta OAuth2 (edit CloudGateway/src/main/resources/application-dev.yml)
+# 2. Configure Auth0 OAuth2 (create .env file - see "Configure OAuth2 (Auth0)" section)
 
 # 3. Build JAR files and Docker images
 mvn clean package -DskipTests

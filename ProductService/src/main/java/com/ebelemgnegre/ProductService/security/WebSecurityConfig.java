@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -19,11 +20,21 @@ public class WebSecurityConfig {
         http
                 .authorizeHttpRequests(
                         authorizeRequest -> authorizeRequest
-                                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**")
+                                .requestMatchers(
+                                        new AntPathRequestMatcher("/swagger-ui.html"),
+                                        new AntPathRequestMatcher("/swagger-ui/**"),
+                                        new AntPathRequestMatcher("/v3/api-docs/**"),
+                                        new AntPathRequestMatcher("/api-docs/**"),
+                                        new AntPathRequestMatcher("/api-docs"),
+                                        new AntPathRequestMatcher("/actuator/**"),
+                                        new AntPathRequestMatcher("/h2-console/**")
+                                )
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
                 )
+                .csrf(csrf -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .oauth2ResourceServer(
                         OAuth2ResourceServerConfigurer::jwt
                 );

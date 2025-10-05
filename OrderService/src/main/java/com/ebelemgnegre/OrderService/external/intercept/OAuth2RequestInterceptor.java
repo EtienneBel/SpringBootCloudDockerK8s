@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 
 @Log4j2
 @Configuration
@@ -26,10 +28,15 @@ public class OAuth2RequestInterceptor implements RequestInterceptor {
         if (authorizedClient != null && authorizedClient.getAccessToken() != null) {
             String accessTokenValue = authorizedClient.getAccessToken().getTokenValue();
             template.header("Authorization", "Bearer " + accessTokenValue);
-            log.info("Added Authorization header");
+            log.debug("Successfully added OAuth2 access token to Feign request");
         } else {
-            log.error("Failed to obtain access token");
-            // Handle the error appropriately
+            log.error("Failed to obtain OAuth2 access token for Feign client communication");
+            OAuth2Error error = new OAuth2Error(
+                    "access_token_unavailable",
+                    "Unable to obtain access token from OAuth2 authorization server for Feign client",
+                    null
+            );
+            throw new OAuth2AuthenticationException(error);
         }
     }
 

@@ -34,3 +34,9 @@
 # Application configuration #
 ##########################################
 **/src/main/resources/application.yml
+
+# Environment variables (contains secrets) #
+###########################################
+.env
+.env.local
+.env.*.local
