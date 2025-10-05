@@ -4,17 +4,18 @@ server:
 spring:
   application:
     name: API-GATEWAY
-  config:
-    import: configserver:http://${CONFIG_SERVER_URL:localhost}:9296
   cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
     gateway:
       routes:
-        - id: ORDER-SERVICEs
+        - id: ORDER-SERVICE
           uri: lb://ORDER-SERVICE
           predicates:
-            - Path=/order/**
+            - Path=/api/orders/**
           filters:
-            - StripPrefix=1
             - name: CircuitBreaker
               args:
                 name: ORDER-SERVICE
@@ -22,9 +23,8 @@ spring:
         - id: PAYMENT-SERVICE
           uri: lb://PAYMENT-SERVICE
           predicates:
-            - Path=/payment/**
+            - Path=/api/payments/**
           filters:
-            - StripPrefix=1
             - name: CircuitBreaker
               args:
                 name: PAYMENT-SERVICE
@@ -32,9 +32,8 @@ spring:
         - id: PRODUCT-SERVICE
           uri: lb://PRODUCT-SERVICE
           predicates:
-            - Path=/product/**
+            - Path=/api/products/**
           filters:
-            - StripPrefix=1
             - name: CircuitBreaker
               args:
                 name: PRODUCT-SERVICE
@@ -54,6 +53,43 @@ spring:
         provider:
           auth0:
             issuer-uri: ${AUTH0_ISSUER_URI}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_ADDRESS:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      PRODUCT-SERVICE:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+      ORDER-SERVICE:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+      PAYMENT-SERVICE:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+  timelimiter:
+    instances:
+      PRODUCT-SERVICE:
+        timeout-duration: 10s
+      ORDER-SERVICE:
+        timeout-duration: 10s
+      PAYMENT-SERVICE:
+        timeout-duration: 10s
 
 springdoc:
   api-docs:

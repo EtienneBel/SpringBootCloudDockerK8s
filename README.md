@@ -7,8 +7,27 @@ A cloud-native e-commerce application built with Spring Boot microservices archi
 
 ## 📚 Documentation
 
-- **[Architecture Documentation](ARCHITECTURE.md)** - Complete technical documentation of patterns, features, and tools
-- **[Frontend Integration Guide](FRONTEND_INTEGRATION.md)** - Guide for integrating React/Vue/Angular frontends
+### Main Documentation
+- **[Quick Start Guide](README.md)** - This file (getting started)
+- **[Architecture Overview](ARCHITECTURE.md)** - Complete technical documentation
+- **[Frontend Integration](FRONTEND_INTEGRATION.md)** - React/Vue/Angular integration guide
+
+### Detailed Guides (`/docs`)
+- **[Documentation Index](docs/README.md)** - Complete documentation navigation
+- **[Documentation Summary](docs/DOCUMENTATION_SUMMARY.md)** - All available docs
+
+#### By Category
+- **Architecture Patterns** → [`/docs/patterns`](docs/patterns/)
+  - [Service Discovery](docs/patterns/service-discovery.md) - Netflix Eureka
+  - [API Gateway](docs/patterns/api-gateway.md) - Spring Cloud Gateway
+  - [Circuit Breaker](docs/patterns/circuit-breaker.md) - Resilience4j
+
+- **Security** → [`/docs/security`](docs/security/)
+  - [OAuth2 Authentication](docs/security/oauth2-authentication.md) - Complete Auth0 guide
+
+- **Tools & Technologies** → [`/docs/tools`](docs/tools/) (Coming soon)
+- **Deployment Guides** → [`/docs/deployment`](docs/deployment/) (Coming soon)
+- **Development Guides** → [`/docs/development`](docs/development/) (Coming soon)
 
 ## Table of Contents
 - [Architecture Overview](#architecture-overview)
