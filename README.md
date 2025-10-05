@@ -5,6 +5,11 @@
 
 A cloud-native e-commerce application built with Spring Boot microservices architecture, featuring service discovery, centralized configuration, API gateway, and comprehensive deployment options using Docker and Kubernetes.
 
+## 📚 Documentation
+
+- **[Architecture Documentation](ARCHITECTURE.md)** - Complete technical documentation of patterns, features, and tools
+- **[Frontend Integration Guide](FRONTEND_INTEGRATION.md)** - Guide for integrating React/Vue/Angular frontends
+
 ## Table of Contents
 - [Architecture Overview](#architecture-overview)
 - [Technology Stack](#technology-stack)
