@@ -15,4 +15,5 @@ public class OrderRequest {
     private long quantity;
     private long totalAmount;
     private PaymentMode paymentMode;
+    private String orderStatus;
 }

@@ -156,6 +156,8 @@ services:
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
       - CONFIG_SERVER_URL=configserver
       - DB_HOST=productDb
+      - AUTH0_M2M_CLIENT_ID=${AUTH0_M2M_CLIENT_ID}
+      - AUTH0_M2M_CLIENT_SECRET=${AUTH0_M2M_CLIENT_SECRET}
       - AUTH0_ISSUER_URI=${AUTH0_ISSUER_URI}
     volumes:
       - ./ProductService/src:/app/src
@@ -212,6 +214,8 @@ services:
       - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
       - CONFIG_SERVER_URL=configserver
       - DB_HOST=paymentDb
+      - AUTH0_M2M_CLIENT_ID=${AUTH0_M2M_CLIENT_ID}
+      - AUTH0_M2M_CLIENT_SECRET=${AUTH0_M2M_CLIENT_SECRET}
       - AUTH0_ISSUER_URI=${AUTH0_ISSUER_URI}
     volumes:
       - ./PaymentService/src:/app/src

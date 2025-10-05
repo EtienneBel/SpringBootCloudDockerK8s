@@ -9,6 +9,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.springframework.beans.BeanUtils.*;
 
 @Service
@@ -66,5 +69,54 @@ public class ProductServiceImpl implements ProductService {
         product.setQuantity(product.getQuantity() - quantity);
         productRepository.save(product);
         log.info("Product Quantity updated Successfully");
+    }
+
+    @Override
+    public List<ProductResponse> getAllProducts() {
+        log.info("Getting all products");
+
+        List<Product> products = productRepository.findAll();
+
+        List<ProductResponse> productResponses = products.stream()
+                .map(product -> {
+                    ProductResponse response = new ProductResponse();
+                    copyProperties(product, response);
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        log.info("Found {} products", productResponses.size());
+        return productResponses;
+    }
+
+    @Override
+    public ProductResponse updateProduct(long productId, ProductRequest productRequest) {
+        log.info("Updating product with id: {}", productId);
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductServiceCustomException("Product not found", "404"));
+
+        product.setProductName(productRequest.getProductName());
+        product.setPrice(productRequest.getPrice());
+        product.setQuantity(productRequest.getQuantity());
+
+        Product updatedProduct = productRepository.save(product);
+
+        ProductResponse productResponse = new ProductResponse();
+        copyProperties(updatedProduct, productResponse);
+
+        log.info("Product updated: {}", productResponse);
+        return productResponse;
+    }
+
+    @Override
+    public void deleteProduct(long productId) {
+        log.info("Deleting product with id: {}", productId);
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductServiceCustomException("Product not found", "404"));
+
+        productRepository.delete(product);
+        log.info("Product deleted successfully");
     }
 }

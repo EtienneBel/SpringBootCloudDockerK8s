@@ -135,4 +135,40 @@ public class OrderServiceImpl implements OrderService {
         }
         return orderResponses;
     }
+
+    @Override
+    public OrderResponse updateOrder(long orderId, OrderRequest orderRequest) {
+        log.info("Updating order with id: {}", orderId);
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new CustomException("Order not found for this id: " + orderId, "NOT_FOUND", 404));
+
+        order.setProductId(orderRequest.getProductId());
+        order.setQuantity(orderRequest.getQuantity());
+        order.setAmount(orderRequest.getTotalAmount());
+        order.setOrderStatus(orderRequest.getOrderStatus() != null ? orderRequest.getOrderStatus() : order.getOrderStatus());
+
+        Order updatedOrder = orderRepository.save(order);
+
+        OrderResponse orderResponse = OrderResponse.builder()
+                .orderId(updatedOrder.getId())
+                .orderStatus(updatedOrder.getOrderStatus())
+                .orderDate(updatedOrder.getOrderDate())
+                .amount(updatedOrder.getAmount())
+                .build();
+
+        log.info("Order updated successfully: {}", orderResponse);
+        return orderResponse;
+    }
+
+    @Override
+    public void deleteOrder(long orderId) {
+        log.info("Deleting order with id: {}", orderId);
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new CustomException("Order not found for this id: " + orderId, "NOT_FOUND", 404));
+
+        orderRepository.delete(order);
+        log.info("Order deleted successfully");
+    }
 }

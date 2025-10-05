@@ -14,29 +14,46 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/order")
+@RequestMapping("/api/orders")
 @Log4j2
 public class OrderController {
 
     @Autowired
     private OrderService orderService;
 
-    @PostMapping("/placeOrder")
+    @PostMapping
     public ResponseEntity<Long> placeOrder(@RequestBody OrderRequest orderRequest){
         log.info("Placing Order");
         long orderId = orderService.placeOrder(orderRequest);
         log.info("Order placed successfully with orderId: {}", orderId);
-        return new ResponseEntity<>(orderId, HttpStatus.OK);
-    }
-
-    @GetMapping("{orderId}")
-    public ResponseEntity<OrderResponse> getOrderDetails(@PathVariable long orderId){
-        return new ResponseEntity<>(orderService.getOrderDetails(orderId), HttpStatus.OK);
+        return new ResponseEntity<>(orderId, HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<List<OrderResponse>> getAllOrders(){
-        return new ResponseEntity<>(orderService.getAllOrders(),
-                HttpStatus.OK);
+        return new ResponseEntity<>(orderService.getAllOrders(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderResponse> getOrderDetails(@PathVariable long orderId){
+        return new ResponseEntity<>(orderService.getOrderDetails(orderId), HttpStatus.OK);
+    }
+
+    @PutMapping("/{orderId}")
+    public ResponseEntity<OrderResponse> updateOrder(
+            @PathVariable long orderId,
+            @RequestBody OrderRequest orderRequest){
+        log.info("Updating order with id: {}", orderId);
+        OrderResponse orderResponse = orderService.updateOrder(orderId, orderRequest);
+        log.info("Order updated successfully");
+        return new ResponseEntity<>(orderResponse, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{orderId}")
+    public ResponseEntity<Void> deleteOrder(@PathVariable long orderId){
+        log.info("Deleting order with id: {}", orderId);
+        orderService.deleteOrder(orderId);
+        log.info("Order deleted successfully");
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

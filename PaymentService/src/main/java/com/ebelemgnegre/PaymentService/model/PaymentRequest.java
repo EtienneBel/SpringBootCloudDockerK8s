@@ -14,4 +14,5 @@ public class PaymentRequest {
     private long amount;
     private String referenceNumber;
     private PaymentMode paymentMode;
+    private String paymentStatus;
 }
