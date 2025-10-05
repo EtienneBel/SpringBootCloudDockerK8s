@@ -13,7 +13,6 @@ import com.ebelemgnegre.OrderService.repository.OrderRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -31,9 +30,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private PaymentService paymentService;
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     @Override
     public long placeOrder(OrderRequest orderRequest) {
@@ -84,15 +80,9 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("Invoking product service to fetch the product for id: {}", order.getProductId());
 
-        ProductResponse productResponse = restTemplate.getForObject(
-                "http://PRODUCT-SERVICE/api/products/" + order.getProductId(),
-                ProductResponse.class
-        );
+        ProductResponse productResponse = productService.getProductById(order.getProductId()).getBody();
 
-        PaymentResponse paymentResponse = restTemplate.getForObject(
-                "http://PAYMENT-SERVICE/api/payments/order/" + order.getId(),
-                PaymentResponse.class
-        );
+        PaymentResponse paymentResponse = paymentService.getPaymentDetailsByOrderId(order.getId()).getBody();
 
         OrderResponse.ProductDetails productDetails = OrderResponse.ProductDetails.builder()
                 .productName(productResponse.getProductName())
