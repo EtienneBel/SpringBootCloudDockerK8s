@@ -10,10 +10,10 @@
 
 ```
 Gateway → Eureka → [Instance1, Instance2, Instance3]
-                   ↓
-            Round-robin selection
-                   ↓
-            Selected Instance
+ ↓
+ Round-robin selection
+ ↓
+ Selected Instance
 ```
 
 ## Implementation
@@ -21,11 +21,11 @@ Gateway → Eureka → [Instance1, Instance2, Instance3]
 **Gateway Routes**:
 ```yaml
 spring:
-  cloud:
-    gateway:
-      routes:
-        - id: PRODUCT-SERVICE
-          uri: lb://PRODUCT-SERVICE  # Load balanced
+ cloud:
+ gateway:
+ routes:
+ - id: PRODUCT-SERVICE
+ uri: lb://PRODUCT-SERVICE # Load balanced
 ```
 
 ## Load Balancing Strategies
@@ -36,10 +36,10 @@ spring:
 
 ## Benefits
 
-✅ Distributes traffic evenly
-✅ No single point of failure
-✅ Automatic failover
-✅ Better resource utilization
+ Distributes traffic evenly
+ No single point of failure
+ Automatic failover
+ Better resource utilization
 
 ---
 

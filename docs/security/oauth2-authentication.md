@@ -15,54 +15,54 @@ OAuth 2.0 is an authorization framework that enables applications to obtain limi
 
 ```
 ┌──────────────┐
-│   Frontend   │
-│  (React/Vue) │
+│ Frontend │
+│ (React/Vue) │
 └──────┬───────┘
-       │ (1) Login Request
-       ▼
+ │ (1) Login Request
+ ▼
 ┌─────────────────────────────┐
-│   CloudGateway (9090)       │
-│  Regular Web Application    │
-│  Authorization Code Flow    │
+│ CloudGateway (9090) │
+│ Regular Web Application │
+│ Authorization Code Flow │
 └──────┬──────────────────────┘
-       │ (2) Redirect to Auth0
-       ▼
+ │ (2) Redirect to Auth0
+ ▼
 ┌─────────────────────────────┐
-│   Auth0                     │
-│  https://dev-xxx.auth0.com  │
-│  - User Authentication      │
-│  - Token Issuance           │
+│ Auth0 │
+│ https://dev-xxx.auth0.com │
+│ - User Authentication │
+│ - Token Issuance │
 └──────┬──────────────────────┘
-       │ (3) Authorization Code
-       ▼
+ │ (3) Authorization Code
+ ▼
 ┌─────────────────────────────┐
-│   CloudGateway              │
-│  Exchange code for tokens   │
+│ CloudGateway │
+│ Exchange code for tokens │
 └──────┬──────────────────────┘
-       │ (4) Access Token
-       │     Refresh Token
-       │     ID Token
-       ▼
+ │ (4) Access Token
+ │ Refresh Token
+ │ ID Token
+ ▼
 ┌──────────────┐
-│   Frontend   │
-│  (Tokens stored)
+│ Frontend │
+│ (Tokens stored)
 └──────┬───────┘
-       │ (5) API Request
-       │     Authorization: Bearer <token>
-       ▼
+ │ (5) API Request
+ │ Authorization: Bearer <token>
+ ▼
 ┌─────────────────────────────┐
-│   CloudGateway              │
-│  - Validate JWT             │
-│  - Check expiration         │
-│  - Verify signature         │
+│ CloudGateway │
+│ - Validate JWT │
+│ - Check expiration │
+│ - Verify signature │
 └──────┬──────────────────────┘
-       │ (6) Validated Request
-       ▼
+ │ (6) Validated Request
+ ▼
 ┌─────────────────────────────┐
-│   ProductService            │
-│   OrderService              │
-│   PaymentService            │
-│  (Also validate JWT)        │
+│ ProductService │
+│ OrderService │
+│ PaymentService │
+│ (Also validate JWT) │
 └─────────────────────────────┘
 ```
 
@@ -79,14 +79,14 @@ This project uses **TWO** different Auth0 applications for better security:
 
 ```
 User → Login Button → CloudGateway → Auth0 Login Page
-                                    ↓
-                           User authenticates
-                                    ↓
-                           Redirect with code
-                                    ↓
-                  CloudGateway exchanges code for tokens
-                                    ↓
-                          Access Token + Refresh Token
+ ↓
+ User authenticates
+ ↓
+ Redirect with code
+ ↓
+ CloudGateway exchanges code for tokens
+ ↓
+ Access Token + Refresh Token
 ```
 
 **Configuration**:
@@ -96,7 +96,7 @@ Name: SpringBoot Microservices Web
 Allowed Callback URLs: http://localhost:9090/login/oauth2/code/auth0
 Allowed Logout URLs: http://localhost:9090
 Allowed Web Origins: http://localhost:3000,http://localhost:4200,http://localhost:5173
-Grant Types: ✅ Authorization Code, ✅ Refresh Token
+Grant Types: Authorization Code, Refresh Token
 ```
 
 ### 2. Machine-to-Machine (M2M) Application
@@ -108,18 +108,18 @@ Grant Types: ✅ Authorization Code, ✅ Refresh Token
 
 ```
 OrderService → Need to call ProductService
-             ↓
-   OAuth2 Interceptor checks token cache
-             ↓
-   Token expired? Request new token from Auth0
-             ↓
-   Auth0 validates client_id + client_secret
-             ↓
-   Returns access token (no user context)
-             ↓
-   Add Authorization header to request
-             ↓
-   ProductService validates token
+ ↓
+ OAuth2 Interceptor checks token cache
+ ↓
+ Token expired? Request new token from Auth0
+ ↓
+ Auth0 validates client_id + client_secret
+ ↓
+ Returns access token (no user context)
+ ↓
+ Add Authorization header to request
+ ↓
+ ProductService validates token
 ```
 
 **Configuration**:
@@ -127,7 +127,7 @@ OrderService → Need to call ProductService
 Application Type: Machine to Machine
 Name: SpringBoot Microservices M2M
 Authorized API: SpringBoot Microservices API
-Grant Types: ✅ Client Credentials
+Grant Types: Client Credentials
 ```
 
 ## OAuth2 Flows Implemented
@@ -148,10 +148,10 @@ window.location.href = 'http://localhost:9090/authenticate/login';
 ```
 HTTP/1.1 302 Found
 Location: https://dev-xxx.auth0.com/authorize?
-  client_id=YOUR_CLIENT_ID&
-  redirect_uri=http://localhost:9090/login/oauth2/code/auth0&
-  response_type=code&
-  scope=openid+profile+email+offline_access
+ client_id=YOUR_CLIENT_ID&
+ redirect_uri=http://localhost:9090/login/oauth2/code/auth0&
+ response_type=code&
+ scope=openid+profile+email+offline_access
 ```
 
 3. **User Authenticates with Auth0**:
@@ -171,33 +171,33 @@ POST https://dev-xxx.auth0.com/oauth/token
 Content-Type: application/json
 
 {
-  "grant_type": "authorization_code",
-  "code": "AUTH_CODE",
-  "redirect_uri": "http://localhost:9090/login/oauth2/code/auth0",
-  "client_id": "YOUR_CLIENT_ID",
-  "client_secret": "YOUR_CLIENT_SECRET"
+ "grant_type": "authorization_code",
+ "code": "AUTH_CODE",
+ "redirect_uri": "http://localhost:9090/login/oauth2/code/auth0",
+ "client_id": "YOUR_CLIENT_ID",
+ "client_secret": "YOUR_CLIENT_SECRET"
 }
 ```
 
 6. **Auth0 Returns Tokens**:
 ```json
 {
-  "access_token": "eyJhbGci...",
-  "refresh_token": "v1.MRrT...",
-  "id_token": "eyJhbGci...",
-  "token_type": "Bearer",
-  "expires_in": 86400
+ "access_token": "eyJhbGci...",
+ "refresh_token": "v1.MRrT...",
+ "id_token": "eyJhbGci...",
+ "token_type": "Bearer",
+ "expires_in": 86400
 }
 ```
 
 7. **CloudGateway Returns to Frontend**:
 ```json
 {
-  "userId": "user@example.com",
-  "accessToken": "eyJhbGci...",
-  "refreshToken": "v1.MRrT...",
-  "expiresAt": 1759750871,
-  "auhorityList": ["ROLE_USER", "SCOPE_openid", "SCOPE_profile", "SCOPE_email"]
+ "userId": "user@example.com",
+ "accessToken": "eyJhbGci...",
+ "refreshToken": "v1.MRrT...",
+ "expiresAt": 1759750871,
+ "auhorityList": ["ROLE_USER", "SCOPE_openid", "SCOPE_profile", "SCOPE_email"]
 }
 ```
 
@@ -211,8 +211,8 @@ Content-Type: application/json
 ```java
 // RestTemplate interceptor automatically handles this
 Product product = restTemplate.getForObject(
-    "lb://PRODUCT-SERVICE/product/1",
-    Product.class
+ "lb://PRODUCT-SERVICE/product/1",
+ Product.class
 );
 ```
 
@@ -222,19 +222,19 @@ POST https://dev-xxx.auth0.com/oauth/token
 Content-Type: application/json
 
 {
-  "grant_type": "client_credentials",
-  "client_id": "YOUR_M2M_CLIENT_ID",
-  "client_secret": "YOUR_M2M_CLIENT_SECRET",
-  "audience": "http://springboot-microservices-api"
+ "grant_type": "client_credentials",
+ "client_id": "YOUR_M2M_CLIENT_ID",
+ "client_secret": "YOUR_M2M_CLIENT_SECRET",
+ "audience": "http://springboot-microservices-api"
 }
 ```
 
 3. **Auth0 Returns Access Token**:
 ```json
 {
-  "access_token": "eyJhbGci...",
-  "token_type": "Bearer",
-  "expires_in": 86400
+ "access_token": "eyJhbGci...",
+ "token_type": "Bearer",
+ "expires_in": 86400
 }
 ```
 
@@ -256,22 +256,22 @@ Authorization: Bearer eyJhbGci...
 
 ```json
 {
-  "header": {
-    "alg": "RS256",
-    "typ": "JWT",
-    "kid": "key-id-123"
-  },
-  "payload": {
-    "iss": "https://dev-5nw6367bfpr277ec.us.auth0.com/",
-    "sub": "auth0|user-id-123",
-    "aud": "http://springboot-microservices-api",
-    "exp": 1759750871,
-    "iat": 1759664471,
-    "scope": "openid profile email offline_access",
-    "email": "user@example.com",
-    "email_verified": true
-  },
-  "signature": "..."
+ "header": {
+ "alg": "RS256",
+ "typ": "JWT",
+ "kid": "key-id-123"
+ },
+ "payload": {
+ "iss": "https://dev-5nw6367bfpr277ec.us.auth0.com/",
+ "sub": "auth0|user-id-123",
+ "aud": "http://springboot-microservices-api",
+ "exp": 1759750871,
+ "iat": 1759664471,
+ "scope": "openid profile email offline_access",
+ "email": "user@example.com",
+ "email_verified": true
+ },
+ "signature": "..."
 }
 ```
 
@@ -287,21 +287,21 @@ Authorization: Bearer eyJhbGci...
 
 ```json
 {
-  "header": {
-    "alg": "RS256",
-    "typ": "JWT"
-  },
-  "payload": {
-    "iss": "https://dev-5nw6367bfpr277ec.us.auth0.com/",
-    "sub": "auth0|user-id-123",
-    "aud": "YOUR_CLIENT_ID",
-    "exp": 1759750871,
-    "iat": 1759664471,
-    "nonce": "random-nonce",
-    "email": "user@example.com",
-    "name": "John Doe",
-    "picture": "https://example.com/avatar.jpg"
-  }
+ "header": {
+ "alg": "RS256",
+ "typ": "JWT"
+ },
+ "payload": {
+ "iss": "https://dev-5nw6367bfpr277ec.us.auth0.com/",
+ "sub": "auth0|user-id-123",
+ "aud": "YOUR_CLIENT_ID",
+ "exp": 1759750871,
+ "iat": 1759664471,
+ "nonce": "random-nonce",
+ "email": "user@example.com",
+ "name": "John Doe",
+ "picture": "https://example.com/avatar.jpg"
+ }
 }
 ```
 
@@ -315,24 +315,24 @@ Authorization: Bearer eyJhbGci...
 
 ```yaml
 spring:
-  security:
-    oauth2:
-      # Resource Server (validates incoming tokens)
-      resource-server:
-        jwt:
-          issuer-uri: ${AUTH0_ISSUER_URI}
-          audiences: ${AUTH0_AUDIENCE}
+ security:
+ oauth2:
+ # Resource Server (validates incoming tokens)
+ resource-server:
+ jwt:
+ issuer-uri: ${AUTH0_ISSUER_URI}
+ audiences: ${AUTH0_AUDIENCE}
 
-      # OAuth2 Client (for user login)
-      client:
-        registration:
-          auth0:
-            client-id: ${AUTH0_CLIENT_ID}
-            client-secret: ${AUTH0_CLIENT_SECRET}
-            scope: openid,profile,email,offline_access
-        provider:
-          auth0:
-            issuer-uri: ${AUTH0_ISSUER_URI}
+ # OAuth2 Client (for user login)
+ client:
+ registration:
+ auth0:
+ client-id: ${AUTH0_CLIENT_ID}
+ client-secret: ${AUTH0_CLIENT_SECRET}
+ scope: openid,profile,email,offline_access
+ provider:
+ auth0:
+ issuer-uri: ${AUTH0_ISSUER_URI}
 ```
 
 **Security Configuration**:
@@ -342,27 +342,27 @@ spring:
 @EnableWebFluxSecurity
 public class OktaOAuth2WebSecurity {
 
-    @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        return http
-            .authorizeExchange(exchanges -> exchanges
-                // Public endpoints
-                .pathMatchers(
-                    "/swagger-ui.html",
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**",
-                    "/actuator/**"
-                ).permitAll()
-                // All other endpoints require authentication
-                .anyExchange().authenticated()
-            )
-            .csrf(csrf -> csrf.disable())
-            .oauth2Login(withDefaults())  // Enable OAuth2 login
-            .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(withDefaults())  // Enable JWT validation
-            )
-            .build();
-    }
+ @Bean
+ public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+ return http
+ .authorizeExchange(exchanges -> exchanges
+ // Public endpoints
+ .pathMatchers(
+ "/swagger-ui.html",
+ "/swagger-ui/**",
+ "/v3/api-docs/**",
+ "/actuator/**"
+ ).permitAll()
+ // All other endpoints require authentication
+ .anyExchange().authenticated()
+ )
+ .csrf(csrf -> csrf.disable())
+ .oauth2Login(withDefaults()) // Enable OAuth2 login
+ .oauth2ResourceServer(oauth2 -> oauth2
+ .jwt(withDefaults()) // Enable JWT validation
+ )
+ .build();
+ }
 }
 ```
 
@@ -372,25 +372,25 @@ public class OktaOAuth2WebSecurity {
 
 ```yaml
 spring:
-  security:
-    oauth2:
-      # Resource Server (validates incoming tokens)
-      resource-server:
-        jwt:
-          issuer-uri: ${AUTH0_ISSUER_URI}
+ security:
+ oauth2:
+ # Resource Server (validates incoming tokens)
+ resource-server:
+ jwt:
+ issuer-uri: ${AUTH0_ISSUER_URI}
 
-      # OAuth2 Client (for service-to-service calls)
-      client:
-        registration:
-          internal-client:
-            provider: auth0
-            authorization-grant-type: client_credentials
-            scope: openid,profile,email
-            client-id: ${AUTH0_M2M_CLIENT_ID}
-            client-secret: ${AUTH0_M2M_CLIENT_SECRET}
-        provider:
-          auth0:
-            issuer-uri: ${AUTH0_ISSUER_URI}
+ # OAuth2 Client (for service-to-service calls)
+ client:
+ registration:
+ internal-client:
+ provider: auth0
+ authorization-grant-type: client_credentials
+ scope: openid,profile,email
+ client-id: ${AUTH0_M2M_CLIENT_ID}
+ client-secret: ${AUTH0_M2M_CLIENT_SECRET}
+ provider:
+ auth0:
+ issuer-uri: ${AUTH0_ISSUER_URI}
 ```
 
 **OAuth2 Client Manager**:
@@ -398,23 +398,23 @@ spring:
 ```java
 @Bean
 public OAuth2AuthorizedClientManager clientManager(
-        ClientRegistrationRepository clientRegistrationRepository,
-        OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository) {
+ ClientRegistrationRepository clientRegistrationRepository,
+ OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository) {
 
-    OAuth2AuthorizedClientProvider provider = OAuth2AuthorizedClientProviderBuilder
-        .builder()
-        .clientCredentials()
-        .refreshToken()  // Enable automatic token refresh
-        .build();
+ OAuth2AuthorizedClientProvider provider = OAuth2AuthorizedClientProviderBuilder
+ .builder()
+ .clientCredentials()
+ .refreshToken() // Enable automatic token refresh
+ .build();
 
-    DefaultOAuth2AuthorizedClientManager manager = new DefaultOAuth2AuthorizedClientManager(
-        clientRegistrationRepository,
-        oAuth2AuthorizedClientRepository
-    );
+ DefaultOAuth2AuthorizedClientManager manager = new DefaultOAuth2AuthorizedClientManager(
+ clientRegistrationRepository,
+ oAuth2AuthorizedClientRepository
+ );
 
-    manager.setAuthorizedClientProvider(provider);
+ manager.setAuthorizedClientProvider(provider);
 
-    return manager;
+ return manager;
 }
 ```
 
@@ -424,33 +424,33 @@ public OAuth2AuthorizedClientManager clientManager(
 @Component
 public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
 
-    @Autowired
-    private OAuth2AuthorizedClientManager clientManager;
+ @Autowired
+ private OAuth2AuthorizedClientManager clientManager;
 
-    @Override
-    public ClientHttpResponse intercept(HttpRequest request, byte[] body,
-                                        ClientHttpRequestExecution execution) throws IOException {
-        // Request OAuth2 token
-        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
-            .withClientRegistrationId("internal-client")
-            .principal("internal")
-            .build();
+ @Override
+ public ClientHttpResponse intercept(HttpRequest request, byte[] body,
+ ClientHttpRequestExecution execution) throws IOException {
+ // Request OAuth2 token
+ OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
+ .withClientRegistrationId("internal-client")
+ .principal("internal")
+ .build();
 
-        OAuth2AuthorizedClient client = clientManager.authorize(authorizeRequest);
+ OAuth2AuthorizedClient client = clientManager.authorize(authorizeRequest);
 
-        if (client != null && client.getAccessToken() != null) {
-            String token = client.getAccessToken().getTokenValue();
-            request.getHeaders().add("Authorization", "Bearer " + token);
-            log.debug("Added OAuth2 token to request");
-        } else {
-            log.error("Failed to obtain OAuth2 access token");
-            throw new OAuth2AuthenticationException(
-                new OAuth2Error("access_token_unavailable")
-            );
-        }
+ if (client != null && client.getAccessToken() != null) {
+ String token = client.getAccessToken().getTokenValue();
+ request.getHeaders().add("Authorization", "Bearer " + token);
+ log.debug("Added OAuth2 token to request");
+ } else {
+ log.error("Failed to obtain OAuth2 access token");
+ throw new OAuth2AuthenticationException(
+ new OAuth2Error("access_token_unavailable")
+ );
+ }
 
-        return execution.execute(request, body);
-    }
+ return execution.execute(request, body);
+ }
 }
 ```
 
@@ -460,11 +460,11 @@ public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
 
 ```yaml
 spring:
-  security:
-    oauth2:
-      resource-server:
-        jwt:
-          issuer-uri: ${AUTH0_ISSUER_URI}
+ security:
+ oauth2:
+ resource-server:
+ jwt:
+ issuer-uri: ${AUTH0_ISSUER_URI}
 ```
 
 **Security Configuration**:
@@ -475,18 +475,18 @@ spring:
 @EnableMethodSecurity
 public class WebSecurityConfig {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .anyRequest().authenticated()
-            )
-            .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(withDefaults())
-            )
-            .build();
-    }
+ @Bean
+ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+ return http
+ .authorizeHttpRequests(auth -> auth
+ .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+ .anyRequest().authenticated()
+ )
+ .oauth2ResourceServer(oauth2 -> oauth2
+ .jwt(withDefaults())
+ )
+ .build();
+ }
 }
 ```
 
@@ -539,7 +539,7 @@ TOKEN="eyJhbGciOiJkaXIi..."
 
 # Make authenticated request
 curl -H "Authorization: Bearer $TOKEN" \
-  http://localhost:9090/product/1
+ http://localhost:9090/product/1
 ```
 
 ### 3. Test Service-to-Service Auth
@@ -561,94 +561,94 @@ curl http://localhost:9090/product/1
 
 # Request with invalid token
 curl -H "Authorization: Bearer invalid-token" \
-  http://localhost:9090/product/1
+ http://localhost:9090/product/1
 # Response: 401 Unauthorized
 
 # Request with valid token
 curl -H "Authorization: Bearer $VALID_TOKEN" \
-  http://localhost:9090/product/1
+ http://localhost:9090/product/1
 # Response: 200 OK with product data
 ```
 
 ## Benefits
 
-✅ **Industry Standard**
+ **Industry Standard**
 - OAuth 2.0 and OIDC are widely adopted
 - Works with any OAuth2-compliant provider
 - Well-documented and tested
 
-✅ **Stateless Authentication**
+ **Stateless Authentication**
 - JWT tokens are self-contained
 - No session storage needed
 - Easy to scale horizontally
 
-✅ **Automatic Token Management**
+ **Automatic Token Management**
 - RestTemplate interceptor handles tokens
 - Automatic refresh when expired
 - No manual token management in business logic
 
-✅ **Centralized User Management**
+ **Centralized User Management**
 - Auth0 handles user database
 - Multi-factor authentication
 - Social login support
 - Enterprise SSO integration
 
-✅ **Fine-Grained Authorization**
+ **Fine-Grained Authorization**
 - Scope-based permissions
 - Role-based access control (RBAC)
 - Custom claims in tokens
 
 ## Security Best Practices
 
-✅ **Use HTTPS in Production**
+ **Use HTTPS in Production**
 ```yaml
 server:
-  ssl:
-    enabled: true
-    key-store: classpath:keystore.p12
-    key-store-password: ${SSL_PASSWORD}
+ ssl:
+ enabled: true
+ key-store: classpath:keystore.p12
+ key-store-password: ${SSL_PASSWORD}
 ```
 
-✅ **Validate Tokens on Every Service**
+ **Validate Tokens on Every Service**
 ```yaml
 # All services should validate tokens
 spring:
-  security:
-    oauth2:
-      resource-server:
-        jwt:
-          issuer-uri: ${AUTH0_ISSUER_URI}
+ security:
+ oauth2:
+ resource-server:
+ jwt:
+ issuer-uri: ${AUTH0_ISSUER_URI}
 ```
 
-✅ **Use Refresh Tokens**
+ **Use Refresh Tokens**
 ```yaml
 spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          auth0:
-            scope: openid,profile,email,offline_access  # offline_access = refresh token
+ security:
+ oauth2:
+ client:
+ registration:
+ auth0:
+ scope: openid,profile,email,offline_access # offline_access = refresh token
 ```
 
-✅ **Short Token Expiration**
+ **Short Token Expiration**
 - Access tokens: 24 hours (configurable in Auth0)
 - Refresh tokens: 30 days
 - Force re-authentication for sensitive operations
 
-✅ **Validate Audience**
+ **Validate Audience**
 ```java
 // Ensure token is for your API
 @Value("${spring.security.oauth2.resource-server.jwt.audiences}")
 private List<String> audiences;
 ```
 
-✅ **Never Log Tokens**
+ **Never Log Tokens**
 ```java
-// ❌ Bad
+// Bad
 log.info("Access token: {}", accessToken);
 
-// ✅ Good
+// Good
 log.info("Successfully authenticated user: {}", userId);
 ```
 
@@ -702,12 +702,12 @@ docker-compose logs orderservice | grep -i "oauth\|token\|error"
 ```yaml
 # Add offline_access scope
 spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          auth0:
-            scope: openid,profile,email,offline_access  # Added offline_access
+ security:
+ oauth2:
+ client:
+ registration:
+ auth0:
+ scope: openid,profile,email,offline_access # Added offline_access
 ```
 
 ## Related Documentation

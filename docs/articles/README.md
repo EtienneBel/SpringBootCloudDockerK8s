@@ -26,10 +26,10 @@ This directory contains updated versions of the Medium article series for the Sp
 **File:** [article-2-oauth2-auth0.md](article-2-oauth2-auth0.md)
 
 **Major Updates from Original:**
-- ❌ **Removed:** Okta integration
-- ✅ **Added:** Auth0 setup and configuration
-- ✅ **Updated:** OAuth2 flows and JWT validation
-- ✅ **New:** Two Auth0 applications (Web + M2M)
+- **Removed:** Okta integration
+- **Added:** Auth0 setup and configuration
+- **Updated:** OAuth2 flows and JWT validation
+- **New:** Two Auth0 applications (Web + M2M)
 
 **Topics Covered:**
 - OAuth2 fundamentals
@@ -76,8 +76,8 @@ This directory contains updated versions of the Medium article series for the Sp
 **After (Updated):**
 - Auth0 as OAuth2 provider
 - Two Auth0 applications:
-  - Regular Web App (user login)
-  - Machine-to-Machine (service-to-service)
+ - Regular Web App (user login)
+ - Machine-to-Machine (service-to-service)
 - Auth0-specific configuration
 
 **Environment Variables Changed:**
@@ -122,25 +122,25 @@ AUTH0_AUDIENCE
 ### For Medium Publication
 
 1. **Copy Article Content:**
-   - Copy from the .md files
-   - Paste into Medium editor
-   - Format code blocks with syntax highlighting
+ - Copy from the .md files
+ - Paste into Medium editor
+ - Format code blocks with syntax highlighting
 
 2. **Add Screenshots:**
-   - Auth0 Dashboard screenshots
-   - Eureka Dashboard
-   - Swagger UI
-   - Kubernetes Dashboard
+ - Auth0 Dashboard screenshots
+ - Eureka Dashboard
+ - Swagger UI
+ - Kubernetes Dashboard
 
 3. **Update Links:**
-   - Replace `[Your Repository Link]` with actual GitHub URL
-   - Update author LinkedIn profile
-   - Add canonical URL if republishing
+ - Replace `[Your Repository Link]` with actual GitHub URL
+ - Update author LinkedIn profile
+ - Add canonical URL if republishing
 
 4. **Update Metadata:**
-   - Change publication date
-   - Update tags/keywords
-   - Add cover image
+ - Change publication date
+ - Update tags/keywords
+ - Add cover image
 
 ### For GitHub README
 
@@ -151,28 +151,28 @@ These articles can also be published as detailed guides in the main README or li
 ## Comparison with Original Articles
 
 ### What's Preserved
-✅ Overall structure and flow
-✅ Architecture diagrams (updated)
-✅ Code examples (updated to Auth0)
-✅ Teaching approach and explanations
+ Overall structure and flow
+ Architecture diagrams (updated)
+ Code examples (updated to Auth0)
+ Teaching approach and explanations
 
 ### What's Updated
-🔄 All Okta references → Auth0
-🔄 OAuth2 configuration examples
-🔄 Environment variable names
-🔄 Security class names
-🔄 Technology versions
-🔄 Docker Compose configurations
-🔄 Kubernetes manifests
+ All Okta references → Auth0
+ OAuth2 configuration examples
+ Environment variable names
+ Security class names
+ Technology versions
+ Docker Compose configurations
+ Kubernetes manifests
 
 ### What's New
-✨ Two Auth0 applications setup
-✨ Service-to-service auth explanation
-✨ RestTemplate OAuth2 interceptor details
-✨ Development Dockerfiles
-✨ Remote debugging setup
-✨ Complete CI/CD pipeline
-✨ Production best practices section
+ Two Auth0 applications setup
+ Service-to-service auth explanation
+ RestTemplate OAuth2 interceptor details
+ Development Dockerfiles
+ Remote debugging setup
+ Complete CI/CD pipeline
+ Production best practices section
 
 ---
 
@@ -196,11 +196,11 @@ Before publishing to Medium:
 
 | Aspect | Original (Okta) | Updated (Auth0) | Status |
 |--------|----------------|-----------------|--------|
-| **Part 1** | Spring Boot 3.1.5 | Spring Boot 3.2.0 | ✅ Updated |
-| **Part 2** | Okta OAuth2 | Auth0 OAuth2 | ✅ Rewritten |
-| **Part 2** | Single app | Two apps (Web + M2M) | ✅ Enhanced |
-| **Part 3** | Basic Docker | Dev + Prod Dockerfiles | ✅ Enhanced |
-| **Part 3** | Basic K8s | Secrets + HPA + CI/CD | ✅ Enhanced |
+| **Part 1** | Spring Boot 3.1.5 | Spring Boot 3.2.0 | Updated |
+| **Part 2** | Okta OAuth2 | Auth0 OAuth2 | Rewritten |
+| **Part 2** | Single app | Two apps (Web + M2M) | Enhanced |
+| **Part 3** | Basic Docker | Dev + Prod Dockerfiles | Enhanced |
+| **Part 3** | Basic K8s | Secrets + HPA + CI/CD | Enhanced |
 
 ---
 

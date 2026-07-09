@@ -2,7 +2,7 @@
 
 This guide explains how to integrate a frontend application (React, Vue, Angular, etc.) with the Spring Boot microservices backend using Auth0 OAuth2 authentication.
 
-## ⚠️ Prerequisites: Auth0 Application Configuration
+## Prerequisites: Auth0 Application Configuration
 
 **IMPORTANT:** Your CloudGateway must use a **Regular Web Application** in Auth0 (NOT Machine-to-Machine).
 
@@ -15,23 +15,23 @@ Frontend user login requires **Authorization Code flow**, which is only supporte
 ### Configuration Required
 
 1. **Create/Use Regular Web Application in Auth0:**
-   - Type: Regular Web Application
-   - Grant Types: ✅ Authorization Code, ✅ Refresh Token
-   - Allowed Callback URLs: `http://localhost:9090/login/oauth2/code/auth0`
-   - Allowed Logout URLs: `http://localhost:9090`
-   - Allowed Web Origins: `http://localhost:3000,http://localhost:4200,http://localhost:5173`
+ - Type: Regular Web Application
+ - Grant Types: Authorization Code, Refresh Token
+ - Allowed Callback URLs: `http://localhost:9090/login/oauth2/code/auth0`
+ - Allowed Logout URLs: `http://localhost:9090`
+ - Allowed Web Origins: `http://localhost:3000,http://localhost:4200,http://localhost:5173`
 
 2. **Update `.env` file:**
-   ```bash
-   AUTH0_CLIENT_ID=<your_regular_web_app_client_id>
-   AUTH0_CLIENT_SECRET=<your_regular_web_app_client_secret>
-   ```
+ ```bash
+ AUTH0_CLIENT_ID=<your_regular_web_app_client_id>
+ AUTH0_CLIENT_SECRET=<your_regular_web_app_client_secret>
+ ```
 
 3. **Optional:** If using separate M2M app for backend services:
-   ```bash
-   AUTH0_M2M_CLIENT_ID=<your_m2m_client_id>
-   AUTH0_M2M_CLIENT_SECRET=<your_m2m_client_secret>
-   ```
+ ```bash
+ AUTH0_M2M_CLIENT_ID=<your_m2m_client_id>
+ AUTH0_M2M_CLIENT_SECRET=<your_m2m_client_secret>
+ ```
 
 For detailed instructions, see [README.md - Troubleshooting #8](#do-i-need-to-change-my-m2m-app)
 
@@ -49,19 +49,19 @@ For detailed instructions, see [README.md - Troubleshooting #8](#do-i-need-to-ch
 
 ## Authentication Flow Options
 
-### **Option 1: Session-Based** ✅ Recommended
+### **Option 1: Session-Based** Recommended
 - **Best for:** Traditional web apps, server-side rendered apps
 - **How:** OAuth2 Authorization Code flow with session cookies
 - **Pros:** Simple, secure (cookies are HTTP-only)
 - **Cons:** Requires same-domain or CORS setup
 
-### **Option 2: Token-Based with BFF** ✅ Recommended for SPAs
+### **Option 2: Token-Based with BFF** Recommended for SPAs
 - **Best for:** Single Page Applications (React, Vue, Angular)
 - **How:** Backend-for-Frontend pattern with token exchange
 - **Pros:** Better security than storing tokens in localStorage
 - **Cons:** Requires additional endpoint
 
-### **Option 3: Direct Auth0 SDK** ⚠️ Advanced
+### **Option 3: Direct Auth0 SDK** Advanced
 - **Best for:** Mobile apps, native apps
 - **How:** Frontend directly integrates with Auth0
 - **Pros:** Full control, works for mobile
@@ -75,41 +75,41 @@ For detailed instructions, see [README.md - Troubleshooting #8](#do-i-need-to-ch
 
 ```
 ┌─────────────┐
-│   Browser   │
-│  (Frontend) │
+│ Browser │
+│ (Frontend) │
 └──────┬──────┘
-       │
-       │ 1. Click "Login" → Redirect to /oauth2/authorization/auth0
-       │
-       ▼
+ │
+ │ 1. Click "Login" → Redirect to /oauth2/authorization/auth0
+ │
+ ▼
 ┌─────────────────┐
-│ Cloud Gateway   │
+│ Cloud Gateway │
 │ (localhost:9090)│
 └────────┬────────┘
-         │
-         │ 2. Redirect to Auth0 login page
-         │
-         ▼
+ │
+ │ 2. Redirect to Auth0 login page
+ │
+ ▼
 ┌─────────────────┐
-│  Auth0 Login    │
-│  (auth0.com)    │
+│ Auth0 Login │
+│ (auth0.com) │
 └────────┬────────┘
-         │
-         │ 3. User logs in
-         │ 4. Redirect back with code
-         │
-         ▼
+ │
+ │ 3. User logs in
+ │ 4. Redirect back with code
+ │
+ ▼
 ┌─────────────────┐
-│ Cloud Gateway   │
+│ Cloud Gateway │
 └────────┬────────┘
-         │
-         │ 5. Exchange code for tokens
-         │ 6. Create session cookie
-         │ 7. Redirect to frontend
-         │
-         ▼
+ │
+ │ 5. Exchange code for tokens
+ │ 6. Create session cookie
+ │ 7. Redirect to frontend
+ │
+ ▼
 ┌─────────────┐
-│   Browser   │
+│ Browser │
 │ (Logged in) │
 └─────────────┘
 ```
@@ -123,19 +123,19 @@ For detailed instructions, see [README.md - Troubleshooting #8](#do-i-need-to-ch
 import React from 'react';
 
 function Login() {
-  const handleLogin = () => {
-    // Redirect to Cloud Gateway OAuth2 endpoint
-    window.location.href = 'http://localhost:9090/oauth2/authorization/auth0';
-  };
+ const handleLogin = () => {
+ // Redirect to Cloud Gateway OAuth2 endpoint
+ window.location.href = 'http://localhost:9090/oauth2/authorization/auth0';
+ };
 
-  return (
-    <div className="login-page">
-      <h1>Welcome to E-Commerce App</h1>
-      <button onClick={handleLogin} className="btn-login">
-        Login with Auth0
-      </button>
-    </div>
-  );
+ return (
+ <div className="login-page">
+ <h1>Welcome to E-Commerce App</h1>
+ <button onClick={handleLogin} className="btn-login">
+ Login with Auth0
+ </button>
+ </div>
+ );
 }
 
 export default Login;
@@ -149,36 +149,36 @@ const API_BASE_URL = 'http://localhost:9090';
 
 // Fetch wrapper with credentials
 async function apiCall(endpoint, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    credentials: 'include', // IMPORTANT: Sends cookies
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+ const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+ ...options,
+ credentials: 'include', // IMPORTANT: Sends cookies
+ headers: {
+ 'Content-Type': 'application/json',
+ ...options.headers,
+ },
+ });
 
-  if (!response.ok) {
-    if (response.status === 401) {
-      // Redirect to login if unauthorized
-      window.location.href = '/login';
-    }
-    throw new Error(`API Error: ${response.status}`);
-  }
+ if (!response.ok) {
+ if (response.status === 401) {
+ // Redirect to login if unauthorized
+ window.location.href = '/login';
+ }
+ throw new Error(`API Error: ${response.status}`);
+ }
 
-  return response.json();
+ return response.json();
 }
 
 // Products API
 export const getProducts = () => apiCall('/product');
 export const getProduct = (id) => apiCall(`/product/${id}`);
 export const createProduct = (product) =>
-  apiCall('/product', { method: 'POST', body: JSON.stringify(product) });
+ apiCall('/product', { method: 'POST', body: JSON.stringify(product) });
 
 // Orders API
 export const getOrders = () => apiCall('/order');
 export const placeOrder = (order) =>
-  apiCall('/order/placeOrder', { method: 'POST', body: JSON.stringify(order) });
+ apiCall('/order/placeOrder', { method: 'POST', body: JSON.stringify(order) });
 
 // User Info
 export const getUserInfo = () => apiCall('/authenticate/login');
@@ -192,34 +192,34 @@ import React, { useEffect, useState } from 'react';
 import { getUserInfo } from '../services/api';
 
 function UserProfile() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+ const [user, setUser] = useState(null);
+ const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    getUserInfo()
-      .then(data => {
-        setUser(data);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Failed to load user:', error);
-        setLoading(false);
-      });
-  }, []);
+ useEffect(() => {
+ getUserInfo()
+ .then(data => {
+ setUser(data);
+ setLoading(false);
+ })
+ .catch(error => {
+ console.error('Failed to load user:', error);
+ setLoading(false);
+ });
+ }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (!user) return null;
+ if (loading) return <div>Loading...</div>;
+ if (!user) return null;
 
-  return (
-    <div className="user-profile">
-      <h3>Welcome, {user.userId}</h3>
-      <p>Token expires: {new Date(user.expiresAt * 1000).toLocaleString()}</p>
-      <details>
-        <summary>User Details</summary>
-        <pre>{JSON.stringify(user, null, 2)}</pre>
-      </details>
-    </div>
-  );
+ return (
+ <div className="user-profile">
+ <h3>Welcome, {user.userId}</h3>
+ <p>Token expires: {new Date(user.expiresAt * 1000).toLocaleString()}</p>
+ <details>
+ <summary>User Details</summary>
+ <pre>{JSON.stringify(user, null, 2)}</pre>
+ </details>
+ </div>
+ );
 }
 
 export default UserProfile;
@@ -233,37 +233,37 @@ import React, { useEffect, useState } from 'react';
 import { getProducts } from '../services/api';
 
 function ProductList() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+ const [products, setProducts] = useState([]);
+ const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    getProducts()
-      .then(data => {
-        setProducts(data);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Failed to load products:', error);
-        setLoading(false);
-      });
-  }, []);
+ useEffect(() => {
+ getProducts()
+ .then(data => {
+ setProducts(data);
+ setLoading(false);
+ })
+ .catch(error => {
+ console.error('Failed to load products:', error);
+ setLoading(false);
+ });
+ }, []);
 
-  if (loading) return <div>Loading products...</div>;
+ if (loading) return <div>Loading products...</div>;
 
-  return (
-    <div className="product-list">
-      <h2>Products</h2>
-      <div className="products-grid">
-        {products.map(product => (
-          <div key={product.id} className="product-card">
-            <h3>{product.name}</h3>
-            <p>Price: ${product.price}</p>
-            <p>Stock: {product.quantity}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+ return (
+ <div className="product-list">
+ <h2>Products</h2>
+ <div className="products-grid">
+ {products.map(product => (
+ <div key={product.id} className="product-card">
+ <h3>{product.name}</h3>
+ <p>Price: ${product.price}</p>
+ <p>Stock: {product.quantity}</p>
+ </div>
+ ))}
+ </div>
+ </div>
+ );
 }
 
 export default ProductList;
@@ -281,44 +281,44 @@ import UserProfile from './components/UserProfile';
 import { getUserInfo } from './services/api';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+ const [isAuthenticated, setIsAuthenticated] = useState(false);
+ const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Check if user is authenticated
-    getUserInfo()
-      .then(() => {
-        setIsAuthenticated(true);
-        setLoading(false);
-      })
-      .catch(() => {
-        setIsAuthenticated(false);
-        setLoading(false);
-      });
-  }, []);
+ useEffect(() => {
+ // Check if user is authenticated
+ getUserInfo()
+ .then(() => {
+ setIsAuthenticated(true);
+ setLoading(false);
+ })
+ .catch(() => {
+ setIsAuthenticated(false);
+ setLoading(false);
+ });
+ }, []);
 
-  if (loading) return <div>Loading...</div>;
+ if (loading) return <div>Loading...</div>;
 
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/"
-          element={
-            isAuthenticated ? (
-              <div>
-                <UserProfile />
-                <ProductList />
-              </div>
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
-      </Routes>
-    </BrowserRouter>
-  );
+ return (
+ <BrowserRouter>
+ <Routes>
+ <Route path="/login" element={<Login />} />
+ <Route
+ path="/"
+ element={
+ isAuthenticated ? (
+ <div>
+ <UserProfile />
+ <ProductList />
+ </div>
+ ) : (
+ <Navigate to="/login" />
+ )
+ }
+ />
+ </Routes>
+ </BrowserRouter>
+ );
 }
 
 export default App;
@@ -339,16 +339,16 @@ Create a new endpoint in CloudGateway to return just the access token:
 
 @GetMapping("/token")
 public ResponseEntity<Map<String, String>> getToken(
-        @RegisteredOAuth2AuthorizedClient("auth0") OAuth2AuthorizedClient client) {
+ @RegisteredOAuth2AuthorizedClient("auth0") OAuth2AuthorizedClient client) {
 
-    String accessToken = client.getAccessToken().getTokenValue();
-    long expiresAt = client.getAccessToken().getExpiresAt().getEpochSecond();
+ String accessToken = client.getAccessToken().getTokenValue();
+ long expiresAt = client.getAccessToken().getExpiresAt().getEpochSecond();
 
-    Map<String, String> response = new HashMap<>();
-    response.put("access_token", accessToken);
-    response.put("expires_at", String.valueOf(expiresAt));
+ Map<String, String> response = new HashMap<>();
+ response.put("access_token", accessToken);
+ response.put("expires_at", String.valueOf(expiresAt));
 
-    return ResponseEntity.ok(response);
+ return ResponseEntity.ok(response);
 }
 ```
 
@@ -359,42 +359,42 @@ public ResponseEntity<Map<String, String>> getToken(
 const API_BASE_URL = 'http://localhost:9090';
 
 export const login = () => {
-  // Step 1: Redirect to OAuth2
-  window.location.href = `${API_BASE_URL}/oauth2/authorization/auth0`;
+ // Step 1: Redirect to OAuth2
+ window.location.href = `${API_BASE_URL}/oauth2/authorization/auth0`;
 };
 
 export const getToken = async () => {
-  // Step 2: After redirect, get token
-  const response = await fetch(`${API_BASE_URL}/authenticate/token`, {
-    credentials: 'include',
-  });
+ // Step 2: After redirect, get token
+ const response = await fetch(`${API_BASE_URL}/authenticate/token`, {
+ credentials: 'include',
+ });
 
-  if (!response.ok) throw new Error('Not authenticated');
+ if (!response.ok) throw new Error('Not authenticated');
 
-  const data = await response.json();
+ const data = await response.json();
 
-  // Store token (consider using sessionStorage instead of localStorage for better security)
-  sessionStorage.setItem('access_token', data.access_token);
-  sessionStorage.setItem('expires_at', data.expires_at);
+ // Store token (consider using sessionStorage instead of localStorage for better security)
+ sessionStorage.setItem('access_token', data.access_token);
+ sessionStorage.setItem('expires_at', data.expires_at);
 
-  return data.access_token;
+ return data.access_token;
 };
 
 export const getStoredToken = () => {
-  return sessionStorage.getItem('access_token');
+ return sessionStorage.getItem('access_token');
 };
 
 export const isTokenExpired = () => {
-  const expiresAt = sessionStorage.getItem('expires_at');
-  if (!expiresAt) return true;
+ const expiresAt = sessionStorage.getItem('expires_at');
+ if (!expiresAt) return true;
 
-  return Date.now() / 1000 > parseInt(expiresAt);
+ return Date.now() / 1000 > parseInt(expiresAt);
 };
 
 export const logout = () => {
-  sessionStorage.removeItem('access_token');
-  sessionStorage.removeItem('expires_at');
-  window.location.href = '/login';
+ sessionStorage.removeItem('access_token');
+ sessionStorage.removeItem('expires_at');
+ window.location.href = '/login';
 };
 ```
 
@@ -403,30 +403,30 @@ export const logout = () => {
 import { getStoredToken, isTokenExpired, logout } from './auth';
 
 async function apiCallWithToken(endpoint, options = {}) {
-  if (isTokenExpired()) {
-    logout();
-    return;
-  }
+ if (isTokenExpired()) {
+ logout();
+ return;
+ }
 
-  const token = getStoredToken();
+ const token = getStoredToken();
 
-  const response = await fetch(`http://localhost:9090${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-      ...options.headers,
-    },
-  });
+ const response = await fetch(`http://localhost:9090${endpoint}`, {
+ ...options,
+ headers: {
+ 'Content-Type': 'application/json',
+ 'Authorization': `Bearer ${token}`,
+ ...options.headers,
+ },
+ });
 
-  if (!response.ok) {
-    if (response.status === 401) {
-      logout();
-    }
-    throw new Error(`API Error: ${response.status}`);
-  }
+ if (!response.ok) {
+ if (response.status === 401) {
+ logout();
+ }
+ throw new Error(`API Error: ${response.status}`);
+ }
 
-  return response.json();
+ return response.json();
 }
 
 export const getProducts = () => apiCallWithToken('/product');
@@ -451,17 +451,17 @@ npm install @auth0/auth0-react
 import { Auth0Provider } from '@auth0/auth0-react';
 
 ReactDOM.render(
-  <Auth0Provider
-    domain="dev-5nw6367bfpr277ec.us.auth0.com"
-    clientId="YOUR_AUTH0_CLIENT_ID"
-    authorizationParams={{
-      redirect_uri: window.location.origin,
-      audience: "http://springboot-microservices-api"
-    }}
-  >
-    <App />
-  </Auth0Provider>,
-  document.getElementById('root')
+ <Auth0Provider
+ domain="dev-5nw6367bfpr277ec.us.auth0.com"
+ clientId="YOUR_AUTH0_CLIENT_ID"
+ authorizationParams={{
+ redirect_uri: window.location.origin,
+ audience: "http://springboot-microservices-api"
+ }}
+ >
+ <App />
+ </Auth0Provider>,
+ document.getElementById('root')
 );
 ```
 
@@ -472,13 +472,13 @@ ReactDOM.render(
 import { useAuth0 } from '@auth0/auth0-react';
 
 function Login() {
-  const { loginWithRedirect } = useAuth0();
+ const { loginWithRedirect } = useAuth0();
 
-  return (
-    <button onClick={() => loginWithRedirect()}>
-      Login with Auth0
-    </button>
-  );
+ return (
+ <button onClick={() => loginWithRedirect()}>
+ Login with Auth0
+ </button>
+ );
 }
 ```
 
@@ -487,36 +487,36 @@ function Login() {
 import { useAuth0 } from '@auth0/auth0-react';
 
 function useApiCall() {
-  const { getAccessTokenSilently } = useAuth0();
+ const { getAccessTokenSilently } = useAuth0();
 
-  const apiCall = async (endpoint, options = {}) => {
-    const token = await getAccessTokenSilently();
+ const apiCall = async (endpoint, options = {}) => {
+ const token = await getAccessTokenSilently();
 
-    const response = await fetch(`http://localhost:9090${endpoint}`, {
-      ...options,
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
+ const response = await fetch(`http://localhost:9090${endpoint}`, {
+ ...options,
+ headers: {
+ 'Authorization': `Bearer ${token}`,
+ 'Content-Type': 'application/json',
+ ...options.headers,
+ },
+ });
 
-    return response.json();
-  };
+ return response.json();
+ };
 
-  return apiCall;
+ return apiCall;
 }
 
 // Usage in component
 function ProductList() {
-  const [products, setProducts] = useState([]);
-  const apiCall = useApiCall();
+ const [products, setProducts] = useState([]);
+ const apiCall = useApiCall();
 
-  useEffect(() => {
-    apiCall('/product').then(setProducts);
-  }, []);
+ useEffect(() => {
+ apiCall('/product').then(setProducts);
+ }, []);
 
-  // ...
+ // ...
 }
 ```
 
@@ -609,36 +609,36 @@ touch src/services/api.js
 ```js
 // src/services/api.js
 export const login = () => {
-  window.location.href = 'http://localhost:9090/oauth2/authorization/auth0';
+ window.location.href = 'http://localhost:9090/oauth2/authorization/auth0';
 };
 
 export const apiCall = async (endpoint, options = {}) => {
-  const response = await fetch(`http://localhost:9090${endpoint}`, {
-    ...options,
-    credentials: 'include',
-  });
-  return response.json();
+ const response = await fetch(`http://localhost:9090${endpoint}`, {
+ ...options,
+ credentials: 'include',
+ });
+ return response.json();
 };
 ```
 
 ```vue
 <!-- src/views/Login.vue -->
 <template>
-  <div class="login">
-    <h1>Login</h1>
-    <button @click="handleLogin">Login with Auth0</button>
-  </div>
+ <div class="login">
+ <h1>Login</h1>
+ <button @click="handleLogin">Login with Auth0</button>
+ </div>
 </template>
 
 <script>
 import { login } from '@/services/api';
 
 export default {
-  methods: {
-    handleLogin() {
-      login();
-    }
-  }
+ methods: {
+ handleLogin() {
+ login();
+ }
+ }
 }
 </script>
 ```
@@ -661,10 +661,10 @@ export default {
 ```javascript
 // In browser console
 fetch('http://localhost:9090/product', {
-  credentials: 'include'
+ credentials: 'include'
 })
-  .then(r => r.json())
-  .then(console.log);
+ .then(r => r.json())
+ .then(console.log);
 ```
 
 ### **3. Test Token**
@@ -672,13 +672,13 @@ fetch('http://localhost:9090/product', {
 ```javascript
 // Get user info
 fetch('http://localhost:9090/authenticate/login', {
-  credentials: 'include'
+ credentials: 'include'
 })
-  .then(r => r.json())
-  .then(data => {
-    console.log('User:', data.userId);
-    console.log('Token:', data.accessToken);
-  });
+ .then(r => r.json())
+ .then(data => {
+ console.log('User:', data.userId);
+ console.log('Token:', data.accessToken);
+ });
 ```
 
 ---
@@ -716,14 +716,14 @@ fetch('http://localhost:9090/authenticate/login', {
 
 ## Security Best Practices
 
-✅ **DO:**
+ **DO:**
 - Use `credentials: 'include'` for session cookies
 - Use `sessionStorage` instead of `localStorage` for tokens
 - Implement token expiry checks
 - Use HTTPS in production
 - Set secure, HTTP-only cookies in production
 
-❌ **DON'T:**
+ **DON'T:**
 - Store tokens in `localStorage` (XSS risk)
 - Expose client secrets in frontend code
 - Disable CORS in production
@@ -734,10 +734,10 @@ fetch('http://localhost:9090/authenticate/login', {
 ## Next Steps
 
 1. **Set up environment variables** for frontend:
-   ```env
-   REACT_APP_API_URL=http://localhost:9090
-   REACT_APP_AUTH0_DOMAIN=dev-5nw6367bfpr277ec.us.auth0.com
-   ```
+ ```env
+ REACT_APP_API_URL=http://localhost:9090
+ REACT_APP_AUTH0_DOMAIN=dev-5nw6367bfpr277ec.us.auth0.com
+ ```
 
 2. **Add error handling** for API calls
 

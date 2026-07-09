@@ -9,12 +9,12 @@
 In Part 1, we built a microservices application with service discovery, API gateway, and circuit breakers. Now we'll secure it with OAuth2 authentication using **Auth0** as our identity provider.
 
 **What You'll Learn:**
-- ✅ OAuth2 fundamentals and flows
-- ✅ Setting up Auth0 (Regular Web App + M2M)
-- ✅ JWT token validation at API Gateway
-- ✅ Service-to-service authentication with Client Credentials flow
-- ✅ CORS configuration for frontend applications
-- ✅ Automatic OAuth2 token injection with interceptors
+- OAuth2 fundamentals and flows
+- Setting up Auth0 (Regular Web App + M2M)
+- JWT token validation at API Gateway
+- Service-to-service authentication with Client Credentials flow
+- CORS configuration for frontend applications
+- Automatic OAuth2 token injection with interceptors
 
 **Prerequisites:**
 - Completed Part 1 (microservices setup)
@@ -45,11 +45,11 @@ OAuth 2.0 is an **authorization framework** that enables applications to obtain 
 
 ### Why Auth0?
 
-- ✅ **Managed Identity Provider** - No need to build authentication
-- ✅ **Multiple Login Methods** - Email/password, social, enterprise SSO
-- ✅ **Built-in Security** - MFA, breach detection, bot detection
-- ✅ **JWT Tokens** - Stateless, scalable authentication
-- ✅ **Free Tier** - 7,000 active users, unlimited logins
+- **Managed Identity Provider** - No need to build authentication
+- **Multiple Login Methods** - Email/password, social, enterprise SSO
+- **Built-in Security** - MFA, breach detection, bot detection
+- **JWT Tokens** - Stateless, scalable authentication
+- **Free Tier** - 7,000 active users, unlimited logins
 
 ### OAuth2 Flows Used
 
@@ -60,16 +60,16 @@ Our microservices architecture uses **two OAuth2 flows**:
 
 ```
 User → Login Button → API Gateway → Auth0 Login Page
-                                       ↓
-                              User enters credentials
-                                       ↓
-                              Auth0 validates user
-                                       ↓
-                        Redirect with authorization code
-                                       ↓
-                     Gateway exchanges code for tokens
-                                       ↓
-                   Access Token + Refresh Token + ID Token
+ ↓
+ User enters credentials
+ ↓
+ Auth0 validates user
+ ↓
+ Redirect with authorization code
+ ↓
+ Gateway exchanges code for tokens
+ ↓
+ Access Token + Refresh Token + ID Token
 ```
 
 #### 2. Client Credentials Flow (Service-to-Service)
@@ -77,20 +77,20 @@ User → Login Button → API Gateway → Auth0 Login Page
 
 ```
 OrderService → OAuth2 Interceptor
-                      ↓
-              Check if token valid
-                      ↓
-        Token expired? Request new token
-                      ↓
-        POST /oauth/token to Auth0
-                      ↓
-  client_id + client_secret authentication
-                      ↓
-           Access token returned
-                      ↓
-   Add "Authorization: Bearer <token>" header
-                      ↓
-          ProductService validates token
+ ↓
+ Check if token valid
+ ↓
+ Token expired? Request new token
+ ↓
+ POST /oauth/token to Auth0
+ ↓
+ client_id + client_secret authentication
+ ↓
+ Access token returned
+ ↓
+ Add "Authorization: Bearer <token>" header
+ ↓
+ ProductService validates token
 ```
 
 ---
@@ -140,26 +140,26 @@ Application Type: Regular Web Applications
 **Configure URLs:**
 ```
 Allowed Callback URLs:
-  http://localhost:9090/login/oauth2/code/auth0
+ http://localhost:9090/login/oauth2/code/auth0
 
 Allowed Logout URLs:
-  http://localhost:9090
+ http://localhost:9090
 
 Allowed Web Origins:
-  http://localhost:3000,http://localhost:4200,http://localhost:5173
+ http://localhost:3000,http://localhost:4200,http://localhost:5173
 ```
 
 5. Scroll down to **Advanced Settings → Grant Types**
 6. Ensure these are enabled:
-   - ✅ Authorization Code
-   - ✅ Refresh Token
-   - ✅ Implicit (optional)
+ - Authorization Code
+ - Refresh Token
+ - Implicit (optional)
 
 7. Click **Save Changes**
 
 8. Copy these values:
-   - **Client ID** → `AUTH0_CLIENT_ID`
-   - **Client Secret** → `AUTH0_CLIENT_SECRET`
+ - **Client ID** → `AUTH0_CLIENT_ID`
+ - **Client Secret** → `AUTH0_CLIENT_SECRET`
 
 ### Step 4: Create Machine-to-Machine (M2M) Application
 
@@ -181,8 +181,8 @@ Application Type: Machine to Machine Applications
 
 7. Go to **Settings** tab
 8. Copy these values:
-   - **Client ID** → `AUTH0_M2M_CLIENT_ID`
-   - **Client Secret** → `AUTH0_M2M_CLIENT_SECRET`
+ - **Client ID** → `AUTH0_M2M_CLIENT_ID`
+ - **Client Secret** → `AUTH0_M2M_CLIENT_SECRET`
 
 ### Step 5: Environment Variables Setup
 
@@ -221,26 +221,26 @@ Run this command to verify your M2M credentials:
 
 ```bash
 curl --request POST \
-  --url https://dev-xxxxxxx.us.auth0.com/oauth/token \
-  --header 'content-type: application/json' \
-  --data '{
-    "client_id":"YOUR_M2M_CLIENT_ID",
-    "client_secret":"YOUR_M2M_CLIENT_SECRET",
-    "audience":"http://springboot-microservices-api",
-    "grant_type":"client_credentials"
-  }'
+ --url https://dev-xxxxxxx.us.auth0.com/oauth/token \
+ --header 'content-type: application/json' \
+ --data '{
+ "client_id":"YOUR_M2M_CLIENT_ID",
+ "client_secret":"YOUR_M2M_CLIENT_SECRET",
+ "audience":"http://springboot-microservices-api",
+ "grant_type":"client_credentials"
+ }'
 ```
 
 **Expected Response:**
 ```json
 {
-  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkR...",
-  "token_type": "Bearer",
-  "expires_in": 86400
+ "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkR...",
+ "token_type": "Bearer",
+ "expires_in": 86400
 }
 ```
 
-✅ If you get an access token, Auth0 is configured correctly!
+ If you get an access token, Auth0 is configured correctly!
 
 ---
 
@@ -253,29 +253,29 @@ The API Gateway validates JWT tokens for all incoming requests.
 **pom.xml (CloudGateway)**
 ```xml
 <dependencies>
-    <!-- Spring Security -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-security</artifactId>
-    </dependency>
+ <!-- Spring Security -->
+ <dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-security</artifactId>
+ </dependency>
 
-    <!-- OAuth2 Resource Server (JWT validation) -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-    </dependency>
+ <!-- OAuth2 Resource Server (JWT validation) -->
+ <dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+ </dependency>
 
-    <!-- OAuth2 Client (Authorization Code flow) -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-oauth2-client</artifactId>
-    </dependency>
+ <!-- OAuth2 Client (Authorization Code flow) -->
+ <dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-oauth2-client</artifactId>
+ </dependency>
 
-    <!-- Reactive support (for WebFlux Gateway) -->
-    <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-oauth2-jose</artifactId>
-    </dependency>
+ <!-- Reactive support (for WebFlux Gateway) -->
+ <dependency>
+ <groupId>org.springframework.security</groupId>
+ <artifactId>spring-security-oauth2-jose</artifactId>
+ </dependency>
 </dependencies>
 ```
 
@@ -284,27 +284,27 @@ The API Gateway validates JWT tokens for all incoming requests.
 **CloudGateway/src/main/resources/application-dev.yml**
 ```yaml
 spring:
-  application:
-    name: API-GATEWAY
+ application:
+ name: API-GATEWAY
 
-  security:
-    oauth2:
-      # JWT Validation (Resource Server)
-      resource-server:
-        jwt:
-          issuer-uri: ${AUTH0_ISSUER_URI}
-          audiences: ${AUTH0_AUDIENCE}
+ security:
+ oauth2:
+ # JWT Validation (Resource Server)
+ resource-server:
+ jwt:
+ issuer-uri: ${AUTH0_ISSUER_URI}
+ audiences: ${AUTH0_AUDIENCE}
 
-      # OAuth2 Client (Authorization Code flow)
-      client:
-        registration:
-          auth0:
-            client-id: ${AUTH0_CLIENT_ID}
-            client-secret: ${AUTH0_CLIENT_SECRET}
-            scope: openid,profile,email,offline_access
-        provider:
-          auth0:
-            issuer-uri: ${AUTH0_ISSUER_URI}
+ # OAuth2 Client (Authorization Code flow)
+ client:
+ registration:
+ auth0:
+ client-id: ${AUTH0_CLIENT_ID}
+ client-secret: ${AUTH0_CLIENT_SECRET}
+ scope: openid,profile,email,offline_access
+ provider:
+ auth0:
+ issuer-uri: ${AUTH0_ISSUER_URI}
 ```
 
 **What This Does:**
@@ -329,32 +329,32 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableWebFluxSecurity
 public class Auth0OAuth2WebSecurity {
 
-    @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        return http
-                .authorizeExchange(exchanges -> exchanges
-                        // Public endpoints (no authentication required)
-                        .pathMatchers(
-                                "/actuator/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/api-docs/**",
-                                "/webjars/**",
-                                "/authenticate/**"
-                        ).permitAll()
+ @Bean
+ public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+ return http
+ .authorizeExchange(exchanges -> exchanges
+ // Public endpoints (no authentication required)
+ .pathMatchers(
+ "/actuator/**",
+ "/swagger-ui/**",
+ "/swagger-ui.html",
+ "/api-docs/**",
+ "/webjars/**",
+ "/authenticate/**"
+ ).permitAll()
 
-                        // All other requests require authentication
-                        .anyExchange().authenticated()
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        // Enable OAuth2 login via Auth0
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt()  // Validate JWT tokens
-                )
-                .csrf(csrf -> csrf.disable())  // Disable CSRF for APIs
-                .build();
-    }
+ // All other requests require authentication
+ .anyExchange().authenticated()
+ )
+ .oauth2Login(oauth2 -> oauth2
+ // Enable OAuth2 login via Auth0
+ )
+ .oauth2ResourceServer(oauth2 -> oauth2
+ .jwt() // Validate JWT tokens
+ )
+ .csrf(csrf -> csrf.disable()) // Disable CSRF for APIs
+ .build();
+ }
 }
 ```
 
@@ -380,34 +380,34 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @Configuration
 public class CorsConfiguration {
 
-    @Bean
-    public CorsWebFilter corsWebFilter() {
-        org.springframework.web.cors.CorsConfiguration config =
-            new org.springframework.web.cors.CorsConfiguration();
+ @Bean
+ public CorsWebFilter corsWebFilter() {
+ org.springframework.web.cors.CorsConfiguration config =
+ new org.springframework.web.cors.CorsConfiguration();
 
-        // Allow frontend origins
-        config.addAllowedOrigin("http://localhost:3000");   // React
-        config.addAllowedOrigin("http://localhost:4200");   // Angular
-        config.addAllowedOrigin("http://localhost:5173");   // Vite
+ // Allow frontend origins
+ config.addAllowedOrigin("http://localhost:3000"); // React
+ config.addAllowedOrigin("http://localhost:4200"); // Angular
+ config.addAllowedOrigin("http://localhost:5173"); // Vite
 
-        // Allow credentials (cookies, authorization headers)
-        config.setAllowCredentials(true);
+ // Allow credentials (cookies, authorization headers)
+ config.setAllowCredentials(true);
 
-        // Allow all HTTP methods
-        config.addAllowedMethod("*");
+ // Allow all HTTP methods
+ config.addAllowedMethod("*");
 
-        // Allow all headers
-        config.addAllowedHeader("*");
+ // Allow all headers
+ config.addAllowedHeader("*");
 
-        // Expose Authorization header to frontend
-        config.addExposedHeader("Authorization");
+ // Expose Authorization header to frontend
+ config.addExposedHeader("Authorization");
 
-        UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+ UrlBasedCorsConfigurationSource source =
+ new UrlBasedCorsConfigurationSource();
+ source.registerCorsConfiguration("/**", config);
 
-        return new CorsWebFilter(source);
-    }
+ return new CorsWebFilter(source);
+ }
 }
 ```
 
@@ -422,17 +422,17 @@ Each backend service (Product, Order, Payment) validates JWT tokens independentl
 **pom.xml (ProductService, OrderService, PaymentService)**
 ```xml
 <dependencies>
-    <!-- Spring Security -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-security</artifactId>
-    </dependency>
+ <!-- Spring Security -->
+ <dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-security</artifactId>
+ </dependency>
 
-    <!-- OAuth2 Resource Server -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-    </dependency>
+ <!-- OAuth2 Resource Server -->
+ <dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+ </dependency>
 </dependencies>
 ```
 
@@ -441,15 +441,15 @@ Each backend service (Product, Order, Payment) validates JWT tokens independentl
 **ProductService/src/main/resources/application-dev.yml**
 ```yaml
 spring:
-  application:
-    name: PRODUCT-SERVICE
+ application:
+ name: PRODUCT-SERVICE
 
-  security:
-    oauth2:
-      resource-server:
-        jwt:
-          issuer-uri: ${AUTH0_ISSUER_URI}
-          audiences: ${AUTH0_AUDIENCE}
+ security:
+ oauth2:
+ resource-server:
+ jwt:
+ issuer-uri: ${AUTH0_ISSUER_URI}
+ audiences: ${AUTH0_AUDIENCE}
 ```
 
 **Repeat for OrderService and PaymentService.**
@@ -470,26 +470,26 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .authorizeHttpRequests(authorize -> authorize
-                        // Public endpoints
-                        .requestMatchers(
-                                "/actuator/**",
-                                "/swagger-ui/**",
-                                "/api-docs/**"
-                        ).permitAll()
+ @Bean
+ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+ return http
+ .authorizeHttpRequests(authorize -> authorize
+ // Public endpoints
+ .requestMatchers(
+ "/actuator/**",
+ "/swagger-ui/**",
+ "/api-docs/**"
+ ).permitAll()
 
-                        // All other endpoints require JWT token
-                        .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt()  // Validate JWT tokens
-                )
-                .csrf(csrf -> csrf.disable())
-                .build();
-    }
+ // All other endpoints require JWT token
+ .anyRequest().authenticated()
+ )
+ .oauth2ResourceServer(oauth2 -> oauth2
+ .jwt() // Validate JWT tokens
+ )
+ .csrf(csrf -> csrf.disable())
+ .build();
+ }
 }
 ```
 
@@ -505,32 +505,32 @@ OrderService needs to call ProductService and PaymentService using **OpenFeign**
 
 ```
 OrderService
-     │
-     ├─ Need to call ProductService
-     │
-     ▼
+ │
+ ├─ Need to call ProductService
+ │
+ ▼
 OpenFeign Client (with OAuth2 interceptor)
-     │
-     ├─ Check if token exists and is valid
-     │
-     ▼
+ │
+ ├─ Check if token exists and is valid
+ │
+ ▼
 Token expired?
-     │
-     ├─ YES → Request new token from Auth0
-     │         POST /oauth/token
-     │         grant_type: client_credentials
-     │         client_id: M2M_CLIENT_ID
-     │         client_secret: M2M_CLIENT_SECRET
-     │
-     ▼
+ │
+ ├─ YES → Request new token from Auth0
+ │ POST /oauth/token
+ │ grant_type: client_credentials
+ │ client_id: M2M_CLIENT_ID
+ │ client_secret: M2M_CLIENT_SECRET
+ │
+ ▼
 Add Authorization header
-     │
-     └─ Authorization: Bearer eyJhbGci...
-     │
-     ▼
+ │
+ └─ Authorization: Bearer eyJhbGci...
+ │
+ ▼
 ProductService receives request
-     │
-     └─ Validates JWT token
+ │
+ └─ Validates JWT token
 ```
 
 ### Step 1: Configure M2M Client
@@ -538,37 +538,37 @@ ProductService receives request
 **OrderService/src/main/resources/application-dev.yml**
 ```yaml
 spring:
-  application:
-    name: ORDER-SERVICE
+ application:
+ name: ORDER-SERVICE
 
-  security:
-    oauth2:
-      # Validate incoming JWT tokens
-      resource-server:
-        jwt:
-          issuer-uri: ${AUTH0_ISSUER_URI}
-          audiences: ${AUTH0_AUDIENCE}
+ security:
+ oauth2:
+ # Validate incoming JWT tokens
+ resource-server:
+ jwt:
+ issuer-uri: ${AUTH0_ISSUER_URI}
+ audiences: ${AUTH0_AUDIENCE}
 
-      # Client for making authenticated requests to other services
-      client:
-        registration:
-          internal-client:
-            provider: auth0
-            authorization-grant-type: client_credentials
-            scope: openid,profile,email
-            client-id: ${AUTH0_M2M_CLIENT_ID}
-            client-secret: ${AUTH0_M2M_CLIENT_SECRET}
-        provider:
-          auth0:
-            issuer-uri: ${AUTH0_ISSUER_URI}
-            token-uri: ${AUTH0_ISSUER_URI}oauth/token
+ # Client for making authenticated requests to other services
+ client:
+ registration:
+ internal-client:
+ provider: auth0
+ authorization-grant-type: client_credentials
+ scope: openid,profile,email
+ client-id: ${AUTH0_M2M_CLIENT_ID}
+ client-secret: ${AUTH0_M2M_CLIENT_SECRET}
+ provider:
+ auth0:
+ issuer-uri: ${AUTH0_ISSUER_URI}
+ token-uri: ${AUTH0_ISSUER_URI}oauth/token
 
-  # Configure OpenFeign to use OAuth2
-  cloud:
-    openfeign:
-      oauth2:
-        clientRegistrationId: internal-client
-        audience: ${AUTH0_AUDIENCE}
+ # Configure OpenFeign to use OAuth2
+ cloud:
+ openfeign:
+ oauth2:
+ clientRegistrationId: internal-client
+ audience: ${AUTH0_AUDIENCE}
 ```
 
 ### Step 2: Configure OpenFeign Clients
@@ -590,14 +590,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "PRODUCT-SERVICE")
 public interface ProductService {
 
-    @PutMapping("/api/products/reduceQuantity/{id}")
-    ResponseEntity<Void> reduceQuantity(
-        @PathVariable("id") long productId,
-        @RequestParam long quantity
-    );
+ @PutMapping("/api/products/reduceQuantity/{id}")
+ ResponseEntity<Void> reduceQuantity(
+ @PathVariable("id") long productId,
+ @RequestParam long quantity
+ );
 
-    @GetMapping("/api/products/{id}")
-    ResponseEntity<ProductResponse> getProductById(@PathVariable("id") long productId);
+ @GetMapping("/api/products/{id}")
+ ResponseEntity<ProductResponse> getProductById(@PathVariable("id") long productId);
 }
 ```
 
@@ -617,11 +617,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "PAYMENT-SERVICE")
 public interface PaymentService {
 
-    @PostMapping("/api/payments")
-    ResponseEntity<Long> doPayment(@RequestBody PaymentRequest paymentRequest);
+ @PostMapping("/api/payments")
+ ResponseEntity<Long> doPayment(@RequestBody PaymentRequest paymentRequest);
 
-    @GetMapping("/api/payments/order/{orderId}")
-    ResponseEntity<PaymentResponse> getPaymentDetailsByOrderId(@PathVariable("orderId") long orderId);
+ @GetMapping("/api/payments/order/{orderId}")
+ ResponseEntity<PaymentResponse> getPaymentDetailsByOrderId(@PathVariable("orderId") long orderId);
 }
 ```
 
@@ -639,9 +639,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableFeignClients
 public class OrderServiceApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(OrderServiceApplication.class, args);
-    }
+ public static void main(String[] args) {
+ SpringApplication.run(OrderServiceApplication.class, args);
+ }
 }
 ```
 
@@ -651,20 +651,20 @@ public class OrderServiceApplication {
 2. **OpenFeign OAuth2 interceptor** automatically intercepts the HTTP request
 3. Checks if token exists and is valid using configured `clientRegistrationId`
 4. If token is expired:
-   - Requests new token from Auth0
-   - Uses M2M credentials (client_id + client_secret)
-   - Receives new access token
+ - Requests new token from Auth0
+ - Uses M2M credentials (client_id + client_secret)
+ - Receives new access token
 5. **Interceptor** automatically adds `Authorization: Bearer <token>` header
 6. **ProductService** receives request with valid JWT token
 7. **ProductService** validates token and processes request
 
 **Benefits:**
-- ✅ **Declarative** - No manual interceptor code needed
-- ✅ **Automatic token management** - Built-in token handling
-- ✅ **Token caching** - Reuses valid tokens
-- ✅ **Automatic refresh** - Requests new token when expired
-- ✅ **Type-safe** - Compile-time checking with Feign interfaces
-- ✅ **Transparent** - Business logic doesn't handle auth
+- **Declarative** - No manual interceptor code needed
+- **Automatic token management** - Built-in token handling
+- **Token caching** - Reuses valid tokens
+- **Automatic refresh** - Requests new token when expired
+- **Type-safe** - Compile-time checking with Feign interfaces
+- **Transparent** - Business logic doesn't handle auth
 
 ---
 
@@ -683,19 +683,19 @@ npm install axios
 import React from 'react';
 
 const Login = () => {
-  const handleLogin = () => {
-    // Redirect to API Gateway OAuth2 endpoint
-    window.location.href = 'http://localhost:9090/oauth2/authorization/auth0';
-  };
+ const handleLogin = () => {
+ // Redirect to API Gateway OAuth2 endpoint
+ window.location.href = 'http://localhost:9090/oauth2/authorization/auth0';
+ };
 
-  return (
-    <div>
-      <h1>Login</h1>
-      <button onClick={handleLogin}>
-        Login with Auth0
-      </button>
-    </div>
-  );
+ return (
+ <div>
+ <h1>Login</h1>
+ <button onClick={handleLogin}>
+ Login with Auth0
+ </button>
+ </div>
+ );
 };
 
 export default Login;
@@ -707,19 +707,19 @@ export default Login;
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:9090',
+ baseURL: 'http://localhost:9090',
 });
 
 // Add token to all requests
 api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
+ (config) => {
+ const token = localStorage.getItem('accessToken');
+ if (token) {
+ config.headers.Authorization = `Bearer ${token}`;
+ }
+ return config;
+ },
+ (error) => Promise.reject(error)
 );
 
 export default api;
@@ -732,33 +732,33 @@ import React, { useEffect, useState } from 'react';
 import api from '../api/api';
 
 const ProductList = () => {
-  const [products, setProducts] = useState([]);
+ const [products, setProducts] = useState([]);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await api.get('/api/products');
-        setProducts(response.data);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
+ useEffect(() => {
+ const fetchProducts = async () => {
+ try {
+ const response = await api.get('/api/products');
+ setProducts(response.data);
+ } catch (error) {
+ console.error('Error fetching products:', error);
+ }
+ };
 
-    fetchProducts();
-  }, []);
+ fetchProducts();
+ }, []);
 
-  return (
-    <div>
-      <h1>Products</h1>
-      {products.map((product) => (
-        <div key={product.productId}>
-          <h3>{product.productName}</h3>
-          <p>Price: ${product.price}</p>
-          <p>Stock: {product.quantity}</p>
-        </div>
-      ))}
-    </div>
-  );
+ return (
+ <div>
+ <h1>Products</h1>
+ {products.map((product) => (
+ <div key={product.productId}>
+ <h3>{product.productName}</h3>
+ <p>Price: ${product.price}</p>
+ <p>Stock: {product.quantity}</p>
+ </div>
+ ))}
+ </div>
+ );
 };
 
 export default ProductList;
@@ -788,8 +788,8 @@ curl http://localhost:9090/api/products
 **Expected:** 401 Unauthorized
 ```json
 {
-  "error": "unauthorized",
-  "error_description": "Full authentication is required to access this resource"
+ "error": "unauthorized",
+ "error_description": "Full authentication is required to access this resource"
 }
 ```
 
@@ -797,14 +797,14 @@ curl http://localhost:9090/api/products
 
 ```bash
 curl --request POST \
-  --url https://dev-xxxxxxx.us.auth0.com/oauth/token \
-  --header 'content-type: application/json' \
-  --data '{
-    "client_id":"YOUR_M2M_CLIENT_ID",
-    "client_secret":"YOUR_M2M_CLIENT_SECRET",
-    "audience":"http://springboot-microservices-api",
-    "grant_type":"client_credentials"
-  }' | jq -r '.access_token'
+ --url https://dev-xxxxxxx.us.auth0.com/oauth/token \
+ --header 'content-type: application/json' \
+ --data '{
+ "client_id":"YOUR_M2M_CLIENT_ID",
+ "client_secret":"YOUR_M2M_CLIENT_SECRET",
+ "audience":"http://springboot-microservices-api",
+ "grant_type":"client_credentials"
+ }' | jq -r '.access_token'
 ```
 
 **Save the token:**
@@ -816,18 +816,18 @@ TOKEN="eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6..."
 
 ```bash
 curl -H "Authorization: Bearer $TOKEN" \
-  http://localhost:9090/api/products
+ http://localhost:9090/api/products
 ```
 
 **Expected:** 200 OK
 ```json
 [
-  {
-    "productId": 1,
-    "productName": "iPhone 15",
-    "price": 999.99,
-    "quantity": 100
-  }
+ {
+ "productId": 1,
+ "productName": "iPhone 15",
+ "price": 999.99,
+ "quantity": 100
+ }
 ]
 ```
 
@@ -838,12 +838,12 @@ Visit https://jwt.io and paste your token.
 **Expected Claims:**
 ```json
 {
-  "iss": "https://dev-xxxxxxx.us.auth0.com/",
-  "sub": "YOUR_M2M_CLIENT_ID@clients",
-  "aud": "http://springboot-microservices-api",
-  "iat": 1705315200,
-  "exp": 1705401600,
-  "scope": "openid profile email"
+ "iss": "https://dev-xxxxxxx.us.auth0.com/",
+ "sub": "YOUR_M2M_CLIENT_ID@clients",
+ "aud": "http://springboot-microservices-api",
+ "iat": 1705315200,
+ "exp": 1705401600,
+ "scope": "openid profile email"
 }
 ```
 
@@ -891,49 +891,49 @@ config.addAllowedOrigin("http://localhost:3000");
 **Solution:** Use refresh token to get new access token:
 ```bash
 curl --request POST \
-  --url https://dev-xxxxxxx.us.auth0.com/oauth/token \
-  --header 'content-type: application/json' \
-  --data '{
-    "grant_type":"refresh_token",
-    "client_id":"YOUR_CLIENT_ID",
-    "client_secret":"YOUR_CLIENT_SECRET",
-    "refresh_token":"YOUR_REFRESH_TOKEN"
-  }'
+ --url https://dev-xxxxxxx.us.auth0.com/oauth/token \
+ --header 'content-type: application/json' \
+ --data '{
+ "grant_type":"refresh_token",
+ "client_id":"YOUR_CLIENT_ID",
+ "client_secret":"YOUR_CLIENT_SECRET",
+ "refresh_token":"YOUR_REFRESH_TOKEN"
+ }'
 ```
 
 ---
 
 ## Security Best Practices
 
-✅ **Never commit secrets** - Use environment variables
-✅ **Use HTTPS in production** - Encrypt tokens in transit
-✅ **Validate tokens on every service** - Don't trust the gateway alone
-✅ **Set token expiration** - Access tokens should be short-lived (24h)
-✅ **Use refresh tokens** - For long-lived sessions
-✅ **Enable MFA** - Multi-factor authentication in Auth0
-✅ **Rotate secrets** - Change client secrets periodically
-✅ **Monitor token usage** - Check Auth0 logs for anomalies
+ **Never commit secrets** - Use environment variables
+ **Use HTTPS in production** - Encrypt tokens in transit
+ **Validate tokens on every service** - Don't trust the gateway alone
+ **Set token expiration** - Access tokens should be short-lived (24h)
+ **Use refresh tokens** - For long-lived sessions
+ **Enable MFA** - Multi-factor authentication in Auth0
+ **Rotate secrets** - Change client secrets periodically
+ **Monitor token usage** - Check Auth0 logs for anomalies
 
 ---
 
 ## Next Steps
 
 In Part 3, we'll cover:
-- 🐳 **Docker containerization** with multi-stage builds
-- ☸️ **Kubernetes deployment** with ConfigMaps and Secrets
-- 🚀 **CI/CD pipeline** with GitHub Actions
-- 📊 **Monitoring** with Prometheus and Grafana
+- **Docker containerization** with multi-stage builds
+- **Kubernetes deployment** with ConfigMaps and Secrets
+- **CI/CD pipeline** with GitHub Actions
+- **Monitoring** with Prometheus and Grafana
 
 ---
 
 ## Conclusion
 
 You've successfully secured your microservices with:
-- ✅ OAuth2 authentication with Auth0
-- ✅ JWT token validation at Gateway and Services
-- ✅ Service-to-service authentication with Client Credentials
-- ✅ CORS configuration for frontends
-- ✅ Automatic token management with interceptors
+- OAuth2 authentication with Auth0
+- JWT token validation at Gateway and Services
+- Service-to-service authentication with Client Credentials
+- CORS configuration for frontends
+- Automatic token management with interceptors
 
 Your application now has enterprise-grade security!
 

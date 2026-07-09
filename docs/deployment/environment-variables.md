@@ -26,23 +26,23 @@ AUTH0_ISSUER_URI=https://dev-xxx.us.auth0.com/
 
 ```yaml
 spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          auth0:
-            client-id: ${AUTH0_CLIENT_ID}
-            client-secret: ${AUTH0_CLIENT_SECRET}
+ security:
+ oauth2:
+ client:
+ registration:
+ auth0:
+ client-id: ${AUTH0_CLIENT_ID}
+ client-secret: ${AUTH0_CLIENT_SECRET}
 ```
 
 ## Docker Compose
 
 ```yaml
 cloudgateway:
-  environment:
-    - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
-    - AUTH0_CLIENT_SECRET=${AUTH0_CLIENT_SECRET}
-    - AUTH0_ISSUER_URI=${AUTH0_ISSUER_URI}
+ environment:
+ - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+ - AUTH0_CLIENT_SECRET=${AUTH0_CLIENT_SECRET}
+ - AUTH0_ISSUER_URI=${AUTH0_ISSUER_URI}
 ```
 
 Docker Compose automatically loads `.env` file.
@@ -52,15 +52,15 @@ Docker Compose automatically loads `.env` file.
 ```bash
 # Create secret from .env file
 kubectl create secret generic app-secrets \
-  --from-env-file=.env
+ --from-env-file=.env
 
 # Use in deployment
 env:
 - name: AUTH0_CLIENT_ID
-  valueFrom:
-    secretKeyRef:
-      name: app-secrets
-      key: AUTH0_CLIENT_ID
+ valueFrom:
+ secretKeyRef:
+ name: app-secrets
+ key: AUTH0_CLIENT_ID
 ```
 
 ## Verification
@@ -78,11 +78,11 @@ kubectl get secret app-secrets -o yaml
 
 ## Best Practices
 
-✅ Never commit `.env` to git (in `.gitignore`)
-✅ Use `.env.example` as template
-✅ Different values per environment (dev/staging/prod)
-✅ Use secrets management in production (Vault, AWS Secrets Manager)
-✅ Rotate credentials regularly
+ Never commit `.env` to git (in `.gitignore`)
+ Use `.env.example` as template
+ Different values per environment (dev/staging/prod)
+ Use secrets management in production (Vault, AWS Secrets Manager)
+ Rotate credentials regularly
 
 ---
 

@@ -5,7 +5,7 @@
 
 A cloud-native e-commerce application built with Spring Boot microservices architecture, featuring service discovery, centralized configuration, API gateway, and comprehensive deployment options using Docker and Kubernetes.
 
-## 📚 Documentation
+## Documentation
 
 ### Main Documentation
 - **[Quick Start Guide](README.md)** - This file (getting started)
@@ -18,12 +18,12 @@ A cloud-native e-commerce application built with Spring Boot microservices archi
 
 #### By Category
 - **Architecture Patterns** → [`/docs/patterns`](docs/patterns/)
-  - [Service Discovery](docs/patterns/service-discovery.md) - Netflix Eureka
-  - [API Gateway](docs/patterns/api-gateway.md) - Spring Cloud Gateway
-  - [Circuit Breaker](docs/patterns/circuit-breaker.md) - Resilience4j
+ - [Service Discovery](docs/patterns/service-discovery.md) - Netflix Eureka
+ - [API Gateway](docs/patterns/api-gateway.md) - Spring Cloud Gateway
+ - [Circuit Breaker](docs/patterns/circuit-breaker.md) - Resilience4j
 
 - **Security** → [`/docs/security`](docs/security/)
-  - [OAuth2 Authentication](docs/security/oauth2-authentication.md) - Complete Auth0 guide
+ - [OAuth2 Authentication](docs/security/oauth2-authentication.md) - Complete Auth0 guide
 
 - **Tools & Technologies** → [`/docs/tools`](docs/tools/) (Coming soon)
 - **Deployment Guides** → [`/docs/deployment`](docs/deployment/) (Coming soon)
@@ -48,23 +48,23 @@ This project implements a microservices architecture with the following componen
 
 ```
 ┌─────────────┐
-│   Client    │
+│ Client │
 └──────┬──────┘
-       │
-       ▼
+ │
+ ▼
 ┌─────────────────┐
-│  Cloud Gateway  │ (Port 9090) - API Gateway + Circuit Breaker
+│ Cloud Gateway │ (Port 9090) - API Gateway + Circuit Breaker
 └────────┬────────┘
-         │
-    ┌────┴────┬────────────┬──────────────┐
-    ▼         ▼            ▼              ▼
+ │
+ ┌────┴────┬────────────┬──────────────┐
+ ▼ ▼ ▼ ▼
 ┌─────────┐ ┌──────────┐ ┌──────────┐ ┌────────────────┐
-│ Product │ │  Order   │ │ Payment  │ │ ServiceRegistry│
-│ Service │ │ Service  │ │ Service  │ │  (Eureka)      │
+│ Product │ │ Order │ │ Payment │ │ ServiceRegistry│
+│ Service │ │ Service │ │ Service │ │ (Eureka) │
 └─────────┘ └──────────┘ └──────────┘ └────────────────┘
-                                       ┌────────────────┐
-                                       │ Config Server  │
-                                       └────────────────┘
+ ┌────────────────┐
+ │ Config Server │
+ └────────────────┘
 ```
 
 ## Technology Stack
@@ -73,31 +73,31 @@ This project implements a microservices architecture with the following componen
 - **Java Version:** 17
 - **Spring Cloud:** 2022.0.4 / 2023.0.0-RC1
 - **Database:**
-  - MySQL (Production)
-  - H2 (Testing)
+ - MySQL (Production)
+ - H2 (Testing)
 - **Security:**
-  - Spring Security
-  - OAuth2 with Auth0
+ - Spring Security
+ - OAuth2 with Auth0
 - **Service Discovery:** Netflix Eureka
 - **API Gateway:** Spring Cloud Gateway
 - **Resilience:** Circuit Breaker Pattern
 - **Inter-service Communication:**
-  - OpenFeign
-  - RestTemplate with Load Balancing
+ - OpenFeign
+ - RestTemplate with Load Balancing
 - **Observability:**
-  - Micrometer
-  - Zipkin (Distributed Tracing)
-  - Spring Boot Actuator
+ - Micrometer
+ - Zipkin (Distributed Tracing)
+ - Spring Boot Actuator
 - **API Documentation:**
-  - Springdoc OpenAPI 3
-  - Swagger UI (Interactive API Testing)
+ - Springdoc OpenAPI 3
+ - Swagger UI (Interactive API Testing)
 - **Build Tools:**
-  - Maven
-  - Jib (Container Image Build)
+ - Maven
+ - Jib (Container Image Build)
 - **Containerization:** Docker & Kubernetes
 - **Other Libraries:**
-  - Lombok
-  - WireMock (Testing)
+ - Lombok
+ - WireMock (Testing)
 
 ## Microservices
 
@@ -115,12 +115,12 @@ This project implements a microservices architecture with the following componen
 - **Purpose:** API Gateway and routing
 - **Technology:** Spring Cloud Gateway
 - **Functionality:**
-  - Single entry point for all client requests
-  - Circuit breaker implementation for all routes
-  - OAuth2 authentication
-  - Request routing to appropriate microservices
-  - Fallback mechanisms
-  - **API Documentation Aggregation:** Uses `springdoc-openapi-starter-webflux-ui` to aggregate OpenAPI docs from all backend microservices into a single Swagger UI interface
+ - Single entry point for all client requests
+ - Circuit breaker implementation for all routes
+ - OAuth2 authentication
+ - Request routing to appropriate microservices
+ - Fallback mechanisms
+ - **API Documentation Aggregation:** Uses `springdoc-openapi-starter-webflux-ui` to aggregate OpenAPI docs from all backend microservices into a single Swagger UI interface
 - **Centralized Swagger UI:** http://localhost:9090/swagger-ui.html
 
 **Note:** OpenAPI is not required for the gateway's routing functionality, but is useful for providing centralized API documentation and testing interface for all services.
@@ -129,27 +129,27 @@ This project implements a microservices architecture with the following componen
 - **Purpose:** Product catalog management
 - **Database:** MySQL (productDb)
 - **Functionality:**
-  - Create products
-  - Retrieve product information
-  - Update product inventory
-  - Product stock management
+ - Create products
+ - Retrieve product information
+ - Update product inventory
+ - Product stock management
 
 ### 5. Order Service
 - **Purpose:** Order processing and management
 - **Database:** MySQL (orderDb)
 - **Functionality:**
-  - Place orders
-  - Retrieve order details
-  - Communicate with Product and Payment services
-  - OAuth2 client credentials flow
+ - Place orders
+ - Retrieve order details
+ - Communicate with Product and Payment services
+ - OAuth2 client credentials flow
 
 ### 6. Payment Service
 - **Purpose:** Payment transaction handling
 - **Database:** MySQL (paymentDb)
 - **Functionality:**
-  - Process payments
-  - Store transaction details
-  - Support multiple payment modes (CASH, UPI, etc.)
+ - Process payments
+ - Store transaction details
+ - Support multiple payment modes (CASH, UPI, etc.)
 
 ## Key Features
 
@@ -193,59 +193,59 @@ For detailed Auth0 setup instructions, see [Configure OAuth2 (Auth0)](#2-configu
 
 ```
 SpringBoot/
-├── ServiceRegistry/              # Eureka Server
-│   ├── .devcontainer/           # VS Code/Cursor dev container config
-│   │   └── devcontainer.json
-│   ├── src/
-│   ├── Dockerfile.prod          # Production Dockerfile
-│   ├── Dockerfile.dev           # Development Dockerfile (hot reload)
-│   └── pom.xml
-├── ConfigServer/                 # Configuration Server
-│   ├── .devcontainer/           # VS Code/Cursor dev container config
-│   │   └── devcontainer.json
-│   ├── src/
-│   ├── Dockerfile.prod          # Production Dockerfile
-│   ├── Dockerfile.dev           # Development Dockerfile (hot reload)
-│   └── pom.xml
-├── CloudGateway/                 # API Gateway
-│   ├── .devcontainer/           # VS Code/Cursor dev container config
-│   │   └── devcontainer.json
-│   ├── src/
-│   ├── Dockerfile.prod          # Production Dockerfile
-│   ├── Dockerfile.dev           # Development Dockerfile (hot reload)
-│   └── pom.xml
-├── ProductService/               # Product Microservice
-│   ├── .devcontainer/           # VS Code/Cursor dev container config
-│   │   └── devcontainer.json
-│   ├── src/
-│   ├── Dockerfile.prod          # Production Dockerfile
-│   ├── Dockerfile.dev           # Development Dockerfile (hot reload + debug)
-│   └── pom.xml
-├── OrderService/                 # Order Microservice
-│   ├── .devcontainer/           # VS Code/Cursor dev container config
-│   │   └── devcontainer.json
-│   ├── src/
-│   ├── Dockerfile.prod          # Production Dockerfile
-│   ├── Dockerfile.dev           # Development Dockerfile (hot reload + debug)
-│   └── pom.xml
-├── PaymentService/               # Payment Microservice
-│   ├── .devcontainer/           # VS Code/Cursor dev container config
-│   │   └── devcontainer.json
-│   ├── src/
-│   ├── Dockerfile.prod          # Production Dockerfile
-│   ├── Dockerfile.dev           # Development Dockerfile (hot reload + debug)
-│   └── pom.xml
-├── k8s/                          # Kubernetes Manifests
-│   ├── service-registry-statefulset.yml
-│   ├── config-server-deployment.yml
-│   ├── cloud-gateway-deployment.yml
-│   ├── product-service-deployment.yml
-│   ├── order-service-deployment.yml
-│   ├── payment-service-deployment.yml
-│   ├── mysql-deployment.yml
-│   └── config-maps.yml
-├── docker-compose.yml            # Production stack (uses Dockerfile.prod)
-├── docker-compose.dev.yml        # Development stack (uses Dockerfile.dev)
+├── ServiceRegistry/ # Eureka Server
+│ ├── .devcontainer/ # VS Code/Cursor dev container config
+│ │ └── devcontainer.json
+│ ├── src/
+│ ├── Dockerfile.prod # Production Dockerfile
+│ ├── Dockerfile.dev # Development Dockerfile (hot reload)
+│ └── pom.xml
+├── ConfigServer/ # Configuration Server
+│ ├── .devcontainer/ # VS Code/Cursor dev container config
+│ │ └── devcontainer.json
+│ ├── src/
+│ ├── Dockerfile.prod # Production Dockerfile
+│ ├── Dockerfile.dev # Development Dockerfile (hot reload)
+│ └── pom.xml
+├── CloudGateway/ # API Gateway
+│ ├── .devcontainer/ # VS Code/Cursor dev container config
+│ │ └── devcontainer.json
+│ ├── src/
+│ ├── Dockerfile.prod # Production Dockerfile
+│ ├── Dockerfile.dev # Development Dockerfile (hot reload)
+│ └── pom.xml
+├── ProductService/ # Product Microservice
+│ ├── .devcontainer/ # VS Code/Cursor dev container config
+│ │ └── devcontainer.json
+│ ├── src/
+│ ├── Dockerfile.prod # Production Dockerfile
+│ ├── Dockerfile.dev # Development Dockerfile (hot reload + debug)
+│ └── pom.xml
+├── OrderService/ # Order Microservice
+│ ├── .devcontainer/ # VS Code/Cursor dev container config
+│ │ └── devcontainer.json
+│ ├── src/
+│ ├── Dockerfile.prod # Production Dockerfile
+│ ├── Dockerfile.dev # Development Dockerfile (hot reload + debug)
+│ └── pom.xml
+├── PaymentService/ # Payment Microservice
+│ ├── .devcontainer/ # VS Code/Cursor dev container config
+│ │ └── devcontainer.json
+│ ├── src/
+│ ├── Dockerfile.prod # Production Dockerfile
+│ ├── Dockerfile.dev # Development Dockerfile (hot reload + debug)
+│ └── pom.xml
+├── k8s/ # Kubernetes Manifests
+│ ├── service-registry-statefulset.yml
+│ ├── config-server-deployment.yml
+│ ├── cloud-gateway-deployment.yml
+│ ├── product-service-deployment.yml
+│ ├── order-service-deployment.yml
+│ ├── payment-service-deployment.yml
+│ ├── mysql-deployment.yml
+│ └── config-maps.yml
+├── docker-compose.yml # Production stack (uses Dockerfile.prod)
+├── docker-compose.dev.yml # Development stack (uses Dockerfile.dev)
 └── README.md
 ```
 
@@ -293,7 +293,7 @@ This application uses **Auth0** for OAuth2 authentication and authorization. Aut
 
 #### Understanding Auth0 Application Types
 
-⚠️ **IMPORTANT:** This microservices architecture requires **TWO different Auth0 applications**:
+ **IMPORTANT:** This microservices architecture requires **TWO different Auth0 applications**:
 
 | Application Type | Used By | Purpose | Grant Types |
 |-----------------|---------|---------|-------------|
@@ -317,9 +317,9 @@ This application uses **Auth0** for OAuth2 authentication and authorization. Aut
 
 1. Navigate to **Applications** → **APIs** → **Create API**
 2. Configure:
-   - **Name:** SpringBoot Microservices API
-   - **Identifier:** `http://springboot-microservices-api` (this is your audience)
-   - **Signing Algorithm:** RS256
+ - **Name:** SpringBoot Microservices API
+ - **Identifier:** `http://springboot-microservices-api` (this is your audience)
+ - **Signing Algorithm:** RS256
 3. Click **Create**
 
 ##### Step 3: Create Regular Web Application (for CloudGateway)
@@ -327,13 +327,13 @@ This application uses **Auth0** for OAuth2 authentication and authorization. Aut
 1. Navigate to **Applications** → **Create Application**
 2. Choose **Regular Web Applications**
 3. Configure:
-   - **Name:** SpringBoot Microservices Web
-   - **Allowed Callback URLs:** `http://localhost:9090/login/oauth2/code/auth0`
-   - **Allowed Logout URLs:** `http://localhost:9090`
-   - **Allowed Web Origins:** `http://localhost:3000,http://localhost:4200,http://localhost:5173`
+ - **Name:** SpringBoot Microservices Web
+ - **Allowed Callback URLs:** `http://localhost:9090/login/oauth2/code/auth0`
+ - **Allowed Logout URLs:** `http://localhost:9090`
+ - **Allowed Web Origins:** `http://localhost:3000,http://localhost:4200,http://localhost:5173`
 4. Go to **Settings** → **Advanced Settings** → **Grant Types**
-   - Ensure enabled: ✅ Authorization Code, ✅ Refresh Token
-   - **Optional:** ✅ Client Credentials (if you want to use ONE app for everything - see note below)
+ - Ensure enabled: Authorization Code, Refresh Token
+ - **Optional:** Client Credentials (if you want to use ONE app for everything - see note below)
 5. **Copy** the **Client ID** and **Client Secret** (you'll use these in CloudGateway)
 
 ##### Step 4: Create Machine-to-Machine Application (for Backend Services)
@@ -343,9 +343,9 @@ This application uses **Auth0** for OAuth2 authentication and authorization. Aut
 1. Navigate to **Applications** → **Create Application**
 2. Choose **Machine to Machine Applications**
 3. Configure:
-   - **Name:** SpringBoot Microservices M2M
-   - **Authorize:** Select "SpringBoot Microservices API"
-   - **Permissions:** Select all scopes you need
+ - **Name:** SpringBoot Microservices M2M
+ - **Authorize:** Select "SpringBoot Microservices API"
+ - **Permissions:** Select all scopes you need
 4. **Copy** the **Client ID** and **Client Secret** (you'll use these in OrderService)
 
 ##### Step 5: Configure Environment Variables
@@ -395,60 +395,60 @@ All sensitive credentials are externalized to environment variables. The configu
 **Cloud Gateway** (`CloudGateway/src/main/resources/application-dev.yml`):
 ```yaml
 spring:
-  security:
-    oauth2:
-      resource-server:
-        jwt:
-          issuer-uri: ${AUTH0_ISSUER_URI}
-          audiences: ${AUTH0_AUDIENCE}
-      client:
-        registration:
-          auth0:
-            client-id: ${AUTH0_CLIENT_ID}
-            client-secret: ${AUTH0_CLIENT_SECRET}
-            scope: openid,profile,email
-        provider:
-          auth0:
-            issuer-uri: ${AUTH0_ISSUER_URI}
+ security:
+ oauth2:
+ resource-server:
+ jwt:
+ issuer-uri: ${AUTH0_ISSUER_URI}
+ audiences: ${AUTH0_AUDIENCE}
+ client:
+ registration:
+ auth0:
+ client-id: ${AUTH0_CLIENT_ID}
+ client-secret: ${AUTH0_CLIENT_SECRET}
+ scope: openid,profile,email
+ provider:
+ auth0:
+ issuer-uri: ${AUTH0_ISSUER_URI}
 ```
 
 **Order Service** (`OrderService/src/main/resources/application-dev.yaml`):
 ```yaml
 spring:
-  security:
-    oauth2:
-      resource-server:
-        jwt:
-          issuer-uri: ${AUTH0_ISSUER_URI}
-      client:
-        registration:
-          internal-client:
-            provider: auth0
-            authorization-grant-type: client_credentials
-            scope: openid,profile,email
-            client-id: ${AUTH0_M2M_CLIENT_ID}      # Uses M2M app for service-to-service calls
-            client-secret: ${AUTH0_M2M_CLIENT_SECRET}
-        provider:
-          auth0:
-            issuer-uri: ${AUTH0_ISSUER_URI}
+ security:
+ oauth2:
+ resource-server:
+ jwt:
+ issuer-uri: ${AUTH0_ISSUER_URI}
+ client:
+ registration:
+ internal-client:
+ provider: auth0
+ authorization-grant-type: client_credentials
+ scope: openid,profile,email
+ client-id: ${AUTH0_M2M_CLIENT_ID} # Uses M2M app for service-to-service calls
+ client-secret: ${AUTH0_M2M_CLIENT_SECRET}
+ provider:
+ auth0:
+ issuer-uri: ${AUTH0_ISSUER_URI}
 ```
 
 **Product Service & Payment Service** (`application-dev.yml`):
 ```yaml
 spring:
-  security:
-    oauth2:
-      resource-server:
-        jwt:
-          issuer-uri: ${AUTH0_ISSUER_URI}
+ security:
+ oauth2:
+ resource-server:
+ jwt:
+ issuer-uri: ${AUTH0_ISSUER_URI}
 ```
 
-**⚠️ Security Best Practices:**
-- ✅ All credentials use environment variables (no hardcoded values)
-- ✅ `.env` file is in `.gitignore` (never committed)
-- ✅ `.env.example` provides template without real credentials
-- ✅ Docker Compose automatically loads `.env` file
-- ✅ Separate applications for user login vs service-to-service (Option B)
+** Security Best Practices:**
+- All credentials use environment variables (no hardcoded values)
+- `.env` file is in `.gitignore` (never committed)
+- `.env.example` provides template without real credentials
+- Docker Compose automatically loads `.env` file
+- Separate applications for user login vs service-to-service (Option B)
 
 #### Verifying Your Setup
 
@@ -500,11 +500,11 @@ http://localhost:9090/authenticate/login
 After successful login, you'll receive a JSON response with:
 ```json
 {
-  "userId": "user@example.com",
-  "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refreshToken": "v1.MRrT...",
-  "expiresAt": 1759598400,
-  "auhorityList": ["ROLE_USER", "SCOPE_openid", "SCOPE_profile", "SCOPE_email"]
+ "userId": "user@example.com",
+ "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+ "refreshToken": "v1.MRrT...",
+ "expiresAt": 1759598400,
+ "auhorityList": ["ROLE_USER", "SCOPE_openid", "SCOPE_profile", "SCOPE_email"]
 }
 ```
 
@@ -512,22 +512,22 @@ After successful login, you'll receive a JSON response with:
 
 ```bash
 curl --request POST \
-  --url https://dev-xxxxxxxx.us.auth0.com/oauth/token \
-  --header 'content-type: application/json' \
-  --data '{
-    "client_id":"YOUR_M2M_CLIENT_ID",
-    "client_secret":"YOUR_M2M_CLIENT_SECRET",
-    "audience":"http://springboot-microservices-api",
-    "grant_type":"client_credentials"
-  }'
+ --url https://dev-xxxxxxxx.us.auth0.com/oauth/token \
+ --header 'content-type: application/json' \
+ --data '{
+ "client_id":"YOUR_M2M_CLIENT_ID",
+ "client_secret":"YOUR_M2M_CLIENT_SECRET",
+ "audience":"http://springboot-microservices-api",
+ "grant_type":"client_credentials"
+ }'
 ```
 
 **Response:**
 ```json
 {
-  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "Bearer",
-  "expires_in": 86400
+ "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+ "token_type": "Bearer",
+ "expires_in": 86400
 }
 ```
 
@@ -535,7 +535,7 @@ curl --request POST \
 
 ```bash
 curl --location 'http://localhost:9090/product/1' \
-  --header 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...'
+ --header 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...'
 ```
 
 #### How Authentication Works
@@ -568,19 +568,19 @@ curl --location 'http://localhost:9090/product/1' \
 **Architecture Diagram:**
 ```
 Frontend (React/Vue)
-    ↓ (1) GET /authenticate/login
+ ↓ (1) GET /authenticate/login
 CloudGateway (Port 9090)
-    ↓ (2) Redirect to Auth0
+ ↓ (2) Redirect to Auth0
 Auth0 (dev-xxxxxxxx.us.auth0.com)
-    ↓ (3) User authenticates
+ ↓ (3) User authenticates
 CloudGateway
-    ↓ (4) Exchange code for tokens
+ ↓ (4) Exchange code for tokens
 CloudGateway → Frontend (returns tokens)
-    ↓
+ ↓
 Frontend → CloudGateway (API requests with Bearer token)
-    ↓
+ ↓
 CloudGateway → ProductService/OrderService/PaymentService
-    ↓
+ ↓
 OrderService → ProductService/PaymentService (with auto-injected OAuth2 token)
 ```
 
@@ -608,17 +608,17 @@ The provided redirect_uri is not in the list of allowed callback URLs.
 1. Go to: https://manage.auth0.com/dashboard/us/dev-5nw6367bfpr277ec/applications
 2. Click on your application
 3. In **"Allowed Callback URLs"** add:
-   ```
-   http://localhost:9090/login/oauth2/code/auth0
-   ```
+ ```
+ http://localhost:9090/login/oauth2/code/auth0
+ ```
 4. In **"Allowed Logout URLs"** add:
-   ```
-   http://localhost:9090
-   ```
+ ```
+ http://localhost:9090
+ ```
 5. In **"Allowed Web Origins"** add:
-   ```
-   http://localhost:9090
-   ```
+ ```
+ http://localhost:9090
+ ```
 6. Click **"Save Changes"**
 
 ---
@@ -628,8 +628,8 @@ The provided redirect_uri is not in the list of allowed callback URLs.
 **Problem:** When requesting a token:
 ```json
 {
-  "error": "access_denied",
-  "error_description": "Service not enabled within domain: http://localhost:9090"
+ "error": "access_denied",
+ "error_description": "Service not enabled within domain: http://localhost:9090"
 }
 ```
 
@@ -639,24 +639,24 @@ The provided redirect_uri is not in the list of allowed callback URLs.
 1. Go to: https://manage.auth0.com/dashboard/us/dev-5nw6367bfpr277ec/apis
 2. **If you have an API:** Click it and copy the **"Identifier"**
 3. **If no API exists:** Create one:
-   - Click **"Create API"**
-   - **Name:** `Spring Boot Microservices API`
-   - **Identifier:** `https://api.springboot.example.com` (can be any URI)
-   - **Signing Algorithm:** `RS256`
-   - Click **"Create"**
-   - Copy the **"Identifier"**
+ - Click **"Create API"**
+ - **Name:** `Spring Boot Microservices API`
+ - **Identifier:** `https://api.springboot.example.com` (can be any URI)
+ - **Signing Algorithm:** `RS256`
+ - Click **"Create"**
+ - Copy the **"Identifier"**
 4. Update `.env`:
-   ```bash
-   # WRONG:
-   AUTH0_AUDIENCE=http://localhost:9090
+ ```bash
+ # WRONG:
+ AUTH0_AUDIENCE=http://localhost:9090
 
-   # CORRECT:
-   AUTH0_AUDIENCE=https://api.springboot.example.com
-   ```
+ # CORRECT:
+ AUTH0_AUDIENCE=https://api.springboot.example.com
+ ```
 5. Restart services:
-   ```bash
-   docker-compose -f docker-compose.dev.yml restart cloudgateway orderservice
-   ```
+ ```bash
+ docker-compose -f docker-compose.dev.yml restart cloudgateway orderservice
+ ```
 
 ---
 
@@ -673,28 +673,28 @@ The `/authenticate/login` endpoint is for user login. For API-to-API communicati
 ```bash
 # Get access token
 curl -s -X POST https://dev-5nw6367bfpr277ec.us.auth0.com/oauth/token \
-  -H 'content-type: application/json' \
-  -d '{
-    "client_id":"YOUR_CLIENT_ID",
-    "client_secret":"YOUR_CLIENT_SECRET",
-    "audience":"https://api.springboot.example.com",
-    "grant_type":"client_credentials"
-  }'
+ -H 'content-type: application/json' \
+ -d '{
+ "client_id":"YOUR_CLIENT_ID",
+ "client_secret":"YOUR_CLIENT_SECRET",
+ "audience":"https://api.springboot.example.com",
+ "grant_type":"client_credentials"
+ }'
 ```
 
 Response:
 ```json
 {
-  "access_token": "eyJ...",
-  "token_type": "Bearer",
-  "expires_in": 86400
+ "access_token": "eyJ...",
+ "token_type": "Bearer",
+ "expires_in": 86400
 }
 ```
 
 Use the token:
 ```bash
 curl http://localhost:9090/product/1 \
-  -H "Authorization: Bearer eyJ..."
+ -H "Authorization: Bearer eyJ..."
 ```
 
 **Solution B - Create Web Application (For user login):**
@@ -707,10 +707,10 @@ Only if you need interactive browser login:
 4. **Type:** Select **"Regular Web Applications"**
 5. Click **"Create"**
 6. Configure:
-   - **Allowed Callback URLs:** `http://localhost:9090/login/oauth2/code/auth0`
-   - **Allowed Logout URLs:** `http://localhost:9090`
-   - **Allowed Web Origins:** `http://localhost:9090`
-   - **Grant Types:** ✅ Authorization Code, ✅ Refresh Token
+ - **Allowed Callback URLs:** `http://localhost:9090/login/oauth2/code/auth0`
+ - **Allowed Logout URLs:** `http://localhost:9090`
+ - **Allowed Web Origins:** `http://localhost:9090`
+ - **Grant Types:** Authorization Code, Refresh Token
 7. Click **"Save Changes"**
 8. Update `.env` with the new Client ID and Secret
 
@@ -775,25 +775,25 @@ Update CloudGateway to pass API docs requests without authentication (requires m
 
 **Check:**
 1. **Environment variables set:**
-   ```bash
-   docker-compose -f docker-compose.dev.yml exec orderservice env | grep AUTH0
-   ```
+ ```bash
+ docker-compose -f docker-compose.dev.yml exec orderservice env | grep AUTH0
+ ```
 
 2. **Logs show token errors:**
-   ```bash
-   docker-compose -f docker-compose.dev.yml logs orderservice | grep -i "oauth\|token\|auth"
-   ```
+ ```bash
+ docker-compose -f docker-compose.dev.yml logs orderservice | grep -i "oauth\|token\|auth"
+ ```
 
 3. **Client credentials configured:**
-   - Check `OrderService/src/main/resources/application-dev.yaml`
-   - Verify `internal-client` registration exists
-   - Confirm `AUTH0_CLIENT_ID` and `AUTH0_CLIENT_SECRET` are set
+ - Check `OrderService/src/main/resources/application-dev.yaml`
+ - Verify `internal-client` registration exists
+ - Confirm `AUTH0_CLIENT_ID` and `AUTH0_CLIENT_SECRET` are set
 
 4. **API authorized for M2M app:**
-   - Go to: https://manage.auth0.com/dashboard/us/dev-5nw6367bfpr277ec/applications
-   - Click your M2M application
-   - Go to **"APIs" tab**
-   - Ensure your API is listed and authorized
+ - Go to: https://manage.auth0.com/dashboard/us/dev-5nw6367bfpr277ec/applications
+ - Click your M2M application
+ - Go to **"APIs" tab**
+ - Ensure your API is listed and authorized
 
 ---
 
@@ -843,7 +843,7 @@ M2M applications **only support Client Credentials flow** (service-to-service AP
 
 1. Go to your Regular Web Application in Auth0 Dashboard
 2. Navigate to **Settings** → **Advanced Settings** → **Grant Types**
-3. Enable: ✅ **Client Credentials** (in addition to Authorization Code, Refresh Token)
+3. Enable: **Client Credentials** (in addition to Authorization Code, Refresh Token)
 4. **Save Changes**
 5. Use this **single app** for both CloudGateway AND OrderService
 
@@ -860,27 +860,27 @@ M2M applications **only support Client Credentials flow** (service-to-service AP
 1. **Keep** your Regular Web Application for CloudGateway (user login)
 2. **Keep or create** your M2M Application for OrderService (service calls)
 3. Update `.env` to include both:
-   ```bash
-   # CloudGateway uses Regular Web App
-   AUTH0_CLIENT_ID=<web_app_client_id>
-   AUTH0_CLIENT_SECRET=<web_app_client_secret>
+ ```bash
+ # CloudGateway uses Regular Web App
+ AUTH0_CLIENT_ID=<web_app_client_id>
+ AUTH0_CLIENT_SECRET=<web_app_client_secret>
 
-   # OrderService uses M2M App
-   AUTH0_M2M_CLIENT_ID=<m2m_client_id>
-   AUTH0_M2M_CLIENT_SECRET=<m2m_client_secret>
-   ```
+ # OrderService uses M2M App
+ AUTH0_M2M_CLIENT_ID=<m2m_client_id>
+ AUTH0_M2M_CLIENT_SECRET=<m2m_client_secret>
+ ```
 4. Update OrderService configuration files to use `AUTH0_M2M_CLIENT_ID`:
-   ```yaml
-   # OrderService/src/main/resources/application-dev.yaml
-   spring:
-     security:
-       oauth2:
-         client:
-           registration:
-             internal-client:
-               client-id: ${AUTH0_M2M_CLIENT_ID}
-               client-secret: ${AUTH0_M2M_CLIENT_SECRET}
-   ```
+ ```yaml
+ # OrderService/src/main/resources/application-dev.yaml
+ spring:
+ security:
+ oauth2:
+ client:
+ registration:
+ internal-client:
+ client-id: ${AUTH0_M2M_CLIENT_ID}
+ client-secret: ${AUTH0_M2M_CLIENT_SECRET}
+ ```
 
 **Pros:**
 - Better security (separate credentials for different purposes)
@@ -897,37 +897,37 @@ M2M applications **only support Client Credentials flow** (service-to-service AP
 
 This project implements several OAuth2 security best practices:
 
-✅ **Environment Variable Configuration**
+ **Environment Variable Configuration**
 - All Auth0 credentials use environment variables (no hardcoded secrets)
 - Configuration: `${AUTH0_CLIENT_ID}`, `${AUTH0_CLIENT_SECRET}`, etc.
 - Set via `.env` file (automatically loaded by Docker Compose)
 - No fallback defaults to prevent accidental exposure
 
-✅ **Scope-Based Authorization**
+ **Scope-Based Authorization**
 - All services require `SCOPE_internal` for API access
 - ProductService: `/product/**` endpoints
 - OrderService: `/order/**` endpoints
 - PaymentService: `/payment/**` endpoints
 - Configuration: `WebSecurityConfig.java` in each service
 
-✅ **Automatic Token Refresh**
+ **Automatic Token Refresh**
 - OrderService configured with `.refreshToken()` support
 - Tokens automatically renewed before expiration
 - No manual token management required
 - Implementation: `OrderServiceApplication.java:58`
 
-✅ **Proper Error Handling**
+ **Proper Error Handling**
 - OAuth2 interceptors throw exceptions on token failure
 - No silent failures - all auth errors logged and reported
 - Implementation: `RestTemplateInterceptor.java:38-44`
 
-✅ **CORS Configuration**
+ **CORS Configuration**
 - No wildcard origins with credentials
 - Specific allowed origins for security
 - Supports Gateway, frontend ports
 - Configuration: `WebSecurityConfig.java` (OrderService)
 
-✅ **Standardized Auth0 Domain**
+ **Standardized Auth0 Domain**
 - All services use same Auth0 tenant via `AUTH0_ISSUER_URI` environment variable
 - Consistent JWT validation across microservices
 - Single source of truth for authentication
@@ -990,17 +990,17 @@ docker-compose logs -f productservice
 
 This will start:
 - **Infrastructure:**
-  - Service Registry (http://localhost:8761)
-  - Config Server (http://localhost:9296)
-  - Cloud Gateway (http://localhost:9090)
+ - Service Registry (http://localhost:8761)
+ - Config Server (http://localhost:9296)
+ - Cloud Gateway (http://localhost:9090)
 - **Databases:**
-  - Product DB (MySQL on port 3306)
-  - Order DB (MySQL on port 3307)
-  - Payment DB (MySQL on port 3308)
+ - Product DB (MySQL on port 3306)
+ - Order DB (MySQL on port 3307)
+ - Payment DB (MySQL on port 3308)
 - **Business Services:**
-  - Product Service (port 8081)
-  - Order Service (port 8082)
-  - Payment Service (port 8083)
+ - Product Service (port 8081)
+ - Order Service (port 8082)
+ - Payment Service (port 8083)
 
 ### 5. Verify Services
 
@@ -1012,9 +1012,9 @@ open http://localhost:8761
 open http://localhost:9090/swagger-ui.html
 
 # Check service health
-curl http://localhost:8761/actuator/health  # Service Registry
-curl http://localhost:9296/actuator/health  # Config Server
-curl http://localhost:9090/actuator/health  # Cloud Gateway
+curl http://localhost:8761/actuator/health # Service Registry
+curl http://localhost:9296/actuator/health # Config Server
+curl http://localhost:9090/actuator/health # Cloud Gateway
 
 # Check if all containers are running
 docker-compose ps
@@ -1058,17 +1058,17 @@ Access all microservices APIs from a single interface through the Cloud Gateway:
 **URL:** http://localhost:9090/swagger-ui.html
 
 This provides:
-- ✅ **All services in one place**: Product, Order, and Payment services
-- ✅ **Try it out**: Interactive API testing directly from the browser
-- ✅ **OAuth2 authentication**: Pre-configured with bearer token support
-- ✅ **Request/Response examples**: Auto-generated from code
-- ✅ **Schema definitions**: Complete data models
+- **All services in one place**: Product, Order, and Payment services
+- **Try it out**: Interactive API testing directly from the browser
+- **OAuth2 authentication**: Pre-configured with bearer token support
+- **Request/Response examples**: Auto-generated from code
+- **Schema definitions**: Complete data models
 
 **Service Selection:**
 - Use the dropdown in the top-right corner to switch between:
-  - Product Service API
-  - Order Service API
-  - Payment Service API
+ - Product Service API
+ - Order Service API
+ - Payment Service API
 
 #### Individual Service Documentation
 
@@ -1126,9 +1126,9 @@ curl --location 'http://localhost:9090/product' \
 --header 'Content-Type: application/json' \
 --header 'Authorization: Bearer xxxx' \
 --data '{
-    "name": "iPhone 15",
-    "price": 2000,
-    "quantity": 2
+ "name": "iPhone 15",
+ "price": 2000,
+ "quantity": 2
 }'
 ```
 
@@ -1171,10 +1171,10 @@ curl --location 'http://localhost:9090/order/placeOrder' \
 --header 'Content-Type: application/json' \
 --header 'Authorization: Bearer xxxx' \
 --data '{
-    "productId": 103,
-    "totalAmount": 10000,
-    "quantity": 1,
-    "paymentMode": "CASH"
+ "productId": 103,
+ "totalAmount": 10000,
+ "quantity": 1,
+ "paymentMode": "CASH"
 }'
 ```
 
@@ -1209,18 +1209,18 @@ The project includes multiple development environment options to suit different 
 
 ### Development Modes
 
-#### Mode 0: Dev Containers (VS Code/Cursor) - **Easiest Setup** ⭐
+#### Mode 0: Dev Containers (VS Code/Cursor) - **Easiest Setup**
 
 Each service has its own `.devcontainer` configuration for seamless container-based development:
 
 ```
 SpringBoot/
-├── ProductService/.devcontainer/       # ProductService dev container
-├── OrderService/.devcontainer/         # OrderService dev container
-├── PaymentService/.devcontainer/       # PaymentService dev container
-├── ServiceRegistry/.devcontainer/      # ServiceRegistry dev container
-├── ConfigServer/.devcontainer/         # ConfigServer dev container
-└── CloudGateway/.devcontainer/         # CloudGateway dev container
+├── ProductService/.devcontainer/ # ProductService dev container
+├── OrderService/.devcontainer/ # OrderService dev container
+├── PaymentService/.devcontainer/ # PaymentService dev container
+├── ServiceRegistry/.devcontainer/ # ServiceRegistry dev container
+├── ConfigServer/.devcontainer/ # ConfigServer dev container
+└── CloudGateway/.devcontainer/ # CloudGateway dev container
 ```
 
 **How to use:**
@@ -1232,19 +1232,19 @@ SpringBoot/
 3. **Reopen in Container:** VS Code will detect `.devcontainer/devcontainer.json` and prompt you to reopen in container
 
 4. **Start coding!** All dependencies and services run automatically:
-   - ✅ Your service runs in its container with hot reload
-   - ✅ All other services (ServiceRegistry, ConfigServer, databases) run as dependencies
-   - ✅ Full Java tooling, IntelliJ IDEA keybindings, Spring Boot support
-   - ✅ Debug ports exposed and ready to use
-   - ✅ Code changes reload automatically
+ - Your service runs in its container with hot reload
+ - All other services (ServiceRegistry, ConfigServer, databases) run as dependencies
+ - Full Java tooling, IntelliJ IDEA keybindings, Spring Boot support
+ - Debug ports exposed and ready to use
+ - Code changes reload automatically
 
 **Benefits:**
-- 🚀 **Zero setup**: No local Java, Maven, or MySQL installation required
-- 🔥 **Hot reload**: Code changes reload automatically
-- 🐛 **Debugging**: Remote debugging pre-configured
-- 🎯 **Focused**: Work on one service at a time
-- 📦 **Consistent**: Same environment for all developers
-- 🔄 **Isolated**: Each service in its own container
+- **Zero setup**: No local Java, Maven, or MySQL installation required
+- **Hot reload**: Code changes reload automatically
+- **Debugging**: Remote debugging pre-configured
+- **Focused**: Work on one service at a time
+- **Consistent**: Same environment for all developers
+- **Isolated**: Each service in its own container
 
 **Service-specific ports forwarded:**
 
@@ -1272,10 +1272,10 @@ docker-compose -f docker-compose.dev.yml up -d --build serviceregistry configser
 **Note:** Now uses `Dockerfile.dev` with volume mounts for source code hot reload!
 
 This starts:
-- ✓ Service Registry (Eureka)
-- ✓ Config Server
-- ✓ Cloud Gateway
-- ✓ All 3 MySQL Databases
+- Service Registry (Eureka)
+- Config Server
+- Cloud Gateway
+- All 3 MySQL Databases
 
 **Then run the service you're developing:**
 ```bash
@@ -1293,10 +1293,10 @@ mvn spring-boot:run
 ```
 
 **Benefits:**
-- 🚀 Instant code changes (hot reload with Spring Boot DevTools)
-- 🐛 Easy debugging in IDE
-- 💻 Only run what you're editing
-- 🔧 Infrastructure runs in Docker (no manual setup)
+- Instant code changes (hot reload with Spring Boot DevTools)
+- Easy debugging in IDE
+- Only run what you're editing
+- Infrastructure runs in Docker (no manual setup)
 
 #### Mode 2: Full Stack in Docker with Hot Reload
 
@@ -1308,22 +1308,22 @@ docker-compose -f docker-compose.dev.yml up --build -d
 ```
 
 This starts ALL 9 services in Docker:
-- ✓ Service Registry, Config Server, Cloud Gateway
-- ✓ Product, Order, Payment Services
-- ✓ All 3 MySQL Databases
+- Service Registry, Config Server, Cloud Gateway
+- Product, Order, Payment Services
+- All 3 MySQL Databases
 
 **NEW Development Features:**
-- 🔥 **Hot Reload**: Code changes automatically reload in containers!
-- 🐛 **Remote Debugging**: Debug ports exposed (5005-5007)
-- 💾 **Volume Mounts**: Source code mounted for instant updates
-- ⚡ **Maven Cache**: Shared Maven repo for faster builds
+- **Hot Reload**: Code changes automatically reload in containers!
+- **Remote Debugging**: Debug ports exposed (5005-5007)
+- **Volume Mounts**: Source code mounted for instant updates
+- **Maven Cache**: Shared Maven repo for faster builds
 
 **Benefits:**
-- 📦 Test complete system integration
-- 🚀 Code changes reload automatically (Spring Boot DevTools)
-- 🐛 Remote debugging from IDE
-- 💻 Edit code locally, runs in Docker
-- 🔄 Production-like environment
+- Test complete system integration
+- Code changes reload automatically (Spring Boot DevTools)
+- Remote debugging from IDE
+- Edit code locally, runs in Docker
+- Production-like environment
 
 **When to use:**
 - Full stack development with hot reload
@@ -1413,11 +1413,11 @@ ENTRYPOINT ["java", "-jar", "/productservice.jar"]
 **Used by:** `docker-compose.yml`
 
 **Features:**
-- ✅ Small image size (~150MB with Alpine)
-- ✅ Fast startup
-- ✅ Optimized for production
-- ❌ No hot reload
-- ❌ Requires rebuild on code changes
+- Small image size (~150MB with Alpine)
+- Fast startup
+- Optimized for production
+- No hot reload
+- Requires rebuild on code changes
 
 #### `Dockerfile.dev` (Development)
 ```dockerfile
@@ -1431,12 +1431,12 @@ ENTRYPOINT ["mvn", "spring-boot:run"]
 **Used by:** `docker-compose.dev.yml`
 
 **Features:**
-- ✅ **Hot reload** with Spring Boot DevTools
-- ✅ **Volume mounts** for instant code changes
-- ✅ **Remote debugging** enabled
-- ✅ No rebuild needed for code changes
-- ⚠️ Larger image (~700MB)
-- ⚠️ Slower initial build
+- **Hot reload** with Spring Boot DevTools
+- **Volume mounts** for instant code changes
+- **Remote debugging** enabled
+- No rebuild needed for code changes
+- Larger image (~700MB)
+- Slower initial build
 
 ### Development Tips
 
@@ -1446,7 +1446,7 @@ ENTRYPOINT ["mvn", "spring-boot:run"]
 docker-compose -f docker-compose.dev.yml up -d
 
 # Edit code in ProductService/src/...
-# Changes reload automatically! ✨
+# Changes reload automatically!
 ```
 
 **Remote Debugging:**
@@ -1621,25 +1621,25 @@ The application is configured with Zipkin for distributed tracing. When enabled:
 ### Known Issues & Recommendations
 
 1. **Version Inconsistency:**
-   - ProductService uses Spring Boot 3.1.5
-   - OrderService uses Spring Boot 3.2.0
-   - Recommend standardizing to a single version
+ - ProductService uses Spring Boot 3.1.5
+ - OrderService uses Spring Boot 3.2.0
+ - Recommend standardizing to a single version
 
 2. **Security Concerns:**
-   - Okta credentials in `application-dev.yml` should be externalized to environment variables
-   - Use Kubernetes secrets for sensitive data in production
+ - Okta credentials in `application-dev.yml` should be externalized to environment variables
+ - Use Kubernetes secrets for sensitive data in production
 
 3. **Missing Configuration:**
-   - OrderService missing main `application.yaml` (only has `application-dev.yaml`)
+ - OrderService missing main `application.yaml` (only has `application-dev.yaml`)
 
 4. **Database Setup:**
-   - MySQL services are now fully configured in `docker-compose.yml`
-   - Each service has its own dedicated database instance
-   - Database data persists in Docker volumes
+ - MySQL services are now fully configured in `docker-compose.yml`
+ - Each service has its own dedicated database instance
+ - Database data persists in Docker volumes
 
 5. **Service Communication:**
-   - OrderService uses both RestTemplate and OpenFeign for inter-service communication
-   - Consider standardizing on one approach
+ - OrderService uses both RestTemplate and OpenFeign for inter-service communication
+ - Consider standardizing on one approach
 
 ### Environment Variables
 
@@ -1710,12 +1710,12 @@ cd SpringBoot
 ./build-and-start.sh
 
 # 4. Verify
-open http://localhost:8761  # Check Eureka - all services should be registered
-open http://localhost:9090/swagger-ui.html  # Interactive API documentation
+open http://localhost:8761 # Check Eureka - all services should be registered
+open http://localhost:9090/swagger-ui.html # Interactive API documentation
 
 # 5. Test API (use Swagger UI or curl - see API Documentation section)
 curl http://localhost:9090/product/1 \
-  -H 'Authorization: Bearer <your-token>'
+ -H 'Authorization: Bearer <your-token>'
 ```
 
 **Option 2: Manual**
@@ -1735,12 +1735,12 @@ docker-compose up -d
 
 # 5. Verify
 docker-compose ps
-open http://localhost:8761  # Check Eureka - all services should be registered
-open http://localhost:9090/swagger-ui.html  # Interactive API documentation
+open http://localhost:8761 # Check Eureka - all services should be registered
+open http://localhost:9090/swagger-ui.html # Interactive API documentation
 
 # 6. Test API (use Swagger UI or curl - see API Documentation section)
 curl http://localhost:9090/product/1 \
-  -H 'Authorization: Bearer <your-token>'
+ -H 'Authorization: Bearer <your-token>'
 ```
 
 ### Troubleshooting

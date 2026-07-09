@@ -41,9 +41,9 @@
 **Configuration:**
 ```yaml
 eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://serviceregistry:8761/eureka
+ client:
+ serviceUrl:
+ defaultZone: http://serviceregistry:8761/eureka
 ```
 
 **Benefits:**
@@ -73,19 +73,19 @@ eureka:
 **Routing Example:**
 ```yaml
 spring:
-  cloud:
-    gateway:
-      routes:
-        - id: PRODUCT-SERVICE
-          uri: lb://PRODUCT-SERVICE  # Load balanced
-          predicates:
-            - Path=/product/**
-          filters:
-            - StripPrefix=1  # Remove /product prefix
-            - name: CircuitBreaker
-              args:
-                name: PRODUCT-SERVICE
-                fallbackuri: forward:/productServiceFallback
+ cloud:
+ gateway:
+ routes:
+ - id: PRODUCT-SERVICE
+ uri: lb://PRODUCT-SERVICE # Load balanced
+ predicates:
+ - Path=/product/**
+ filters:
+ - StripPrefix=1 # Remove /product prefix
+ - name: CircuitBreaker
+ args:
+ name: PRODUCT-SERVICE
+ fallbackuri: forward:/productServiceFallback
 ```
 
 **Benefits:**
@@ -113,12 +113,12 @@ spring:
 **Configuration:**
 ```yaml
 spring:
-  cloud:
-    config:
-      server:
-        git:
-          uri: https://github.com/your-org/config-repo
-          clone-on-start: true
+ cloud:
+ config:
+ server:
+ git:
+ uri: https://github.com/your-org/config-repo
+ clone-on-start: true
 ```
 
 **Benefits:**
@@ -141,17 +141,17 @@ spring:
 **Implementation:**
 ```yaml
 filters:
-  - name: CircuitBreaker
-    args:
-      name: ORDER-SERVICE
-      fallbackuri: forward:/orderServiceFallback
+ - name: CircuitBreaker
+ args:
+ name: ORDER-SERVICE
+ fallbackuri: forward:/orderServiceFallback
 ```
 
 **Fallback Response:**
 ```java
 @GetMapping("/orderServiceFallback")
 public String orderServiceFallback() {
-    return "OrderService is down";
+ return "OrderService is down";
 }
 ```
 
@@ -211,14 +211,14 @@ public String orderServiceFallback() {
 ```java
 @Bean
 public RestTemplate restTemplate(RestTemplateBuilder builder,
-                                  OAuth2AuthorizedClientManager clientManager) {
-    RestTemplate restTemplate = builder.build();
+ OAuth2AuthorizedClientManager clientManager) {
+ RestTemplate restTemplate = builder.build();
 
-    restTemplate.getInterceptors().add(
-        new RestTemplateInterceptor(clientManager)
-    );
+ restTemplate.getInterceptors().add(
+ new RestTemplateInterceptor(clientManager)
+ );
 
-    return restTemplate;
+ return restTemplate;
 }
 ```
 
@@ -226,28 +226,28 @@ public RestTemplate restTemplate(RestTemplateBuilder builder,
 ```java
 @FeignClient(name = "PRODUCT-SERVICE", path = "/product")
 public interface ProductService {
-    @GetMapping("/{id}")
-    ProductResponse getProductById(@PathVariable("id") long productId);
+ @GetMapping("/{id}")
+ ProductResponse getProductById(@PathVariable("id") long productId);
 }
 ```
 
 **OAuth2 Token Injection:**
 ```java
 public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
-    @Override
-    public ClientHttpResponse intercept(HttpRequest request, byte[] body,
-                                        ClientHttpRequestExecution execution) {
-        OAuth2AuthorizedClient client = clientManager.authorize(
-            OAuth2AuthorizeRequest.withClientRegistrationId("internal-client")
-                .principal("internal")
-                .build()
-        );
+ @Override
+ public ClientHttpResponse intercept(HttpRequest request, byte[] body,
+ ClientHttpRequestExecution execution) {
+ OAuth2AuthorizedClient client = clientManager.authorize(
+ OAuth2AuthorizeRequest.withClientRegistrationId("internal-client")
+ .principal("internal")
+ .build()
+ );
 
-        String token = client.getAccessToken().getTokenValue();
-        request.getHeaders().add("Authorization", "Bearer " + token);
+ String token = client.getAccessToken().getTokenValue();
+ request.getHeaders().add("Authorization", "Bearer " + token);
 
-        return execution.execute(request, body);
-    }
+ return execution.execute(request, body);
+ }
 }
 ```
 
@@ -271,54 +271,54 @@ public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
 
 ```
 ┌─────────────────┐
-│   Frontend      │
-│ (React/Vue)     │
+│ Frontend │
+│ (React/Vue) │
 └────────┬────────┘
-         │
-         │ (1) Login Request
-         ▼
+ │
+ │ (1) Login Request
+ ▼
 ┌─────────────────────────┐
-│   CloudGateway          │
-│   - Regular Web App     │
-│   - Authorization Code  │
+│ CloudGateway │
+│ - Regular Web App │
+│ - Authorization Code │
 └────────┬────────────────┘
-         │
-         │ (2) Redirect to Auth0
-         ▼
+ │
+ │ (2) Redirect to Auth0
+ ▼
 ┌─────────────────────────┐
-│   Auth0                 │
-│   - User Authentication │
-│   - Token Issuance      │
+│ Auth0 │
+│ - User Authentication │
+│ - Token Issuance │
 └────────┬────────────────┘
-         │
-         │ (3) Tokens (Access + Refresh)
-         ▼
+ │
+ │ (3) Tokens (Access + Refresh)
+ ▼
 ┌─────────────────────────┐
-│   CloudGateway          │
-│   - JWT Validation      │
-│   - Routing             │
+│ CloudGateway │
+│ - JWT Validation │
+│ - Routing │
 └────────┬────────────────┘
-         │
-         │ (4) Validated Request
-         ▼
+ │
+ │ (4) Validated Request
+ ▼
 ┌─────────────────────────┐
-│   Backend Services      │
-│   - JWT Validation      │
-│   - Business Logic      │
+│ Backend Services │
+│ - JWT Validation │
+│ - Business Logic │
 └─────────────────────────┘
 
 Service-to-Service:
 ┌─────────────────────────┐
-│   OrderService          │
-│   - M2M Application     │
-│   - Client Credentials  │
+│ OrderService │
+│ - M2M Application │
+│ - Client Credentials │
 └────────┬────────────────┘
-         │
-         │ Auto-inject OAuth2 token
-         ▼
+ │
+ │ Auto-inject OAuth2 token
+ ▼
 ┌─────────────────────────┐
-│   ProductService        │
-│   PaymentService        │
+│ ProductService │
+│ PaymentService │
 └─────────────────────────┘
 ```
 
@@ -348,21 +348,21 @@ Service-to-Service:
 
 ```json
 {
-  "header": {
-    "alg": "RS256",
-    "typ": "JWT",
-    "kid": "key-id"
-  },
-  "payload": {
-    "iss": "https://dev-5nw6367bfpr277ec.us.auth0.com/",
-    "sub": "auth0|user-id",
-    "aud": "http://springboot-microservices-api",
-    "exp": 1759750871,
-    "iat": 1759664471,
-    "scope": "openid profile email offline_access",
-    "email": "user@example.com"
-  },
-  "signature": "..."
+ "header": {
+ "alg": "RS256",
+ "typ": "JWT",
+ "kid": "key-id"
+ },
+ "payload": {
+ "iss": "https://dev-5nw6367bfpr277ec.us.auth0.com/",
+ "sub": "auth0|user-id",
+ "aud": "http://springboot-microservices-api",
+ "exp": 1759750871,
+ "iat": 1759664471,
+ "scope": "openid profile email offline_access",
+ "email": "user@example.com"
+ },
+ "signature": "..."
 }
 ```
 
@@ -387,45 +387,45 @@ AUTH0_ISSUER_URI=https://dev-5nw6367bfpr277ec.us.auth0.com/
 **CloudGateway (Resource Server + OAuth2 Client):**
 ```yaml
 spring:
-  security:
-    oauth2:
-      resource-server:
-        jwt:
-          issuer-uri: ${AUTH0_ISSUER_URI}
-          audiences: ${AUTH0_AUDIENCE}
-      client:
-        registration:
-          auth0:
-            client-id: ${AUTH0_CLIENT_ID}
-            client-secret: ${AUTH0_CLIENT_SECRET}
-            scope: openid,profile,email,offline_access
+ security:
+ oauth2:
+ resource-server:
+ jwt:
+ issuer-uri: ${AUTH0_ISSUER_URI}
+ audiences: ${AUTH0_AUDIENCE}
+ client:
+ registration:
+ auth0:
+ client-id: ${AUTH0_CLIENT_ID}
+ client-secret: ${AUTH0_CLIENT_SECRET}
+ scope: openid,profile,email,offline_access
 ```
 
 **OrderService (Resource Server + OAuth2 Client for service calls):**
 ```yaml
 spring:
-  security:
-    oauth2:
-      resource-server:
-        jwt:
-          issuer-uri: ${AUTH0_ISSUER_URI}
-      client:
-        registration:
-          internal-client:
-            provider: auth0
-            authorization-grant-type: client_credentials
-            client-id: ${AUTH0_M2M_CLIENT_ID}
-            client-secret: ${AUTH0_M2M_CLIENT_SECRET}
+ security:
+ oauth2:
+ resource-server:
+ jwt:
+ issuer-uri: ${AUTH0_ISSUER_URI}
+ client:
+ registration:
+ internal-client:
+ provider: auth0
+ authorization-grant-type: client_credentials
+ client-id: ${AUTH0_M2M_CLIENT_ID}
+ client-secret: ${AUTH0_M2M_CLIENT_SECRET}
 ```
 
 **ProductService, PaymentService (Resource Server only):**
 ```yaml
 spring:
-  security:
-    oauth2:
-      resource-server:
-        jwt:
-          issuer-uri: ${AUTH0_ISSUER_URI}
+ security:
+ oauth2:
+ resource-server:
+ jwt:
+ issuer-uri: ${AUTH0_ISSUER_URI}
 ```
 
 #### Benefits
@@ -454,11 +454,11 @@ spring:
 **Configuration:**
 ```yaml
 spring:
-  cloud:
-    gateway:
-      routes:
-        - id: PRODUCT-SERVICE
-          uri: lb://PRODUCT-SERVICE  # Load balanced via Eureka
+ cloud:
+ gateway:
+ routes:
+ - id: PRODUCT-SERVICE
+ uri: lb://PRODUCT-SERVICE # Load balanced via Eureka
 ```
 
 **Load Balancing Strategies:**
@@ -494,41 +494,41 @@ spring:
 ```java
 @Configuration
 public class CorsConfig {
-    @Bean
-    public CorsWebFilter corsWebFilter() {
-        CorsConfiguration config = new CorsConfiguration();
+ @Bean
+ public CorsWebFilter corsWebFilter() {
+ CorsConfiguration config = new CorsConfiguration();
 
-        // Specific allowed origins (no wildcard with credentials)
-        config.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000",  // React
-            "http://localhost:4200",  // Angular
-            "http://localhost:8080",  // Vue
-            "http://localhost:5173"   // Vite
-        ));
+ // Specific allowed origins (no wildcard with credentials)
+ config.setAllowedOrigins(Arrays.asList(
+ "http://localhost:3000", // React
+ "http://localhost:4200", // Angular
+ "http://localhost:8080", // Vue
+ "http://localhost:5173" // Vite
+ ));
 
-        config.setAllowCredentials(true);
-        config.addAllowedHeader("*");
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        config.setMaxAge(3600L);
+ config.setAllowCredentials(true);
+ config.addAllowedHeader("*");
+ config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+ config.setMaxAge(3600L);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+ UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+ source.registerCorsConfiguration("/**", config);
 
-        return new CorsWebFilter(source);
-    }
+ return new CorsWebFilter(source);
+ }
 }
 ```
 
 ### Security Best Practices Implemented
 
-✅ **No Hardcoded Credentials**: All secrets in environment variables
-✅ **Separate Auth Applications**: Regular Web App (user) + M2M App (services)
-✅ **JWT Validation**: Every service validates tokens independently
-✅ **Automatic Token Refresh**: Refresh token support enabled
-✅ **HTTPS Ready**: Configuration supports HTTPS (enable in production)
-✅ **Scope-Based Authorization**: Fine-grained permissions
-✅ **Defense in Depth**: Multiple security layers
-✅ **Secrets Management**: `.env` in `.gitignore`
+ **No Hardcoded Credentials**: All secrets in environment variables
+ **Separate Auth Applications**: Regular Web App (user) + M2M App (services)
+ **JWT Validation**: Every service validates tokens independently
+ **Automatic Token Refresh**: Refresh token support enabled
+ **HTTPS Ready**: Configuration supports HTTPS (enable in production)
+ **Scope-Based Authorization**: Fine-grained permissions
+ **Defense in Depth**: Multiple security layers
+ **Secrets Management**: `.env` in `.gitignore`
 
 ---
 
@@ -563,21 +563,21 @@ public class CorsConfig {
 
 ```yaml
 springdoc:
-  api-docs:
-    enabled: true
-    path: /api-docs
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui.html
-    urls:
-      - name: Cloud Gateway
-        url: /api-docs
-      - name: Product Service
-        url: /product/api-docs
-      - name: Order Service
-        url: /order/api-docs
-      - name: Payment Service
-        url: /payment/api-docs
+ api-docs:
+ enabled: true
+ path: /api-docs
+ swagger-ui:
+ enabled: true
+ path: /swagger-ui.html
+ urls:
+ - name: Cloud Gateway
+ url: /api-docs
+ - name: Product Service
+ url: /product/api-docs
+ - name: Order Service
+ url: /order/api-docs
+ - name: Payment Service
+ url: /payment/api-docs
 ```
 
 #### Documentation Annotations Example
@@ -588,28 +588,28 @@ springdoc:
 @Tag(name = "Authentication", description = "OAuth2/OIDC authentication endpoints")
 public class AuthenticationController {
 
-    @Operation(
-        summary = "OAuth2 Login",
-        description = "Initiates OAuth2/OIDC login flow with Auth0"
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Successfully authenticated",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = AuthenticationResponse.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "401",
-            description = "Unauthorized"
-        )
-    })
-    @GetMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(...) {
-        // Implementation
-    }
+ @Operation(
+ summary = "OAuth2 Login",
+ description = "Initiates OAuth2/OIDC login flow with Auth0"
+ )
+ @ApiResponses(value = {
+ @ApiResponse(
+ responseCode = "200",
+ description = "Successfully authenticated",
+ content = @Content(
+ mediaType = "application/json",
+ schema = @Schema(implementation = AuthenticationResponse.class)
+ )
+ ),
+ @ApiResponse(
+ responseCode = "401",
+ description = "Unauthorized"
+ )
+ })
+ @GetMapping("/login")
+ public ResponseEntity<AuthenticationResponse> login(...) {
+ // Implementation
+ }
 }
 ```
 
@@ -620,19 +620,19 @@ public class AuthenticationController {
 @Schema(description = "Authentication response containing user information and OAuth2 tokens")
 public class AuthenticationResponse {
 
-    @Schema(
-        description = "User identifier (email address from Auth0)",
-        example = "user@example.com",
-        required = true
-    )
-    private String userId;
+ @Schema(
+ description = "User identifier (email address from Auth0)",
+ example = "user@example.com",
+ required = true
+ )
+ private String userId;
 
-    @Schema(
-        description = "OAuth2 access token (JWT) for API authentication",
-        example = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
-        required = true
-    )
-    private String accessToken;
+ @Schema(
+ description = "OAuth2 access token (JWT) for API authentication",
+ example = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+ required = true
+ )
+ private String accessToken;
 }
 ```
 
@@ -662,7 +662,7 @@ COPY pom.xml .
 
 # Enable remote debugging on port 5005
 ENTRYPOINT ["mvn", "spring-boot:run", \
-    "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"]
+ "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"]
 ```
 
 **Features**:
@@ -698,16 +698,16 @@ ENTRYPOINT ["mvn", "spring-boot:run", \
 
 ```xml
 <plugin>
-    <groupId>com.google.cloud.tools</groupId>
-    <artifactId>jib-maven-plugin</artifactId>
-    <configuration>
-        <from>
-            <image>openjdk@sha256:528707081fdb9562eb819128a9f85ae7fe000e2fbaeaf9f87662e7b3f38cb7d8</image>
-        </from>
-        <to>
-            <image>registry.hub.docker.com/etiennebel/cloudgateway</image>
-        </to>
-    </configuration>
+ <groupId>com.google.cloud.tools</groupId>
+ <artifactId>jib-maven-plugin</artifactId>
+ <configuration>
+ <from>
+ <image>openjdk@sha256:528707081fdb9562eb819128a9f85ae7fe000e2fbaeaf9f87662e7b3f38cb7d8</image>
+ </from>
+ <to>
+ <image>registry.hub.docker.com/etiennebel/cloudgateway</image>
+ </to>
+ </configuration>
 </plugin>
 ```
 
@@ -771,11 +771,11 @@ ENTRYPOINT ["mvn", "spring-boot:run", \
 ### Lombok Annotations Used
 
 ```java
-@Data                    // Getters, setters, toString, equals, hashCode
-@AllArgsConstructor      // Constructor with all fields
-@NoArgsConstructor       // Default constructor
-@Builder                 // Builder pattern
-@Log4j2                  // Logger field
+@Data // Getters, setters, toString, equals, hashCode
+@AllArgsConstructor // Constructor with all fields
+@NoArgsConstructor // Default constructor
+@Builder // Builder pattern
+@Log4j2 // Logger field
 @RequiredArgsConstructor // Constructor for final fields
 ```
 
@@ -797,10 +797,10 @@ ENTRYPOINT ["mvn", "spring-boot:run", \
 **Health Check Integration**:
 ```yaml
 healthcheck:
-  test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
-  interval: 10s
-  timeout: 5s
-  retries: 10
+ test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+ interval: 10s
+ timeout: 5s
+ retries: 10
 ```
 
 ### Logging
@@ -812,11 +812,11 @@ healthcheck:
 @Log4j2
 @RestController
 public class OrderController {
-    public Order createOrder(Order order) {
-        log.info("Creating order: {}", order);
-        log.debug("Order details: {}", order.getItems());
-        log.error("Failed to process order", exception);
-    }
+ public Order createOrder(Order order) {
+ log.info("Creating order: {}", order);
+ log.debug("Order details: {}", order.getItems());
+ log.error("Failed to process order", exception);
+ }
 }
 ```
 
@@ -832,16 +832,16 @@ public class OrderController {
 ```xml
 <!-- Uncomment to enable distributed tracing -->
 <dependency>
-    <groupId>io.micrometer</groupId>
-    <artifactId>micrometer-observation</artifactId>
+ <groupId>io.micrometer</groupId>
+ <artifactId>micrometer-observation</artifactId>
 </dependency>
 <dependency>
-    <groupId>io.micrometer</groupId>
-    <artifactId>micrometer-tracing-bridge-brave</artifactId>
+ <groupId>io.micrometer</groupId>
+ <artifactId>micrometer-tracing-bridge-brave</artifactId>
 </dependency>
 <dependency>
-    <groupId>io.zipkin.reporter2</groupId>
-    <artifactId>zipkin-reporter-brave</artifactId>
+ <groupId>io.zipkin.reporter2</groupId>
+ <artifactId>zipkin-reporter-brave</artifactId>
 </dependency>
 ```
 
@@ -875,26 +875,26 @@ Controller → Service → Repository → Entity → Database
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+ @Id
+ @GeneratedValue(strategy = GenerationType.IDENTITY)
+ private Long id;
 
-    @Column(nullable = false)
-    private String name;
+ @Column(nullable = false)
+ private String name;
 
-    private BigDecimal price;
+ private BigDecimal price;
 
-    private Integer quantity;
+ private Integer quantity;
 }
 ```
 
 **Example Repository**:
 ```java
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    List<Product> findByNameContaining(String name);
+ List<Product> findByNameContaining(String name);
 
-    @Query("SELECT p FROM Product p WHERE p.price < :maxPrice")
-    List<Product> findAffordableProducts(@Param("maxPrice") BigDecimal maxPrice);
+ @Query("SELECT p FROM Product p WHERE p.price < :maxPrice")
+ List<Product> findAffordableProducts(@Param("maxPrice") BigDecimal maxPrice);
 }
 ```
 
@@ -903,28 +903,28 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 **Development (H2)**:
 ```yaml
 spring:
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
+ datasource:
+ url: jdbc:h2:mem:testdb
+ driver-class-name: org.h2.Driver
+ jpa:
+ hibernate:
+ ddl-auto: create-drop
 ```
 
 **Production (MySQL)**:
 ```yaml
 spring:
-  datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:3306/productDb
-    username: root
-    password: root
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+ datasource:
+ url: jdbc:mysql://${DB_HOST:localhost}:3306/productDb
+ username: root
+ password: root
+ driver-class-name: com.mysql.cj.jdbc.Driver
+ jpa:
+ hibernate:
+ ddl-auto: update
+ properties:
+ hibernate:
+ dialect: org.hibernate.dialect.MySQLDialect
 ```
 
 ### Database Migration (Recommended - Not Yet Implemented)
@@ -946,13 +946,13 @@ spring:
 ### Testing Pyramid
 
 ```
-         /\
-        /  \  Unit Tests
-       /____\
-      /      \  Integration Tests
-     /________\
-    /          \  End-to-End Tests
-   /____________\
+ /\
+ / \ Unit Tests
+ /____\
+ / \ Integration Tests
+ /________\
+ / \ End-to-End Tests
+ /____________\
 ```
 
 ### Testing Tools & Frameworks
@@ -977,30 +977,30 @@ spring:
 @ActiveProfiles("test")
 class OrderServiceIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+ @Autowired
+ private MockMvc mockMvc;
 
-    @MockBean
-    private ProductService productService;
+ @MockBean
+ private ProductService productService;
 
-    @Test
-    void shouldCreateOrder() throws Exception {
-        // Given
-        OrderRequest request = OrderRequest.builder()
-            .productId(1L)
-            .quantity(2)
-            .build();
+ @Test
+ void shouldCreateOrder() throws Exception {
+ // Given
+ OrderRequest request = OrderRequest.builder()
+ .productId(1L)
+ .quantity(2)
+ .build();
 
-        when(productService.getProductById(1L))
-            .thenReturn(new Product(1L, "Test Product", 100.0, 10));
+ when(productService.getProductById(1L))
+ .thenReturn(new Product(1L, "Test Product", 100.0, 10));
 
-        // When & Then
-        mockMvc.perform(post("/order")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.orderId").exists());
-    }
+ // When & Then
+ mockMvc.perform(post("/order")
+ .contentType(MediaType.APPLICATION_JSON)
+ .content(objectMapper.writeValueAsString(request)))
+ .andExpect(status().isCreated())
+ .andExpect(jsonPath("$.orderId").exists());
+ }
 }
 ```
 
@@ -1009,16 +1009,16 @@ class OrderServiceIntegrationTest {
 ```java
 @Test
 void shouldHandleProductServiceFailure() {
-    // Setup WireMock stub
-    stubFor(get(urlEqualTo("/product/1"))
-        .willReturn(aResponse()
-            .withStatus(500)
-            .withBody("Internal Server Error")));
+ // Setup WireMock stub
+ stubFor(get(urlEqualTo("/product/1"))
+ .willReturn(aResponse()
+ .withStatus(500)
+ .withBody("Internal Server Error")));
 
-    // Test OrderService handles failure gracefully
-    assertThatThrownBy(() -> orderService.createOrder(request))
-        .isInstanceOf(ServiceException.class)
-        .hasMessageContaining("Product service unavailable");
+ // Test OrderService handles failure gracefully
+ assertThatThrownBy(() -> orderService.createOrder(request))
+ .isInstanceOf(ServiceException.class)
+ .hasMessageContaining("Product service unavailable");
 }
 ```
 
@@ -1053,12 +1053,12 @@ void shouldHandleProductServiceFailure() {
 ```java
 @GetMapping("/products")
 public Flux<Product> getAllProducts() {
-    return productRepository.findAll();
+ return productRepository.findAll();
 }
 
 @GetMapping("/products/{id}")
 public Mono<Product> getProductById(@PathVariable Long id) {
-    return productRepository.findById(id);
+ return productRepository.findById(id);
 }
 ```
 
@@ -1068,11 +1068,11 @@ public Mono<Product> getProductById(@PathVariable Long id) {
 ```java
 @FeignClient(name = "PRODUCT-SERVICE", path = "/product")
 public interface ProductService {
-    @GetMapping("/{id}")
-    ProductResponse getProductById(@PathVariable Long id);
+ @GetMapping("/{id}")
+ ProductResponse getProductById(@PathVariable Long id);
 
-    @PostMapping
-    ProductResponse createProduct(@RequestBody ProductRequest request);
+ @PostMapping
+ ProductResponse createProduct(@RequestBody ProductRequest request);
 }
 ```
 
@@ -1082,10 +1082,10 @@ public interface ProductService {
 private RestTemplate restTemplate;
 
 public Product getProduct(Long id) {
-    return restTemplate.getForObject(
-        "http://PRODUCT-SERVICE/product/" + id,
-        Product.class
-    );
+ return restTemplate.getForObject(
+ "http://PRODUCT-SERVICE/product/" + id,
+ Product.class
+ );
 }
 ```
 
@@ -1107,8 +1107,8 @@ SPRING_PROFILES_ACTIVE=dev
 
 # Via application.yml
 spring:
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
+ profiles:
+ active: ${SPRING_PROFILES_ACTIVE:dev}
 ```
 
 **Profile-Specific Configuration**:
@@ -1121,9 +1121,9 @@ spring:
 **Development Benefits**:
 ```yaml
 volumes:
-  - ./ProductService/src:/app/src        # Live code changes
-  - ./ProductService/target:/app/target  # Compiled classes
-  - maven-repo:/root/.m2                 # Shared Maven cache
+ - ./ProductService/src:/app/src # Live code changes
+ - ./ProductService/target:/app/target # Compiled classes
+ - maven-repo:/root/.m2 # Shared Maven cache
 ```
 
 **Hot Reload Process**:
@@ -1144,21 +1144,21 @@ AUTH0_CLIENT_SECRET=your_client_secret
 **Loaded by Docker Compose**:
 ```yaml
 services:
-  cloudgateway:
-    environment:
-      - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
-      - AUTH0_CLIENT_SECRET=${AUTH0_CLIENT_SECRET}
+ cloudgateway:
+ environment:
+ - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+ - AUTH0_CLIENT_SECRET=${AUTH0_CLIENT_SECRET}
 ```
 
 **Used in Spring**:
 ```yaml
 spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          auth0:
-            client-id: ${AUTH0_CLIENT_ID}
+ security:
+ oauth2:
+ client:
+ registration:
+ auth0:
+ client-id: ${AUTH0_CLIENT_ID}
 ```
 
 ---
@@ -1278,120 +1278,120 @@ PaymentService
 
 ```
 User Request
-    ↓
+ ↓
 CloudGateway (9090)
-    ↓ (JWT validation)
-    ├→ ProductService (8081) → productDb
-    ├→ OrderService (8082) → orderDb
-    │       ├→ ProductService (via RestTemplate)
-    │       └→ PaymentService (via Feign)
-    └→ PaymentService (8083) → paymentDb
+ ↓ (JWT validation)
+ ├→ ProductService (8081) → productDb
+ ├→ OrderService (8082) → orderDb
+ │ ├→ ProductService (via RestTemplate)
+ │ └→ PaymentService (via Feign)
+ └→ PaymentService (8083) → paymentDb
 ```
 
 ---
 
 ## Best Practices Implemented
 
-### ✅ Microservices Design Patterns
+### Microservices Design Patterns
 
 | Pattern | Status | Implementation |
 |---------|--------|----------------|
-| **Service Discovery** | ✅ | Netflix Eureka |
-| **API Gateway** | ✅ | Spring Cloud Gateway |
-| **Circuit Breaker** | ✅ | Resilience4j |
-| **Centralized Configuration** | ✅ | Spring Cloud Config |
-| **Database per Service** | ✅ | Separate MySQL databases |
-| **Load Balancing** | ✅ | Spring Cloud LoadBalancer |
-| **Authentication at Gateway** | ✅ | OAuth2/JWT |
-| **Service-to-Service Auth** | ✅ | OAuth2 Client Credentials |
-| **Externalized Configuration** | ✅ | Environment variables |
-| **Health Checks** | ✅ | Actuator + Docker healthchecks |
-| **API Documentation** | ✅ | OpenAPI/Swagger |
-| **Containerization** | ✅ | Docker + Docker Compose |
-| **Orchestration Ready** | ✅ | Kubernetes manifests |
-| **Hot Reload (Dev)** | ✅ | DevTools + volume mounts |
+| **Service Discovery** | | Netflix Eureka |
+| **API Gateway** | | Spring Cloud Gateway |
+| **Circuit Breaker** | | Resilience4j |
+| **Centralized Configuration** | | Spring Cloud Config |
+| **Database per Service** | | Separate MySQL databases |
+| **Load Balancing** | | Spring Cloud LoadBalancer |
+| **Authentication at Gateway** | | OAuth2/JWT |
+| **Service-to-Service Auth** | | OAuth2 Client Credentials |
+| **Externalized Configuration** | | Environment variables |
+| **Health Checks** | | Actuator + Docker healthchecks |
+| **API Documentation** | | OpenAPI/Swagger |
+| **Containerization** | | Docker + Docker Compose |
+| **Orchestration Ready** | | Kubernetes manifests |
+| **Hot Reload (Dev)** | | DevTools + volume mounts |
 
-### ✅ Security Best Practices
-
-| Practice | Status | Details |
-|----------|--------|---------|
-| **No Hardcoded Secrets** | ✅ | All credentials in `.env` |
-| **Separate Auth Apps** | ✅ | Web App + M2M App |
-| **JWT Validation** | ✅ | All services validate tokens |
-| **Automatic Token Refresh** | ✅ | Refresh token support |
-| **CORS Protection** | ✅ | Specific allowed origins |
-| **HTTPS Ready** | ✅ | Configuration supports TLS |
-| **Defense in Depth** | ✅ | Multiple security layers |
-| **Principle of Least Privilege** | ✅ | Minimal scopes/permissions |
-| **Secrets in .gitignore** | ✅ | `.env` never committed |
-
-### ✅ Development Best Practices
+### Security Best Practices
 
 | Practice | Status | Details |
 |----------|--------|---------|
-| **Hot Reload** | ✅ | No rebuild needed in dev |
-| **Remote Debugging** | ✅ | Debug ports exposed |
-| **Dev Containers** | ✅ | Consistent dev environment |
-| **Shared Maven Cache** | ✅ | Faster builds |
-| **Profile-Based Config** | ✅ | Dev/prod separation |
-| **Automated Testing** | ✅ | Unit + integration tests |
-| **API Documentation** | ✅ | Auto-generated from code |
-| **Code Generation** | ✅ | Lombok reduces boilerplate |
+| **No Hardcoded Secrets** | | All credentials in `.env` |
+| **Separate Auth Apps** | | Web App + M2M App |
+| **JWT Validation** | | All services validate tokens |
+| **Automatic Token Refresh** | | Refresh token support |
+| **CORS Protection** | | Specific allowed origins |
+| **HTTPS Ready** | | Configuration supports TLS |
+| **Defense in Depth** | | Multiple security layers |
+| **Principle of Least Privilege** | | Minimal scopes/permissions |
+| **Secrets in .gitignore** | | `.env` never committed |
 
-### ✅ Operational Best Practices
+### Development Best Practices
 
 | Practice | Status | Details |
 |----------|--------|---------|
-| **Health Checks** | ✅ | All services monitored |
-| **Graceful Degradation** | ✅ | Circuit breaker fallbacks |
-| **Service Isolation** | ✅ | Independent deployments |
-| **Horizontal Scaling** | ✅ | Load balancer ready |
-| **Logging** | ✅ | Structured logging |
-| **Monitoring Endpoints** | ✅ | Actuator |
-| **Dependency Management** | ✅ | Maven BOM |
-| **Version Control** | ✅ | Git |
+| **Hot Reload** | | No rebuild needed in dev |
+| **Remote Debugging** | | Debug ports exposed |
+| **Dev Containers** | | Consistent dev environment |
+| **Shared Maven Cache** | | Faster builds |
+| **Profile-Based Config** | | Dev/prod separation |
+| **Automated Testing** | | Unit + integration tests |
+| **API Documentation** | | Auto-generated from code |
+| **Code Generation** | | Lombok reduces boilerplate |
+
+### Operational Best Practices
+
+| Practice | Status | Details |
+|----------|--------|---------|
+| **Health Checks** | | All services monitored |
+| **Graceful Degradation** | | Circuit breaker fallbacks |
+| **Service Isolation** | | Independent deployments |
+| **Horizontal Scaling** | | Load balancer ready |
+| **Logging** | | Structured logging |
+| **Monitoring Endpoints** | | Actuator |
+| **Dependency Management** | | Maven BOM |
+| **Version Control** | | Git |
 
 ---
 
 ## Future Enhancements
 
-### ✅ Ready to Enable (Dependencies Already Present)
+### Ready to Enable (Dependencies Already Present)
 
 These features have dependencies already in the codebase but are commented out or disabled:
 
-#### 1. Distributed Tracing ⚡ Quick Win
-**Status**: ✅ Dependencies present but commented out
+#### 1. Distributed Tracing Quick Win
+**Status**: Dependencies present but commented out
 **Location**: `OrderService/pom.xml` lines 95-106
 **Action Required**:
 1. Uncomment these dependencies:
-   ```xml
-   <dependency>
-       <groupId>io.micrometer</groupId>
-       <artifactId>micrometer-observation</artifactId>
-   </dependency>
-   <dependency>
-       <groupId>io.micrometer</groupId>
-       <artifactId>micrometer-tracing-bridge-brave</artifactId>
-   </dependency>
-   <dependency>
-       <groupId>io.zipkin.reporter2</groupId>
-       <artifactId>zipkin-reporter-brave</artifactId>
-   </dependency>
-   ```
+ ```xml
+ <dependency>
+ <groupId>io.micrometer</groupId>
+ <artifactId>micrometer-observation</artifactId>
+ </dependency>
+ <dependency>
+ <groupId>io.micrometer</groupId>
+ <artifactId>micrometer-tracing-bridge-brave</artifactId>
+ </dependency>
+ <dependency>
+ <groupId>io.zipkin.reporter2</groupId>
+ <artifactId>zipkin-reporter-brave</artifactId>
+ </dependency>
+ ```
 2. Add configuration:
-   ```yaml
-   management:
-     tracing:
-       sampling:
-         probability: 1.0
-     zipkin:
-       tracing:
-         endpoint: http://localhost:9411/api/v2/spans
-   ```
+ ```yaml
+ management:
+ tracing:
+ sampling:
+ probability: 1.0
+ zipkin:
+ tracing:
+ endpoint: http://localhost:9411/api/v2/spans
+ ```
 3. Start Zipkin:
-   ```bash
-   docker run -d -p 9411:9411 openzipkin/zipkin
-   ```
+ ```bash
+ docker run -d -p 9411:9411 openzipkin/zipkin
+ ```
 
 **Tools**: Micrometer Tracing + Zipkin
 **Effort**: 30 minutes
@@ -1399,146 +1399,146 @@ These features have dependencies already in the codebase but are commented out o
 
 ---
 
-### 🔨 Easy to Add (Simple Configuration)
+### Easy to Add (Simple Configuration)
 
 These features require adding dependencies but have straightforward setup:
 
-#### 2. API Rate Limiting ⚡ Quick Win
-**Status**: ❌ Not implemented (Gateway supports it natively)
+#### 2. API Rate Limiting Quick Win
+**Status**: Not implemented (Gateway supports it natively)
 **Action Required**:
 1. Add Redis dependency to CloudGateway:
-   ```xml
-   <dependency>
-       <groupId>org.springframework.boot</groupId>
-       <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
-   </dependency>
-   ```
+ ```xml
+ <dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+ </dependency>
+ ```
 2. Add rate limiter filter in `application-dev.yml`:
-   ```yaml
-   spring:
-     cloud:
-       gateway:
-         routes:
-           - id: PRODUCT-SERVICE
-             filters:
-               - name: RequestRateLimiter
-                 args:
-                   redis-rate-limiter.replenishRate: 10
-                   redis-rate-limiter.burstCapacity: 20
-   ```
+ ```yaml
+ spring:
+ cloud:
+ gateway:
+ routes:
+ - id: PRODUCT-SERVICE
+ filters:
+ - name: RequestRateLimiter
+ args:
+ redis-rate-limiter.replenishRate: 10
+ redis-rate-limiter.burstCapacity: 20
+ ```
 3. Start Redis:
-   ```bash
-   docker run -d -p 6379:6379 redis:alpine
-   ```
+ ```bash
+ docker run -d -p 6379:6379 redis:alpine
+ ```
 
 **Tools**: Redis + Spring Cloud Gateway Rate Limiter
 **Effort**: 1 hour
 **Benefit**: Prevent API abuse, ensure fair usage
 
-#### 3. API Versioning ⚡ Quick Win
-**Status**: ❌ Not implemented (requires code changes only)
+#### 3. API Versioning Quick Win
+**Status**: Not implemented (requires code changes only)
 **Action Required**:
 1. Add version prefix to controllers:
-   ```java
-   @RequestMapping("/api/v1/products")
-   public class ProductController { }
-   ```
+ ```java
+ @RequestMapping("/api/v1/products")
+ public class ProductController { }
+ ```
 2. Update gateway routes:
-   ```yaml
-   - Path=/api/v1/product/**
-   ```
+ ```yaml
+ - Path=/api/v1/product/**
+ ```
 
 **Effort**: 2 hours
 **Benefit**: Backward compatibility, gradual migrations
 
 ---
 
-### 🛠️ Moderate Effort (Requires Infrastructure)
+### Moderate Effort (Requires Infrastructure)
 
 #### 4. Database Migration
-**Status**: ❌ Not implemented (currently using JPA auto-DDL)
+**Status**: Not implemented (currently using JPA auto-DDL)
 **Action Required**:
 1. Add Flyway dependency (recommended):
-   ```xml
-   <dependency>
-       <groupId>org.flywaydb</groupId>
-       <artifactId>flyway-core</artifactId>
-   </dependency>
-   <dependency>
-       <groupId>org.flywaydb</groupId>
-       <artifactId>flyway-mysql</artifactId>
-   </dependency>
-   ```
+ ```xml
+ <dependency>
+ <groupId>org.flywaydb</groupId>
+ <artifactId>flyway-core</artifactId>
+ </dependency>
+ <dependency>
+ <groupId>org.flywaydb</groupId>
+ <artifactId>flyway-mysql</artifactId>
+ </dependency>
+ ```
 2. Disable JPA auto-DDL:
-   ```yaml
-   spring:
-     jpa:
-       hibernate:
-         ddl-auto: validate  # Change from 'update'
-   ```
+ ```yaml
+ spring:
+ jpa:
+ hibernate:
+ ddl-auto: validate # Change from 'update'
+ ```
 3. Create migration scripts:
-   ```
-   src/main/resources/db/migration/
-   └── V1__initial_schema.sql
-   └── V2__add_product_category.sql
-   ```
+ ```
+ src/main/resources/db/migration/
+ └── V1__initial_schema.sql
+ └── V2__add_product_category.sql
+ ```
 
 **Tools**: Flyway or Liquibase
 **Effort**: 1 day (includes creating initial migrations)
 **Benefit**: Version-controlled schema changes, safe deployments
 
 #### 5. Caching Layer
-**Status**: ❌ Not implemented
+**Status**: Not implemented
 **Action Required**:
 1. Add Redis + Spring Cache dependencies:
-   ```xml
-   <dependency>
-       <groupId>org.springframework.boot</groupId>
-       <artifactId>spring-boot-starter-data-redis</artifactId>
-   </dependency>
-   <dependency>
-       <groupId>org.springframework.boot</groupId>
-       <artifactId>spring-boot-starter-cache</artifactId>
-   </dependency>
-   ```
+ ```xml
+ <dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-data-redis</artifactId>
+ </dependency>
+ <dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-cache</artifactId>
+ </dependency>
+ ```
 2. Enable caching:
-   ```java
-   @EnableCaching
-   @SpringBootApplication
-   public class ProductServiceApplication { }
-   ```
+ ```java
+ @EnableCaching
+ @SpringBootApplication
+ public class ProductServiceApplication { }
+ ```
 3. Add cache annotations:
-   ```java
-   @Cacheable("products")
-   public Product getProductById(Long id) { }
-   ```
+ ```java
+ @Cacheable("products")
+ public Product getProductById(Long id) { }
+ ```
 
 **Tools**: Redis + Spring Cache
 **Effort**: 1 day
 **Benefit**: Reduced database load, 10x faster reads
 
 #### 6. Metrics & Monitoring
-**Status**: ⚠️ Partially ready (Actuator endpoints exist)
+**Status**: Partially ready (Actuator endpoints exist)
 **Action Required**:
 1. Add Micrometer Prometheus registry:
-   ```xml
-   <dependency>
-       <groupId>io.micrometer</groupId>
-       <artifactId>micrometer-registry-prometheus</artifactId>
-   </dependency>
-   ```
+ ```xml
+ <dependency>
+ <groupId>io.micrometer</groupId>
+ <artifactId>micrometer-registry-prometheus</artifactId>
+ </dependency>
+ ```
 2. Expose Prometheus endpoint:
-   ```yaml
-   management:
-     endpoints:
-       web:
-         exposure:
-           include: health,info,prometheus
-   ```
+ ```yaml
+ management:
+ endpoints:
+ web:
+ exposure:
+ include: health,info,prometheus
+ ```
 3. Start Prometheus + Grafana:
-   ```bash
-   docker-compose -f monitoring-compose.yml up -d
-   ```
+ ```bash
+ docker-compose -f monitoring-compose.yml up -d
+ ```
 
 **Tools**: Prometheus + Grafana + Micrometer
 **Effort**: 2 days (includes dashboard creation)
@@ -1546,12 +1546,12 @@ These features require adding dependencies but have straightforward setup:
 
 ---
 
-### 🚀 Advanced Features (Significant Effort)
+### Advanced Features (Significant Effort)
 
 These features require architectural changes and significant development effort:
 
 #### 7. Message Queue (Async Communication)
-**Status**: ❌ Not implemented
+**Status**: Not implemented
 **Complexity**: High
 **Effort**: 1-2 weeks
 
@@ -1573,12 +1573,12 @@ These features require architectural changes and significant development effort:
 **Example Architecture**:
 ```
 OrderService → [OrderCreated Event] → RabbitMQ → PaymentService
-                                               → EmailService
-                                               → InventoryService
+ → EmailService
+ → InventoryService
 ```
 
 #### 8. SAGA Pattern (Distributed Transactions)
-**Status**: ❌ Not implemented
+**Status**: Not implemented
 **Complexity**: Very High
 **Effort**: 2-3 weeks
 
@@ -1604,7 +1604,7 @@ OrderService → [OrderCreated Event] → RabbitMQ → PaymentService
 ```
 
 #### 9. Event Sourcing
-**Status**: ❌ Not implemented
+**Status**: Not implemented
 **Complexity**: Very High
 **Effort**: 3-4 weeks
 
@@ -1620,7 +1620,7 @@ OrderService → [OrderCreated Event] → RabbitMQ → PaymentService
 **Use Case**: Financial transactions, order history, audit requirements
 
 #### 10. Service Mesh
-**Status**: ❌ Not implemented (Kubernetes prerequisite)
+**Status**: Not implemented (Kubernetes prerequisite)
 **Complexity**: High
 **Effort**: 1-2 weeks
 
@@ -1644,7 +1644,7 @@ OrderService → [OrderCreated Event] → RabbitMQ → PaymentService
 - Service-to-service authorization
 
 #### 11. CQRS Pattern
-**Status**: ❌ Not implemented
+**Status**: Not implemented
 **Complexity**: High
 **Effort**: 2-3 weeks
 
@@ -1660,7 +1660,7 @@ OrderService → [OrderCreated Event] → RabbitMQ → PaymentService
 **Use Case**: High-read, low-write scenarios (product catalog, reporting)
 
 #### 12. GraphQL Gateway
-**Status**: ❌ Not implemented
+**Status**: Not implemented
 **Complexity**: Moderate
 **Effort**: 1-2 weeks
 
@@ -1677,45 +1677,45 @@ OrderService → [OrderCreated Event] → RabbitMQ → PaymentService
 
 ---
 
-### 📊 Summary Table
+### Summary Table
 
 | Feature | Status | Effort | Complexity | Prerequisites | ROI |
 |---------|--------|--------|------------|---------------|-----|
-| **Distributed Tracing** | ✅ Ready (commented) | 30 min | Low | Zipkin container | ⭐⭐⭐⭐⭐ |
-| **API Rate Limiting** | ❌ Not implemented | 1 hour | Low | Redis container | ⭐⭐⭐⭐ |
-| **API Versioning** | ❌ Not implemented | 2 hours | Low | None | ⭐⭐⭐⭐ |
-| **Database Migration** | ❌ Not implemented | 1 day | Low | None | ⭐⭐⭐⭐⭐ |
-| **Caching** | ❌ Not implemented | 1 day | Moderate | Redis | ⭐⭐⭐⭐⭐ |
-| **Metrics/Monitoring** | ⚠️ Partial | 2 days | Moderate | Prometheus/Grafana | ⭐⭐⭐⭐⭐ |
-| **Message Queue** | ❌ Not implemented | 1-2 weeks | High | RabbitMQ/Kafka | ⭐⭐⭐⭐ |
-| **SAGA Pattern** | ❌ Not implemented | 2-3 weeks | Very High | Message Queue | ⭐⭐⭐ |
-| **Event Sourcing** | ❌ Not implemented | 3-4 weeks | Very High | Event Store | ⭐⭐⭐ |
-| **Service Mesh** | ❌ Not implemented | 1-2 weeks | High | Kubernetes | ⭐⭐⭐⭐ |
-| **CQRS** | ❌ Not implemented | 2-3 weeks | High | Separate DB | ⭐⭐⭐ |
-| **GraphQL** | ❌ Not implemented | 1-2 weeks | Moderate | None | ⭐⭐⭐ |
+| **Distributed Tracing** | Ready (commented) | 30 min | Low | Zipkin container | |
+| **API Rate Limiting** | Not implemented | 1 hour | Low | Redis container | |
+| **API Versioning** | Not implemented | 2 hours | Low | None | |
+| **Database Migration** | Not implemented | 1 day | Low | None | |
+| **Caching** | Not implemented | 1 day | Moderate | Redis | |
+| **Metrics/Monitoring** | Partial | 2 days | Moderate | Prometheus/Grafana | |
+| **Message Queue** | Not implemented | 1-2 weeks | High | RabbitMQ/Kafka | |
+| **SAGA Pattern** | Not implemented | 2-3 weeks | Very High | Message Queue | |
+| **Event Sourcing** | Not implemented | 3-4 weeks | Very High | Event Store | |
+| **Service Mesh** | Not implemented | 1-2 weeks | High | Kubernetes | |
+| **CQRS** | Not implemented | 2-3 weeks | High | Separate DB | |
+| **GraphQL** | Not implemented | 1-2 weeks | Moderate | None | |
 
 ---
 
-### 🎯 Recommended Implementation Order
+### Recommended Implementation Order
 
 **Phase 1: Quick Wins (Week 1)**
-1. ✅ Enable Distributed Tracing (30 min)
-2. ✅ Add API Rate Limiting (1 hour)
-3. ✅ Implement API Versioning (2 hours)
-4. ✅ Add Database Migration (1 day)
+1. Enable Distributed Tracing (30 min)
+2. Add API Rate Limiting (1 hour)
+3. Implement API Versioning (2 hours)
+4. Add Database Migration (1 day)
 
 **Phase 2: Performance & Monitoring (Week 2-3)**
-5. ✅ Implement Caching Layer (1 day)
-6. ✅ Set up Metrics & Monitoring (2 days)
+5. Implement Caching Layer (1 day)
+6. Set up Metrics & Monitoring (2 days)
 
 **Phase 3: Advanced Patterns (Month 2)**
-7. ✅ Implement Message Queue (1-2 weeks)
-8. ✅ Add SAGA Pattern (2-3 weeks)
+7. Implement Message Queue (1-2 weeks)
+8. Add SAGA Pattern (2-3 weeks)
 
 **Phase 4: Enterprise Features (Month 3+)**
-9. ✅ Deploy to Kubernetes
-10. ✅ Implement Service Mesh
-11. ✅ Consider Event Sourcing or CQRS based on requirements
+9. Deploy to Kubernetes
+10. Implement Service Mesh
+11. Consider Event Sourcing or CQRS based on requirements
 
 ---
 
@@ -1725,46 +1725,46 @@ OrderService → [OrderCreated Event] → RabbitMQ → PaymentService
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                                                               │
-│                      External Systems                         │
-│                                                               │
-│  ┌──────────┐              ┌──────────┐                     │
-│  │  Auth0   │              │ Frontend │                     │
-│  │ (OAuth2) │              │   Apps   │                     │
-│  └────┬─────┘              └────┬─────┘                     │
-│       │                         │                           │
+│ │
+│ External Systems │
+│ │
+│ ┌──────────┐ ┌──────────┐ │
+│ │ Auth0 │ │ Frontend │ │
+│ │ (OAuth2) │ │ Apps │ │
+│ └────┬─────┘ └────┬─────┘ │
+│ │ │ │
 └───────┼─────────────────────────┼───────────────────────────┘
-        │                         │
-        │   ┌─────────────────────┼────────────────────────┐
-        │   │                     ▼                        │
-        │   │          ┌─────────────────────┐            │
-        └───┼──────────┤   CloudGateway      │            │
-            │          │   (Port 9090)       │            │
-            │          └──────────┬──────────┘            │
-            │                     │                        │
-            │       ┌─────────────┼─────────────┐         │
-            │       │             │             │         │
-            │       ▼             ▼             ▼         │
-            │  ┌─────────┐  ┌─────────┐  ┌─────────┐    │
-            │  │ Product │  │  Order  │  │ Payment │    │
-            │  │ Service │  │ Service │  │ Service │    │
-            │  │  8081   │  │  8082   │  │  8083   │    │
-            │  └────┬────┘  └────┬────┘  └────┬────┘    │
-            │       │            │            │         │
-            │       ▼            ▼            ▼         │
-            │  ┌─────────┐  ┌─────────┐  ┌─────────┐   │
-            │  │productDb│  │ orderDb │  │paymentDb│   │
-            │  │  MySQL  │  │  MySQL  │  │  MySQL  │   │
-            │  └─────────┘  └─────────┘  └─────────┘   │
-            │                                            │
-            │  Infrastructure Services:                 │
-            │  ┌────────────────┐  ┌──────────────┐    │
-            │  │ Eureka Server  │  │ Config Server│    │
-            │  │    (8761)      │  │    (9296)    │    │
-            │  └────────────────┘  └──────────────┘    │
-            │                                            │
-            └────────────────────────────────────────────┘
-                    Spring Boot Microservices
+ │ │
+ │ ┌─────────────────────┼────────────────────────┐
+ │ │ ▼ │
+ │ │ ┌─────────────────────┐ │
+ └───┼──────────┤ CloudGateway │ │
+ │ │ (Port 9090) │ │
+ │ └──────────┬──────────┘ │
+ │ │ │
+ │ ┌─────────────┼─────────────┐ │
+ │ │ │ │ │
+ │ ▼ ▼ ▼ │
+ │ ┌─────────┐ ┌─────────┐ ┌─────────┐ │
+ │ │ Product │ │ Order │ │ Payment │ │
+ │ │ Service │ │ Service │ │ Service │ │
+ │ │ 8081 │ │ 8082 │ │ 8083 │ │
+ │ └────┬────┘ └────┬────┘ └────┬────┘ │
+ │ │ │ │ │
+ │ ▼ ▼ ▼ │
+ │ ┌─────────┐ ┌─────────┐ ┌─────────┐ │
+ │ │productDb│ │ orderDb │ │paymentDb│ │
+ │ │ MySQL │ │ MySQL │ │ MySQL │ │
+ │ └─────────┘ └─────────┘ └─────────┘ │
+ │ │
+ │ Infrastructure Services: │
+ │ ┌────────────────┐ ┌──────────────┐ │
+ │ │ Eureka Server │ │ Config Server│ │
+ │ │ (8761) │ │ (9296) │ │
+ │ └────────────────┘ └──────────────┘ │
+ │ │
+ └────────────────────────────────────────────┘
+ Spring Boot Microservices
 ```
 
 ### OAuth2 Authentication Flow
@@ -1773,40 +1773,40 @@ OrderService → [OrderCreated Event] → RabbitMQ → PaymentService
 ┌──────────┐
 │ Frontend │
 └─────┬────┘
-      │ (1) GET /authenticate/login
-      ▼
+ │ (1) GET /authenticate/login
+ ▼
 ┌─────────────────┐
-│  CloudGateway   │
-│  Regular Web    │
-│  Application    │
+│ CloudGateway │
+│ Regular Web │
+│ Application │
 └────┬───────────┘
-     │ (2) Redirect to Auth0 login
-     ▼
+ │ (2) Redirect to Auth0 login
+ ▼
 ┌─────────────────┐
-│     Auth0       │
-│  Login Page     │
+│ Auth0 │
+│ Login Page │
 └────┬───────────┘
-     │ (3) User authenticates
-     │ (4) Redirect with auth code
-     ▼
+ │ (3) User authenticates
+ │ (4) Redirect with auth code
+ ▼
 ┌─────────────────┐
-│  CloudGateway   │
+│ CloudGateway │
 └────┬───────────┘
-     │ (5) Exchange code for tokens
-     │ (6) Return tokens to frontend
-     ▼
+ │ (5) Exchange code for tokens
+ │ (6) Return tokens to frontend
+ ▼
 ┌──────────┐
 │ Frontend │ ← Access Token, Refresh Token
 └──────────┘
-     │
-     │ (7) API request with Bearer token
-     ▼
+ │
+ │ (7) API request with Bearer token
+ ▼
 ┌─────────────────┐
-│  CloudGateway   │
+│ CloudGateway │
 └────┬───────────┘
-     │ (8) Validate JWT
-     │ (9) Route to service
-     ▼
+ │ (8) Validate JWT
+ │ (9) Route to service
+ ▼
 ┌─────────────────┐
 │ Business Service│
 │ (validates JWT) │
@@ -1817,32 +1817,32 @@ OrderService → [OrderCreated Event] → RabbitMQ → PaymentService
 
 ```
 ┌─────────────────┐
-│  OrderService   │
-│  (M2M Client)   │
+│ OrderService │
+│ (M2M Client) │
 └────┬───────────┘
-     │ (1) Need to call ProductService
-     │
-     ▼
+ │ (1) Need to call ProductService
+ │
+ ▼
 ┌─────────────────────────────┐
-│ RestTemplate Interceptor    │
+│ RestTemplate Interceptor │
 └────┬───────────────────────┘
-     │ (2) Check token cache
-     │ (3) If expired, request new token
-     ▼
+ │ (2) Check token cache
+ │ (3) If expired, request new token
+ ▼
 ┌─────────────────┐
-│     Auth0       │
-│ (M2M App)       │
+│ Auth0 │
+│ (M2M App) │
 └────┬───────────┘
-     │ (4) Client Credentials grant
-     │ (5) Return access token
-     ▼
+ │ (4) Client Credentials grant
+ │ (5) Return access token
+ ▼
 ┌─────────────────────────────┐
-│ RestTemplate Interceptor    │
+│ RestTemplate Interceptor │
 └────┬───────────────────────┘
-     │ (6) Add Authorization: Bearer <token>
-     ▼
+ │ (6) Add Authorization: Bearer <token>
+ ▼
 ┌─────────────────┐
-│ ProductService  │
+│ ProductService │
 │ (validates JWT) │
 └─────────────────┘
 ```
@@ -1853,13 +1853,13 @@ OrderService → [OrderCreated Event] → RabbitMQ → PaymentService
 
 This Spring Boot microservices application demonstrates a comprehensive implementation of modern cloud-native patterns and best practices. It provides:
 
-✅ **Scalability**: Horizontal scaling with load balancing
-✅ **Resilience**: Circuit breakers and fault tolerance
-✅ **Security**: OAuth2/JWT with Auth0
-✅ **Observability**: Health checks, logging, monitoring
-✅ **Developer Experience**: Hot reload, debugging, documentation
-✅ **Production Ready**: Containerization, Kubernetes manifests
-✅ **Maintainability**: Clean architecture, separation of concerns
+ **Scalability**: Horizontal scaling with load balancing
+ **Resilience**: Circuit breakers and fault tolerance
+ **Security**: OAuth2/JWT with Auth0
+ **Observability**: Health checks, logging, monitoring
+ **Developer Experience**: Hot reload, debugging, documentation
+ **Production Ready**: Containerization, Kubernetes manifests
+ **Maintainability**: Clean architecture, separation of concerns
 
 The architecture is designed to be extended with additional patterns like event-driven communication, CQRS, and distributed tracing as the application grows.
 

@@ -9,13 +9,13 @@
 In this comprehensive guide, we'll build a cloud-native e-commerce application using Spring Boot microservices architecture. You'll learn how to implement service discovery, API gateway, circuit breaker patterns, and deploy using Docker and Kubernetes.
 
 **What You'll Learn:**
-- ✅ Microservices architecture patterns
-- ✅ Service discovery with Netflix Eureka
-- ✅ API Gateway with Spring Cloud Gateway
-- ✅ Circuit breaker pattern for fault tolerance
-- ✅ Inter-service communication with OpenFeign
-- ✅ Centralized configuration management
-- ✅ Database per service pattern
+- Microservices architecture patterns
+- Service discovery with Netflix Eureka
+- API Gateway with Spring Cloud Gateway
+- Circuit breaker pattern for fault tolerance
+- Inter-service communication with OpenFeign
+- Centralized configuration management
+- Database per service pattern
 
 **GitHub Repository:** [Your Repository Link]
 
@@ -42,38 +42,38 @@ Our e-commerce application follows a microservices architecture with the followi
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│                        Client                            │
-│                  (Browser/Mobile App)                    │
+│ Client │
+│ (Browser/Mobile App) │
 └───────────────────────┬──────────────────────────────────┘
-                        │
-                        ▼
+ │
+ ▼
 ┌───────────────────────────────────────────────────────────┐
-│                   Cloud Gateway                           │
-│              (Spring Cloud Gateway)                       │
-│         Port 9090 - Single Entry Point                   │
-│  • Routing          • Circuit Breaker                    │
-│  • Load Balancing   • JWT Validation                     │
+│ Cloud Gateway │
+│ (Spring Cloud Gateway) │
+│ Port 9090 - Single Entry Point │
+│ • Routing • Circuit Breaker │
+│ • Load Balancing • JWT Validation │
 └───────────────────┬───────────────────────────────────────┘
-                    │
-        ┌───────────┼───────────┬──────────────┐
-        ▼           ▼           ▼              ▼
+ │
+ ┌───────────┼───────────┬──────────────┐
+ ▼ ▼ ▼ ▼
 ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
-│  Product    │ │   Order     │ │  Payment    │ │   Service   │
-│  Service    │ │   Service   │ │  Service    │ │  Registry   │
-│  Port 8081  │ │  Port 8082  │ │  Port 8083  │ │  (Eureka)   │
-│             │ │             │ │             │ │  Port 8761  │
+│ Product │ │ Order │ │ Payment │ │ Service │
+│ Service │ │ Service │ │ Service │ │ Registry │
+│ Port 8081 │ │ Port 8082 │ │ Port 8083 │ │ (Eureka) │
+│ │ │ │ │ │ │ Port 8761 │
 └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘
-        │               │               │
-        ▼               ▼               ▼
+ │ │ │
+ ▼ ▼ ▼
 ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
-│  MySQL DB   │ │  MySQL DB   │ │  MySQL DB   │
-│ (Products)  │ │  (Orders)   │ │ (Payments)  │
+│ MySQL DB │ │ MySQL DB │ │ MySQL DB │
+│ (Products) │ │ (Orders) │ │ (Payments) │
 └─────────────┘ └─────────────┘ └─────────────┘
 
-                ┌─────────────────┐
-                │  Config Server  │
-                │   Port 9296     │
-                └─────────────────┘
+ ┌─────────────────┐
+ │ Config Server │
+ │ Port 9296 │
+ └─────────────────┘
 ```
 
 **Key Design Decisions:**
@@ -173,22 +173,22 @@ Our e-commerce application follows a microservices architecture with the followi
 **pom.xml**
 ```xml
 <dependencies>
-    <dependency>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
-    </dependency>
+ <dependency>
+ <groupId>org.springframework.cloud</groupId>
+ <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+ </dependency>
 </dependencies>
 
 <dependencyManagement>
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-dependencies</artifactId>
-            <version>2023.0.0</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-    </dependencies>
+ <dependencies>
+ <dependency>
+ <groupId>org.springframework.cloud</groupId>
+ <artifactId>spring-cloud-dependencies</artifactId>
+ <version>2023.0.0</version>
+ <type>pom</type>
+ <scope>import</scope>
+ </dependency>
+ </dependencies>
 </dependencyManagement>
 ```
 
@@ -197,29 +197,29 @@ Our e-commerce application follows a microservices architecture with the followi
 @SpringBootApplication
 @EnableEurekaServer
 public class ServiceRegistryApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(ServiceRegistryApplication.class, args);
-    }
+ public static void main(String[] args) {
+ SpringApplication.run(ServiceRegistryApplication.class, args);
+ }
 }
 ```
 
 **application.yml**
 ```yaml
 server:
-  port: 8761
+ port: 8761
 
 spring:
-  application:
-    name: SERVICE-REGISTRY
+ application:
+ name: SERVICE-REGISTRY
 
 eureka:
-  instance:
-    hostname: localhost
-  client:
-    register-with-eureka: false  # Don't register itself
-    fetch-registry: false
-    service-url:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+ instance:
+ hostname: localhost
+ client:
+ register-with-eureka: false # Don't register itself
+ fetch-registry: false
+ service-url:
+ defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
 ```
 
 **Access Eureka Dashboard:** http://localhost:8761
@@ -231,25 +231,25 @@ eureka:
 **Add Dependency to Each Service**
 ```xml
 <dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+ <groupId>org.springframework.cloud</groupId>
+ <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 </dependency>
 ```
 
 **Service Configuration (Product Service Example)**
 ```yaml
 spring:
-  application:
-    name: PRODUCT-SERVICE
+ application:
+ name: PRODUCT-SERVICE
 
 eureka:
-  instance:
-    preferIpAddress: true
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: ${EUREKA_SERVER_ADDRESS:http://localhost:8761/eureka}
+ instance:
+ preferIpAddress: true
+ client:
+ register-with-eureka: true
+ fetch-registry: true
+ service-url:
+ defaultZone: ${EUREKA_SERVER_ADDRESS:http://localhost:8761/eureka}
 ```
 
 **Enable Discovery Client**
@@ -257,9 +257,9 @@ eureka:
 @SpringBootApplication
 @EnableDiscoveryClient
 public class ProductServiceApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(ProductServiceApplication.class, args);
-    }
+ public static void main(String[] args) {
+ SpringApplication.run(ProductServiceApplication.class, args);
+ }
 }
 ```
 
@@ -274,18 +274,18 @@ public class ProductServiceApplication {
 **pom.xml**
 ```xml
 <dependencies>
-    <dependency>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-starter-gateway</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
-    </dependency>
+ <dependency>
+ <groupId>org.springframework.cloud</groupId>
+ <artifactId>spring-cloud-starter-gateway</artifactId>
+ </dependency>
+ <dependency>
+ <groupId>org.springframework.cloud</groupId>
+ <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+ </dependency>
+ <dependency>
+ <groupId>org.springframework.cloud</groupId>
+ <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
+ </dependency>
 </dependencies>
 ```
 
@@ -294,9 +294,9 @@ public class ProductServiceApplication {
 @SpringBootApplication
 @EnableDiscoveryClient
 public class CloudGatewayApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(CloudGatewayApplication.class, args);
-    }
+ public static void main(String[] args) {
+ SpringApplication.run(CloudGatewayApplication.class, args);
+ }
 }
 ```
 
@@ -305,53 +305,53 @@ public class CloudGatewayApplication {
 **application.yml**
 ```yaml
 server:
-  port: 9090
+ port: 9090
 
 spring:
-  application:
-    name: API-GATEWAY
-  cloud:
-    gateway:
-      routes:
-        # Product Service Routes
-        - id: PRODUCT-SERVICE
-          uri: lb://PRODUCT-SERVICE  # lb = load balanced
-          predicates:
-            - Path=/api/products/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: PRODUCT-SERVICE
-                fallbackuri: forward:/productServiceFallback
+ application:
+ name: API-GATEWAY
+ cloud:
+ gateway:
+ routes:
+ # Product Service Routes
+ - id: PRODUCT-SERVICE
+ uri: lb://PRODUCT-SERVICE # lb = load balanced
+ predicates:
+ - Path=/api/products/**
+ filters:
+ - name: CircuitBreaker
+ args:
+ name: PRODUCT-SERVICE
+ fallbackuri: forward:/productServiceFallback
 
-        # Order Service Routes
-        - id: ORDER-SERVICE
-          uri: lb://ORDER-SERVICE
-          predicates:
-            - Path=/api/orders/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: ORDER-SERVICE
-                fallbackuri: forward:/orderServiceFallback
+ # Order Service Routes
+ - id: ORDER-SERVICE
+ uri: lb://ORDER-SERVICE
+ predicates:
+ - Path=/api/orders/**
+ filters:
+ - name: CircuitBreaker
+ args:
+ name: ORDER-SERVICE
+ fallbackuri: forward:/orderServiceFallback
 
-        # Payment Service Routes
-        - id: PAYMENT-SERVICE
-          uri: lb://PAYMENT-SERVICE
-          predicates:
-            - Path=/api/payments/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: PAYMENT-SERVICE
-                fallbackuri: forward:/paymentServiceFallback
+ # Payment Service Routes
+ - id: PAYMENT-SERVICE
+ uri: lb://PAYMENT-SERVICE
+ predicates:
+ - Path=/api/payments/**
+ filters:
+ - name: CircuitBreaker
+ args:
+ name: PAYMENT-SERVICE
+ fallbackuri: forward:/paymentServiceFallback
 
 eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka
-    register-with-eureka: true
-    fetch-registry: true
+ client:
+ serviceUrl:
+ defaultZone: http://localhost:8761/eureka
+ register-with-eureka: true
+ fetch-registry: true
 ```
 
 **How Routes Work:**
@@ -373,31 +373,31 @@ Circuit breaker prevents cascading failures when a service is down or slow.
 **application.yml (Cloud Gateway)**
 ```yaml
 resilience4j:
-  circuitbreaker:
-    instances:
-      PRODUCT-SERVICE:
-        sliding-window-size: 10              # Monitor last 10 requests
-        failure-rate-threshold: 50           # Open if 50% fail
-        wait-duration-in-open-state: 10000   # Wait 10s before retry
-        permitted-number-of-calls-in-half-open-state: 3
-        automatic-transition-from-open-to-half-open-enabled: true
-      ORDER-SERVICE:
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10000
-      PAYMENT-SERVICE:
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10000
+ circuitbreaker:
+ instances:
+ PRODUCT-SERVICE:
+ sliding-window-size: 10 # Monitor last 10 requests
+ failure-rate-threshold: 50 # Open if 50% fail
+ wait-duration-in-open-state: 10000 # Wait 10s before retry
+ permitted-number-of-calls-in-half-open-state: 3
+ automatic-transition-from-open-to-half-open-enabled: true
+ ORDER-SERVICE:
+ sliding-window-size: 10
+ failure-rate-threshold: 50
+ wait-duration-in-open-state: 10000
+ PAYMENT-SERVICE:
+ sliding-window-size: 10
+ failure-rate-threshold: 50
+ wait-duration-in-open-state: 10000
 
-  timelimiter:
-    instances:
-      PRODUCT-SERVICE:
-        timeout-duration: 10s
-      ORDER-SERVICE:
-        timeout-duration: 10s
-      PAYMENT-SERVICE:
-        timeout-duration: 10s
+ timelimiter:
+ instances:
+ PRODUCT-SERVICE:
+ timeout-duration: 10s
+ ORDER-SERVICE:
+ timeout-duration: 10s
+ PAYMENT-SERVICE:
+ timeout-duration: 10s
 ```
 
 ### Step 2: Create Fallback Controller
@@ -407,20 +407,20 @@ resilience4j:
 @RestController
 public class FallbackController {
 
-    @GetMapping("/productServiceFallback")
-    public String productServiceFallback() {
-        return "Product Service is temporarily unavailable. Please try again later.";
-    }
+ @GetMapping("/productServiceFallback")
+ public String productServiceFallback() {
+ return "Product Service is temporarily unavailable. Please try again later.";
+ }
 
-    @GetMapping("/orderServiceFallback")
-    public String orderServiceFallback() {
-        return "Order Service is temporarily unavailable. Please try again later.";
-    }
+ @GetMapping("/orderServiceFallback")
+ public String orderServiceFallback() {
+ return "Order Service is temporarily unavailable. Please try again later.";
+ }
 
-    @GetMapping("/paymentServiceFallback")
-    public String paymentServiceFallback() {
-        return "Payment Service is temporarily unavailable. Please try again later.";
-    }
+ @GetMapping("/paymentServiceFallback")
+ public String paymentServiceFallback() {
+ return "Payment Service is temporarily unavailable. Please try again later.";
+ }
 }
 ```
 
@@ -428,26 +428,26 @@ public class FallbackController {
 
 ```
 ┌──────────────┐
-│    CLOSED    │  ← Normal operation
-│  (Healthy)   │
+│ CLOSED │ ← Normal operation
+│ (Healthy) │
 └──────┬───────┘
-       │
-       │ Failure rate > 50%
-       ▼
+ │
+ │ Failure rate > 50%
+ ▼
 ┌──────────────┐
-│     OPEN     │  ← Rejects all requests
-│   (Failed)   │     Returns fallback
+│ OPEN │ ← Rejects all requests
+│ (Failed) │ Returns fallback
 └──────┬───────┘
-       │
-       │ After wait duration
-       ▼
+ │
+ │ After wait duration
+ ▼
 ┌──────────────┐
-│ HALF-OPEN    │  ← Allows 3 test requests
-│  (Testing)   │
+│ HALF-OPEN │ ← Allows 3 test requests
+│ (Testing) │
 └──────┬───────┘
-       │
-       ├─ Success → CLOSED
-       └─ Failure → OPEN
+ │
+ ├─ Success → CLOSED
+ └─ Failure → OPEN
 ```
 
 ---
@@ -461,8 +461,8 @@ Our application uses **OpenFeign** for all inter-service communication:
 **Add Dependency**
 ```xml
 <dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-openfeign</artifactId>
+ <groupId>org.springframework.cloud</groupId>
+ <artifactId>spring-cloud-starter-openfeign</artifactId>
 </dependency>
 ```
 
@@ -472,9 +472,9 @@ Our application uses **OpenFeign** for all inter-service communication:
 @EnableFeignClients
 @EnableDiscoveryClient
 public class OrderServiceApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(OrderServiceApplication.class, args);
-    }
+ public static void main(String[] args) {
+ SpringApplication.run(OrderServiceApplication.class, args);
+ }
 }
 ```
 
@@ -483,14 +483,14 @@ public class OrderServiceApplication {
 @FeignClient(name = "PRODUCT-SERVICE")
 public interface ProductService {
 
-    @PutMapping("/api/products/reduceQuantity/{id}")
-    ResponseEntity<Void> reduceQuantity(
-        @PathVariable("id") long productId,
-        @RequestParam long quantity
-    );
+ @PutMapping("/api/products/reduceQuantity/{id}")
+ ResponseEntity<Void> reduceQuantity(
+ @PathVariable("id") long productId,
+ @RequestParam long quantity
+ );
 
-    @GetMapping("/api/products/{id}")
-    ResponseEntity<ProductResponse> getProductById(@PathVariable("id") long productId);
+ @GetMapping("/api/products/{id}")
+ ResponseEntity<ProductResponse> getProductById(@PathVariable("id") long productId);
 }
 ```
 
@@ -500,55 +500,55 @@ public interface ProductService {
 @Log4j2
 public class OrderServiceImpl implements OrderService {
 
-    @Autowired
-    private ProductService productService;  // Feign client
+ @Autowired
+ private ProductService productService; // Feign client
 
-    @Autowired
-    private PaymentService paymentService;  // Feign client
+ @Autowired
+ private PaymentService paymentService; // Feign client
 
-    @Override
-    public long placeOrder(OrderRequest orderRequest) {
-        log.info("Placing order: {}", orderRequest);
+ @Override
+ public long placeOrder(OrderRequest orderRequest) {
+ log.info("Placing order: {}", orderRequest);
 
-        // Call Product Service to reduce quantity
-        productService.reduceQuantity(
-            orderRequest.getProductId(),
-            orderRequest.getQuantity()
-        );
+ // Call Product Service to reduce quantity
+ productService.reduceQuantity(
+ orderRequest.getProductId(),
+ orderRequest.getQuantity()
+ );
 
-        // Save order and process payment
-        paymentService.doPayment(paymentRequest);
+ // Save order and process payment
+ paymentService.doPayment(paymentRequest);
 
-        return order.getId();
-    }
+ return order.getId();
+ }
 
-    @Override
-    public OrderResponse getOrderDetails(long orderId) {
-        Order order = orderRepository.findById(orderId).orElseThrow();
+ @Override
+ public OrderResponse getOrderDetails(long orderId) {
+ Order order = orderRepository.findById(orderId).orElseThrow();
 
-        // Fetch product details via Feign
-        ProductResponse product = productService.getProductById(order.getProductId()).getBody();
+ // Fetch product details via Feign
+ ProductResponse product = productService.getProductById(order.getProductId()).getBody();
 
-        // Fetch payment details via Feign
-        PaymentResponse payment = paymentService.getPaymentDetailsByOrderId(order.getId()).getBody();
+ // Fetch payment details via Feign
+ PaymentResponse payment = paymentService.getPaymentDetailsByOrderId(order.getId()).getBody();
 
-        // Build response
-        return OrderResponse.builder()
-            .orderId(order.getId())
-            .productDetails(product)
-            .paymentDetails(payment)
-            .build();
-    }
+ // Build response
+ return OrderResponse.builder()
+ .orderId(order.getId())
+ .productDetails(product)
+ .paymentDetails(payment)
+ .build();
+ }
 }
 ```
 
 **Why OpenFeign?**
 
-✅ **Declarative** - Interface-based, minimal boilerplate
-✅ **Type-Safe** - Compile-time checking
-✅ **Load Balanced** - Automatic Eureka integration
-✅ **Consistent** - Same approach for all HTTP operations
-✅ **OAuth2 Integration** - Built-in support for token propagation
+ **Declarative** - Interface-based, minimal boilerplate
+ **Type-Safe** - Compile-time checking
+ **Load Balanced** - Automatic Eureka integration
+ **Consistent** - Same approach for all HTTP operations
+ **OAuth2 Integration** - Built-in support for token propagation
 
 ---
 
@@ -642,9 +642,9 @@ Each service has Swagger UI enabled for interactive API testing.
 ```bash
 POST http://localhost:9090/api/products
 {
-  "productName": "iPhone 15",
-  "price": 999.99,
-  "quantity": 100
+ "productName": "iPhone 15",
+ "price": 999.99,
+ "quantity": 100
 }
 ```
 
@@ -652,10 +652,10 @@ POST http://localhost:9090/api/products
 ```bash
 POST http://localhost:9090/api/orders/placeOrder
 {
-  "productId": 1,
-  "quantity": 2,
-  "totalAmount": 1999.98,
-  "paymentMode": "CREDIT_CARD"
+ "productId": 1,
+ "quantity": 2,
+ "totalAmount": 1999.98,
+ "paymentMode": "CREDIT_CARD"
 }
 ```
 
@@ -667,20 +667,20 @@ GET http://localhost:9090/api/orders/1
 **Response:**
 ```json
 {
-  "orderId": 1,
-  "orderStatus": "PLACED",
-  "orderDate": "2025-01-15T10:30:00Z",
-  "amount": 1999.98,
-  "productDetails": {
-    "productId": 1,
-    "productName": "iPhone 15"
-  },
-  "paymentDetails": {
-    "paymentId": 1,
-    "status": "SUCCESS",
-    "paymentMode": "CREDIT_CARD",
-    "paymentDate": "2025-01-15T10:30:05Z"
-  }
+ "orderId": 1,
+ "orderStatus": "PLACED",
+ "orderDate": "2025-01-15T10:30:00Z",
+ "amount": 1999.98,
+ "productDetails": {
+ "productId": 1,
+ "productName": "iPhone 15"
+ },
+ "paymentDetails": {
+ "paymentId": 1,
+ "status": "SUCCESS",
+ "paymentMode": "CREDIT_CARD",
+ "paymentDate": "2025-01-15T10:30:05Z"
+ }
 }
 ```
 
@@ -715,15 +715,15 @@ curl http://localhost:8081/actuator/metrics
 
 ## Best Practices Implemented
 
-✅ **Database per Service** - Each microservice owns its database
-✅ **API Gateway Pattern** - Single entry point for all clients
-✅ **Service Discovery** - Dynamic service registration with Eureka
-✅ **Circuit Breaker** - Fault tolerance with Resilience4j
-✅ **Load Balancing** - Client-side load balancing via Eureka
-✅ **Health Checks** - Spring Boot Actuator endpoints
-✅ **API Documentation** - Swagger UI for all services
-✅ **Centralized Configuration** - Spring Cloud Config Server
-✅ **Container-Ready** - Docker and Kubernetes support
+ **Database per Service** - Each microservice owns its database
+ **API Gateway Pattern** - Single entry point for all clients
+ **Service Discovery** - Dynamic service registration with Eureka
+ **Circuit Breaker** - Fault tolerance with Resilience4j
+ **Load Balancing** - Client-side load balancing via Eureka
+ **Health Checks** - Spring Boot Actuator endpoints
+ **API Documentation** - Swagger UI for all services
+ **Centralized Configuration** - Spring Cloud Config Server
+ **Container-Ready** - Docker and Kubernetes support
 
 ---
 
@@ -752,28 +752,28 @@ curl http://localhost:8081/actuator/metrics
 ## Next Steps
 
 In Part 2, we'll cover:
-- 🔐 **Security with OAuth2 and Auth0**
-- 🔑 **JWT token validation**
-- 🛡️ **Service-to-service authentication**
-- 🌐 **CORS configuration for frontends**
+- **Security with OAuth2 and Auth0**
+- **JWT token validation**
+- **Service-to-service authentication**
+- **CORS configuration for frontends**
 
 In Part 3, we'll explore:
-- 🐳 **Docker containerization**
-- ☸️ **Kubernetes deployment**
-- 🚀 **CI/CD pipeline setup**
-- 📊 **Monitoring with Prometheus & Grafana**
+- **Docker containerization**
+- **Kubernetes deployment**
+- **CI/CD pipeline setup**
+- **Monitoring with Prometheus & Grafana**
 
 ---
 
 ## Conclusion
 
 You've successfully built a production-ready microservices application with:
-- ✅ 6 microservices with clear responsibilities
-- ✅ Service discovery and registration
-- ✅ API Gateway with routing and circuit breaker
-- ✅ Inter-service communication with OpenFeign
-- ✅ Fault tolerance and resilience
-- ✅ Interactive API documentation
+- 6 microservices with clear responsibilities
+- Service discovery and registration
+- API Gateway with routing and circuit breaker
+- Inter-service communication with OpenFeign
+- Fault tolerance and resilience
+- Interactive API documentation
 
 The complete source code is available on GitHub: [Your Repository Link]
 

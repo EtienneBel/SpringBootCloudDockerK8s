@@ -16,9 +16,9 @@ eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4
 
 ```json
 {
-  "alg": "RS256",
-  "typ": "JWT",
-  "kid": "key-id"
+ "alg": "RS256",
+ "typ": "JWT",
+ "kid": "key-id"
 }
 ```
 
@@ -26,13 +26,13 @@ eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4
 
 ```json
 {
-  "iss": "https://dev-xxx.auth0.com/",
-  "sub": "auth0|user-123",
-  "aud": "http://springboot-microservices-api",
-  "exp": 1759750871,
-  "iat": 1759664471,
-  "scope": "openid profile email",
-  "email": "user@example.com"
+ "iss": "https://dev-xxx.auth0.com/",
+ "sub": "auth0|user-123",
+ "aud": "http://springboot-microservices-api",
+ "exp": 1759750871,
+ "iat": 1759664471,
+ "scope": "openid profile email",
+ "email": "user@example.com"
 }
 ```
 
@@ -42,20 +42,20 @@ All services validate JWT:
 
 ```yaml
 spring:
-  security:
-    oauth2:
-      resource-server:
-        jwt:
-          issuer-uri: ${AUTH0_ISSUER_URI}
+ security:
+ oauth2:
+ resource-server:
+ jwt:
+ issuer-uri: ${AUTH0_ISSUER_URI}
 ```
 
 ## Best Practices
 
-✅ Short expiration (24 hours)
-✅ Validate on every service
-✅ Use refresh tokens
-✅ Never log tokens
-✅ Validate signature, issuer, audience
+ Short expiration (24 hours)
+ Validate on every service
+ Use refresh tokens
+ Never log tokens
+ Validate signature, issuer, audience
 
 ## Decode JWT (for debugging)
 

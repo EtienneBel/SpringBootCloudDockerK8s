@@ -2,9 +2,9 @@
 
 Comprehensive guides for architecture patterns, tools, and technologies used in this Spring Boot Microservices project.
 
-## 📂 Documentation Categories
+## Documentation Categories
 
-### 🏗️ Architecture Patterns (`/patterns`)
+### Architecture Patterns (`/patterns`)
 
 | Pattern | Description | File |
 |---------|-------------|------|
@@ -16,7 +16,7 @@ Comprehensive guides for architecture patterns, tools, and technologies used in 
 | **Load Balancing** | Client-side load balancing | [load-balancing.md](patterns/load-balancing.md) |
 | **Service-to-Service Communication** | RestTemplate & OpenFeign with OAuth2 | [service-communication.md](patterns/service-communication.md) |
 
-### 🔐 Security (`/security`)
+### Security (`/security`)
 
 | Topic | Description | File |
 |-------|-------------|------|
@@ -25,7 +25,7 @@ Comprehensive guides for architecture patterns, tools, and technologies used in 
 | **CORS Configuration** | Cross-Origin Resource Sharing setup | [cors-configuration.md](security/cors-configuration.md) |
 | **Service-to-Service Auth** | OAuth2 Client Credentials flow | [service-to-service-auth.md](security/service-to-service-auth.md) |
 
-### 🛠️ Tools & Technologies (`/tools`)
+### Tools & Technologies (`/tools`)
 
 | Tool | Description | File |
 |------|-------------|------|
@@ -38,7 +38,7 @@ Comprehensive guides for architecture patterns, tools, and technologies used in 
 | **OpenAPI/Swagger** | API documentation | [openapi.md](tools/openapi.md) |
 | **Lombok** | Code generation | [lombok.md](tools/lombok.md) |
 
-### 🚀 Deployment (`/deployment`)
+### Deployment (`/deployment`)
 
 | Topic | Description | File |
 |-------|-------------|------|
@@ -47,7 +47,7 @@ Comprehensive guides for architecture patterns, tools, and technologies used in 
 | **Environment Variables** | Configuration management | [environment-variables.md](deployment/environment-variables.md) |
 | **CI/CD Pipeline** | Continuous integration and deployment | [cicd-pipeline.md](deployment/cicd-pipeline.md) |
 
-### 💻 Development (`/development`)
+### Development (`/development`)
 
 | Topic | Description | File |
 |-------|-------------|------|
@@ -57,7 +57,7 @@ Comprehensive guides for architecture patterns, tools, and technologies used in 
 | **Dev Containers** | Containerized development environment | [dev-containers.md](development/dev-containers.md) |
 | **Logging** | Logging best practices | [logging.md](development/logging.md) |
 
-## 🎯 Quick Start Guides
+## Quick Start Guides
 
 ### For Developers
 1. Read [Spring Boot Overview](tools/spring-boot.md)
@@ -83,7 +83,7 @@ Comprehensive guides for architecture patterns, tools, and technologies used in 
 3. Study [Database per Service](patterns/database-per-service.md)
 4. Plan future enhancements (see [ARCHITECTURE.md](../ARCHITECTURE.md#future-enhancements))
 
-## 📚 Main Documentation
+## Main Documentation
 
 - **[Project README](../README.md)** - Quick start and overview
 - **[Architecture](../ARCHITECTURE.md)** - Complete technical documentation

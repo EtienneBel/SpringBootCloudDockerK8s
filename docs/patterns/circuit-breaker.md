@@ -17,47 +17,47 @@ The Circuit Breaker pattern prevents cascading failures in distributed systems b
 Without circuit breaker:
 ```
 Client → Gateway → Failing Service (timeout: 30s)
-                   ↓
-                 Wait... wait... wait... (each request waits 30s)
-                   ↓
-                 Eventually: 500 Internal Server Error
+ ↓
+ Wait... wait... wait... (each request waits 30s)
+ ↓
+ Eventually: 500 Internal Server Error
 ```
 
 With circuit breaker:
 ```
 Client → Gateway → Circuit Breaker
-                   ↓
-                 ✅ Healthy? → Forward to service
-                 ❌ Failing? → Return fallback immediately (no wait)
+ ↓
+ Healthy? → Forward to service
+ Failing? → Return fallback immediately (no wait)
 ```
 
 ## Circuit States
 
 ```
 ┌─────────────┐
-│             │  All requests pass through
-│   CLOSED    │  (Normal operation)
-│             │
+│ │ All requests pass through
+│ CLOSED │ (Normal operation)
+│ │
 └──────┬──────┘
-       │ Failure threshold reached
-       │ (e.g., 50% failures)
-       ▼
+ │ Failure threshold reached
+ │ (e.g., 50% failures)
+ ▼
 ┌─────────────┐
-│             │  All requests fail fast
-│    OPEN     │  (Service protection)
-│             │  Return fallback immediately
+│ │ All requests fail fast
+│ OPEN │ (Service protection)
+│ │ Return fallback immediately
 └──────┬──────┘
-       │ Wait duration elapsed
-       │ (e.g., 30 seconds)
-       ▼
+ │ Wait duration elapsed
+ │ (e.g., 30 seconds)
+ ▼
 ┌─────────────┐
-│             │  Limited requests allowed
-│  HALF-OPEN  │  (Testing recovery)
-│             │
+│ │ Limited requests allowed
+│ HALF-OPEN │ (Testing recovery)
+│ │
 └──────┬──────┘
-       │
-       ├─ Success → CLOSED (Service recovered)
-       └─ Failure → OPEN (Still failing)
+ │
+ ├─ Success → CLOSED (Service recovered)
+ └─ Failure → OPEN (Still failing)
 ```
 
 ## Implementation
@@ -68,41 +68,41 @@ Client → Gateway → Circuit Breaker
 
 ```yaml
 spring:
-  cloud:
-    gateway:
-      routes:
-        - id: PRODUCT-SERVICE
-          uri: lb://PRODUCT-SERVICE
-          predicates:
-            - Path=/product/**
-          filters:
-            - StripPrefix=1
-            - name: CircuitBreaker
-              args:
-                name: PRODUCT-SERVICE
-                fallbackuri: forward:/productServiceFallback
+ cloud:
+ gateway:
+ routes:
+ - id: PRODUCT-SERVICE
+ uri: lb://PRODUCT-SERVICE
+ predicates:
+ - Path=/product/**
+ filters:
+ - StripPrefix=1
+ - name: CircuitBreaker
+ args:
+ name: PRODUCT-SERVICE
+ fallbackuri: forward:/productServiceFallback
 
-        - id: ORDER-SERVICE
-          uri: lb://ORDER-SERVICE
-          predicates:
-            - Path=/order/**
-          filters:
-            - StripPrefix=1
-            - name: CircuitBreaker
-              args:
-                name: ORDER-SERVICE
-                fallbackuri: forward:/orderServiceFallback
+ - id: ORDER-SERVICE
+ uri: lb://ORDER-SERVICE
+ predicates:
+ - Path=/order/**
+ filters:
+ - StripPrefix=1
+ - name: CircuitBreaker
+ args:
+ name: ORDER-SERVICE
+ fallbackuri: forward:/orderServiceFallback
 
-        - id: PAYMENT-SERVICE
-          uri: lb://PAYMENT-SERVICE
-          predicates:
-            - Path=/payment/**
-          filters:
-            - StripPrefix=1
-            - name: CircuitBreaker
-              args:
-                name: PAYMENT-SERVICE
-                fallbackuri: forward:/paymentServiceFallback
+ - id: PAYMENT-SERVICE
+ uri: lb://PAYMENT-SERVICE
+ predicates:
+ - Path=/payment/**
+ filters:
+ - StripPrefix=1
+ - name: CircuitBreaker
+ args:
+ name: PAYMENT-SERVICE
+ fallbackuri: forward:/paymentServiceFallback
 ```
 
 ### 2. Fallback Controller
@@ -114,24 +114,24 @@ spring:
 @Tag(name = "Circuit Breaker Fallbacks")
 public class FallbackController {
 
-    @Operation(
-        summary = "Order Service Fallback",
-        description = "Returns when Order Service is down or circuit is open"
-    )
-    @GetMapping("/orderServiceFallback")
-    public String orderServiceFallback() {
-        return "OrderService is temporarily unavailable. Please try again later.";
-    }
+ @Operation(
+ summary = "Order Service Fallback",
+ description = "Returns when Order Service is down or circuit is open"
+ )
+ @GetMapping("/orderServiceFallback")
+ public String orderServiceFallback() {
+ return "OrderService is temporarily unavailable. Please try again later.";
+ }
 
-    @GetMapping("/paymentServiceFallback")
-    public String paymentServiceFallback() {
-        return "PaymentService is temporarily unavailable. Please try again later.";
-    }
+ @GetMapping("/paymentServiceFallback")
+ public String paymentServiceFallback() {
+ return "PaymentService is temporarily unavailable. Please try again later.";
+ }
 
-    @GetMapping("/productServiceFallback")
-    public String productServiceFallback() {
-        return "ProductService is temporarily unavailable. Please try again later.";
-    }
+ @GetMapping("/productServiceFallback")
+ public String productServiceFallback() {
+ return "ProductService is temporarily unavailable. Please try again later.";
+ }
 }
 ```
 
@@ -140,27 +140,27 @@ public class FallbackController {
 ```java
 @GetMapping("/productServiceFallback")
 public ResponseEntity<ProductResponse> productServiceFallback(
-        ServerWebExchange exchange) {
+ ServerWebExchange exchange) {
 
-    // Access original request details
-    ServerHttpRequest request = exchange.getRequest();
-    String path = request.getPath().value();
+ // Access original request details
+ ServerHttpRequest request = exchange.getRequest();
+ String path = request.getPath().value();
 
-    // Log the failure
-    log.error("Circuit breaker opened for path: {}", path);
+ // Log the failure
+ log.error("Circuit breaker opened for path: {}", path);
 
-    // Return structured fallback response
-    ProductResponse fallback = ProductResponse.builder()
-        .id(null)
-        .name("Service Unavailable")
-        .price(BigDecimal.ZERO)
-        .available(false)
-        .message("Product service is temporarily down. Please try again later.")
-        .build();
+ // Return structured fallback response
+ ProductResponse fallback = ProductResponse.builder()
+ .id(null)
+ .name("Service Unavailable")
+ .price(BigDecimal.ZERO)
+ .available(false)
+ .message("Product service is temporarily down. Please try again later.")
+ .build();
 
-    return ResponseEntity
-        .status(HttpStatus.SERVICE_UNAVAILABLE)
-        .body(fallback);
+ return ResponseEntity
+ .status(HttpStatus.SERVICE_UNAVAILABLE)
+ .body(fallback);
 }
 ```
 
@@ -170,42 +170,42 @@ public ResponseEntity<ProductResponse> productServiceFallback(
 
 ```yaml
 resilience4j:
-  circuitbreaker:
-    instances:
-      PRODUCT-SERVICE:
-        # Failure rate threshold (percentage)
-        failureRateThreshold: 50
+ circuitbreaker:
+ instances:
+ PRODUCT-SERVICE:
+ # Failure rate threshold (percentage)
+ failureRateThreshold: 50
 
-        # Minimum number of calls before calculating failure rate
-        minimumNumberOfCalls: 5
+ # Minimum number of calls before calculating failure rate
+ minimumNumberOfCalls: 5
 
-        # Wait duration in open state before attempting half-open
-        waitDurationInOpenState: 30s
+ # Wait duration in open state before attempting half-open
+ waitDurationInOpenState: 30s
 
-        # Number of permitted calls in half-open state
-        permittedNumberOfCallsInHalfOpenState: 3
+ # Number of permitted calls in half-open state
+ permittedNumberOfCallsInHalfOpenState: 3
 
-        # Sliding window size for failure rate calculation
-        slidingWindowSize: 10
+ # Sliding window size for failure rate calculation
+ slidingWindowSize: 10
 
-        # Sliding window type (COUNT_BASED or TIME_BASED)
-        slidingWindowType: COUNT_BASED
+ # Sliding window type (COUNT_BASED or TIME_BASED)
+ slidingWindowType: COUNT_BASED
 
-        # Slow call duration threshold
-        slowCallDurationThreshold: 5s
+ # Slow call duration threshold
+ slowCallDurationThreshold: 5s
 
-        # Slow call rate threshold
-        slowCallRateThreshold: 50
+ # Slow call rate threshold
+ slowCallRateThreshold: 50
 
-        # Record exceptions that should count as failures
-        recordExceptions:
-          - org.springframework.web.client.HttpServerErrorException
-          - java.util.concurrent.TimeoutException
-          - java.io.IOException
+ # Record exceptions that should count as failures
+ recordExceptions:
+ - org.springframework.web.client.HttpServerErrorException
+ - java.util.concurrent.TimeoutException
+ - java.io.IOException
 
-        # Ignore exceptions (don't count as failures)
-        ignoreExceptions:
-          - org.springframework.web.client.HttpClientErrorException
+ # Ignore exceptions (don't count as failures)
+ ignoreExceptions:
+ - org.springframework.web.client.HttpClientErrorException
 ```
 
 ### Configuration Explained
@@ -225,13 +225,13 @@ resilience4j:
 
 ```
 Client Request
-    ↓
+ ↓
 Gateway
-    ↓
+ ↓
 Circuit Breaker (CLOSED)
-    ↓
-ProductService ✅ (Success - 200ms)
-    ↓
+ ↓
+ProductService (Success - 200ms)
+ ↓
 Response to Client
 ```
 
@@ -239,15 +239,15 @@ Response to Client
 
 ```
 Client Request
-    ↓
+ ↓
 Gateway
-    ↓
-Circuit Breaker (OPEN) ⚠️
-    ↓
+ ↓
+Circuit Breaker (OPEN)
+ ↓
 Skip service call
-    ↓
+ ↓
 Fallback Controller
-    ↓
+ ↓
 "ProductService is down" (Immediate response)
 ```
 
@@ -255,36 +255,36 @@ Fallback Controller
 
 ```
 Client Request
-    ↓
+ ↓
 Gateway
-    ↓
-Circuit Breaker (HALF-OPEN) 🟡
-    ↓
+ ↓
+Circuit Breaker (HALF-OPEN)
+ ↓
 ProductService (Test call)
-    ↓
-✅ Success? → CLOSED (Recovered)
-❌ Failure? → OPEN (Still down)
+ ↓
+ Success? → CLOSED (Recovered)
+ Failure? → OPEN (Still down)
 ```
 
 ## Benefits
 
-✅ **Prevent Cascading Failures**
+ **Prevent Cascading Failures**
 ```
 Without CB: Service A down → Service B times out → Service C times out → Entire system down
-With CB:    Service A down → Circuit opens → Immediate fallback → Other services OK
+With CB: Service A down → Circuit opens → Immediate fallback → Other services OK
 ```
 
-✅ **Fast Failure**
+ **Fast Failure**
 - No waiting for timeouts
 - Immediate fallback response
 - Better user experience
 
-✅ **Service Protection**
+ **Service Protection**
 - Gives failing service time to recover
 - Reduces load on unhealthy service
 - Prevents resource exhaustion
 
-✅ **Graceful Degradation**
+ **Graceful Degradation**
 - System continues to function
 - Reduced functionality instead of complete failure
 - Better than nothing
@@ -297,13 +297,13 @@ Enable circuit breaker metrics:
 
 ```yaml
 management:
-  endpoints:
-    web:
-      exposure:
-        include: health,circuitbreakers,circuitbreakerevents
-  health:
-    circuitbreakers:
-      enabled: true
+ endpoints:
+ web:
+ exposure:
+ include: health,circuitbreakers,circuitbreakerevents
+ health:
+ circuitbreakers:
+ enabled: true
 ```
 
 ### Check Circuit State
@@ -314,17 +314,17 @@ curl http://localhost:9090/actuator/circuitbreakers
 
 # Response:
 {
-  "circuitBreakers": {
-    "PRODUCT-SERVICE": {
-      "state": "CLOSED",
-      "failureRate": 10.5,
-      "slowCallRate": 5.2,
-      "bufferedCalls": 10,
-      "failedCalls": 1,
-      "slowCalls": 0,
-      "notPermittedCalls": 0
-    }
-  }
+ "circuitBreakers": {
+ "PRODUCT-SERVICE": {
+ "state": "CLOSED",
+ "failureRate": 10.5,
+ "slowCallRate": 5.2,
+ "bufferedCalls": 10,
+ "failedCalls": 1,
+ "slowCalls": 0,
+ "notPermittedCalls": 0
+ }
+ }
 }
 ```
 
@@ -336,21 +336,21 @@ curl http://localhost:9090/actuator/circuitbreakerevents
 
 # Response:
 {
-  "circuitBreakerEvents": [
-    {
-      "circuitBreakerName": "PRODUCT-SERVICE",
-      "type": "ERROR",
-      "creationTime": "2025-10-05T12:00:00Z",
-      "errorMessage": "Connection timeout",
-      "duration": 5000
-    },
-    {
-      "circuitBreakerName": "PRODUCT-SERVICE",
-      "type": "STATE_TRANSITION",
-      "creationTime": "2025-10-05T12:00:30Z",
-      "stateTransition": "CLOSED_TO_OPEN"
-    }
-  ]
+ "circuitBreakerEvents": [
+ {
+ "circuitBreakerName": "PRODUCT-SERVICE",
+ "type": "ERROR",
+ "creationTime": "2025-10-05T12:00:00Z",
+ "errorMessage": "Connection timeout",
+ "duration": 5000
+ },
+ {
+ "circuitBreakerName": "PRODUCT-SERVICE",
+ "type": "STATE_TRANSITION",
+ "creationTime": "2025-10-05T12:00:30Z",
+ "stateTransition": "CLOSED_TO_OPEN"
+ }
+ ]
 }
 ```
 
@@ -394,26 +394,26 @@ docker-compose -f docker-compose.dev.yml start productservice
 @Component
 public class ProductFallbackService {
 
-    @Autowired
-    private RedisTemplate<String, Product> redisTemplate;
+ @Autowired
+ private RedisTemplate<String, Product> redisTemplate;
 
-    public Product getProductFallback(Long productId) {
-        // Try to return cached data
-        Product cached = redisTemplate.opsForValue()
-            .get("product:" + productId);
+ public Product getProductFallback(Long productId) {
+ // Try to return cached data
+ Product cached = redisTemplate.opsForValue()
+ .get("product:" + productId);
 
-        if (cached != null) {
-            log.info("Returning cached product: {}", productId);
-            return cached;
-        }
+ if (cached != null) {
+ log.info("Returning cached product: {}", productId);
+ return cached;
+ }
 
-        // Return default product
-        return Product.builder()
-            .id(productId)
-            .name("Product Unavailable")
-            .price(BigDecimal.ZERO)
-            .build();
-    }
+ // Return default product
+ return Product.builder()
+ .id(productId)
+ .name("Product Unavailable")
+ .price(BigDecimal.ZERO)
+ .build();
+ }
 }
 ```
 
@@ -421,23 +421,23 @@ public class ProductFallbackService {
 
 ```yaml
 spring:
-  cloud:
-    gateway:
-      routes:
-        - id: PRODUCT-SERVICE
-          filters:
-            - name: Retry
-              args:
-                retries: 3
-                statuses: BAD_GATEWAY,GATEWAY_TIMEOUT
-                backoff:
-                  firstBackoff: 100ms
-                  maxBackoff: 1s
-                  factor: 2
-            - name: CircuitBreaker
-              args:
-                name: PRODUCT-SERVICE
-                fallbackuri: forward:/productServiceFallback
+ cloud:
+ gateway:
+ routes:
+ - id: PRODUCT-SERVICE
+ filters:
+ - name: Retry
+ args:
+ retries: 3
+ statuses: BAD_GATEWAY,GATEWAY_TIMEOUT
+ backoff:
+ firstBackoff: 100ms
+ maxBackoff: 1s
+ factor: 2
+ - name: CircuitBreaker
+ args:
+ name: PRODUCT-SERVICE
+ fallbackuri: forward:/productServiceFallback
 ```
 
 ### Bulkhead Pattern (Resource Isolation)
@@ -446,62 +446,62 @@ Limit concurrent calls to prevent resource exhaustion:
 
 ```yaml
 resilience4j:
-  bulkhead:
-    instances:
-      PRODUCT-SERVICE:
-        maxConcurrentCalls: 10
-        maxWaitDuration: 100ms
+ bulkhead:
+ instances:
+ PRODUCT-SERVICE:
+ maxConcurrentCalls: 10
+ maxWaitDuration: 100ms
 ```
 
 ```java
 @Bulkhead(name = "PRODUCT-SERVICE", fallbackMethod = "fallbackProduct")
 public Product getProduct(Long id) {
-    return restTemplate.getForObject(
-        "lb://PRODUCT-SERVICE/product/" + id,
-        Product.class
-    );
+ return restTemplate.getForObject(
+ "lb://PRODUCT-SERVICE/product/" + id,
+ Product.class
+ );
 }
 ```
 
 ## Best Practices
 
-✅ **Set Appropriate Thresholds**
+ **Set Appropriate Thresholds**
 ```yaml
 # Too sensitive: Opens too easily
-failureRateThreshold: 10  # ❌
+failureRateThreshold: 10 #
 
 # Too lenient: Doesn't protect
-failureRateThreshold: 90  # ❌
+failureRateThreshold: 90 #
 
 # Just right: Balanced
-failureRateThreshold: 50  # ✅
+failureRateThreshold: 50 #
 ```
 
-✅ **Provide Meaningful Fallbacks**
+ **Provide Meaningful Fallbacks**
 ```java
-// ❌ Bad: Generic error
+// Bad: Generic error
 return "Error";
 
-// ✅ Good: Helpful message
+// Good: Helpful message
 return "OrderService is temporarily unavailable. " +
-       "Your cart is saved. Please try again in a few minutes.";
+ "Your cart is saved. Please try again in a few minutes.";
 ```
 
-✅ **Log Circuit Events**
+ **Log Circuit Events**
 ```java
 @EventListener
 public void onCircuitBreakerEvent(CircuitBreakerEvent event) {
-    if (event.getEventType() == CircuitBreakerEvent.Type.STATE_TRANSITION) {
-        log.warn("Circuit breaker {} transitioned from {} to {}",
-            event.getCircuitBreakerName(),
-            event.getStateTransition().getFromState(),
-            event.getStateTransition().getToState()
-        );
-    }
+ if (event.getEventType() == CircuitBreakerEvent.Type.STATE_TRANSITION) {
+ log.warn("Circuit breaker {} transitioned from {} to {}",
+ event.getCircuitBreakerName(),
+ event.getStateTransition().getFromState(),
+ event.getStateTransition().getToState()
+ );
+ }
 }
 ```
 
-✅ **Monitor and Alert**
+ **Monitor and Alert**
 - Set up alerts when circuits open
 - Track failure rates
 - Monitor recovery times
@@ -520,13 +520,13 @@ public void onCircuitBreakerEvent(CircuitBreakerEvent event) {
 **Solution**:
 ```yaml
 resilience4j:
-  circuitbreaker:
-    instances:
-      SERVICE:
-        minimumNumberOfCalls: 5  # Lower threshold
-        failureRateThreshold: 30  # More sensitive
-        recordExceptions:
-          - java.lang.Exception  # Record all exceptions
+ circuitbreaker:
+ instances:
+ SERVICE:
+ minimumNumberOfCalls: 5 # Lower threshold
+ failureRateThreshold: 30 # More sensitive
+ recordExceptions:
+ - java.lang.Exception # Record all exceptions
 ```
 
 ### Circuit Always Open
@@ -547,7 +547,7 @@ docker-compose ps
 curl http://localhost:9090/actuator/circuitbreakers
 
 # Adjust configuration
-waitDurationInOpenState: 10s  # Shorter wait time
+waitDurationInOpenState: 10s # Shorter wait time
 ```
 
 ### Fallback Not Triggered
@@ -562,7 +562,7 @@ waitDurationInOpenState: 10s  # Shorter wait time
 **Solution**:
 ```yaml
 # Ensure correct fallback URI
-fallbackuri: forward:/productServiceFallback  # Must match @GetMapping
+fallbackuri: forward:/productServiceFallback # Must match @GetMapping
 
 # Check controller is registered
 curl http://localhost:9090/actuator/mappings | grep -i fallback
@@ -580,7 +580,7 @@ curl http://localhost:9090/actuator/mappings | grep -i fallback
 | Tool | Pros | Cons |
 |------|------|------|
 | **Hystrix** | Mature, feature-rich | Deprecated, in maintenance mode |
-| **Resilience4j** | Modern, lightweight, reactive | ✅ Our choice |
+| **Resilience4j** | Modern, lightweight, reactive | Our choice |
 | **Sentinel** | Alibaba, powerful | Less Spring integration |
 | **Istio** | Service mesh, automatic | Requires Kubernetes |
 

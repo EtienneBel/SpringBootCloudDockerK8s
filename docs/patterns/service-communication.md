@@ -15,18 +15,18 @@ The **OrderService** uses both approaches strategically:
 ### OpenFeign (Declarative)
 **Used for**: Write operations (POST, PUT, DELETE)
 
-✅ **Cleaner syntax** - No boilerplate code
-✅ **Type-safe** - Compile-time checking
-✅ **Self-documenting** - Interface mirrors API
-✅ **Automatic serialization** - JSON handling built-in
+ **Cleaner syntax** - No boilerplate code
+ **Type-safe** - Compile-time checking
+ **Self-documenting** - Interface mirrors API
+ **Automatic serialization** - JSON handling built-in
 
 ### RestTemplate (Imperative)
 **Used for**: Read operations (GET) and complex scenarios
 
-✅ **More control** - Explicit configuration
-✅ **Error handling** - Fine-grained exception management
-✅ **Flexibility** - Custom headers, interceptors
-✅ **Debugging** - Easier to trace and log
+ **More control** - Explicit configuration
+ **Error handling** - Fine-grained exception management
+ **Flexibility** - Custom headers, interceptors
+ **Debugging** - Easier to trace and log
 
 ## Real Implementation Examples
 
@@ -36,11 +36,11 @@ The **OrderService** uses both approaches strategically:
 ```java
 @FeignClient(name = "PRODUCT-SERVICE/product")
 public interface ProductService {
-    @PutMapping("/reduceQuantity/{id}")
-    ResponseEntity<Void> reduceQuantity(
-        @PathVariable("id") long productId,
-        @RequestParam long quantity
-    );
+ @PutMapping("/reduceQuantity/{id}")
+ ResponseEntity<Void> reduceQuantity(
+ @PathVariable("id") long productId,
+ @RequestParam long quantity
+ );
 }
 ```
 
@@ -48,8 +48,8 @@ public interface ProductService {
 ```java
 @FeignClient(name = "PAYMENT-SERVICE/payment")
 public interface PaymentService {
-    @PostMapping
-    ResponseEntity<Long> doPayment(@RequestBody PaymentRequest paymentRequest);
+ @PostMapping
+ ResponseEntity<Long> doPayment(@RequestBody PaymentRequest paymentRequest);
 }
 ```
 
@@ -59,30 +59,30 @@ public interface PaymentService {
 @Log4j2
 public class OrderServiceImpl implements OrderService {
 
-    @Autowired
-    private ProductService productService;  // Feign client
+ @Autowired
+ private ProductService productService; // Feign client
 
-    @Autowired
-    private PaymentService paymentService;  // Feign client
+ @Autowired
+ private PaymentService paymentService; // Feign client
 
-    @Override
-    public long placeOrder(OrderRequest orderRequest) {
-        // Using Feign for write operations
-        productService.reduceQuantity(
-            orderRequest.getProductId(),
-            orderRequest.getQuantity()
-        );
+ @Override
+ public long placeOrder(OrderRequest orderRequest) {
+ // Using Feign for write operations
+ productService.reduceQuantity(
+ orderRequest.getProductId(),
+ orderRequest.getQuantity()
+ );
 
-        PaymentRequest paymentRequest = PaymentRequest.builder()
-            .orderId(order.getId())
-            .paymentMode(orderRequest.getPaymentMode())
-            .amount(orderRequest.getTotalAmount())
-            .build();
+ PaymentRequest paymentRequest = PaymentRequest.builder()
+ .orderId(order.getId())
+ .paymentMode(orderRequest.getPaymentMode())
+ .amount(orderRequest.getTotalAmount())
+ .build();
 
-        paymentService.doPayment(paymentRequest);
+ paymentService.doPayment(paymentRequest);
 
-        return order.getId();
-    }
+ return order.getId();
+ }
 }
 ```
 
@@ -94,39 +94,39 @@ public class OrderServiceImpl implements OrderService {
 @EnableFeignClients
 public class OrderServiceApplication {
 
-    @Bean
-    @LoadBalanced  // Enables Eureka service discovery
-    public RestTemplate restTemplate() {
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setInterceptors(
-            Arrays.asList(
-                new RestTemplateInterceptor(
-                    clientManager(clientRegistrationRepository, oAuth2AuthorizedClientRepository)
-                )
-            )
-        );
-        return restTemplate;
-    }
+ @Bean
+ @LoadBalanced // Enables Eureka service discovery
+ public RestTemplate restTemplate() {
+ RestTemplate restTemplate = new RestTemplate();
+ restTemplate.setInterceptors(
+ Arrays.asList(
+ new RestTemplateInterceptor(
+ clientManager(clientRegistrationRepository, oAuth2AuthorizedClientRepository)
+ )
+ )
+ );
+ return restTemplate;
+ }
 
-    @Bean
-    public OAuth2AuthorizedClientManager clientManager(
-        ClientRegistrationRepository clientRegistrationRepository,
-        OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository
-    ) {
-        OAuth2AuthorizedClientProvider provider = OAuth2AuthorizedClientProviderBuilder
-            .builder()
-            .clientCredentials()  // Service-to-service flow
-            .refreshToken()       // Auto token refresh
-            .build();
+ @Bean
+ public OAuth2AuthorizedClientManager clientManager(
+ ClientRegistrationRepository clientRegistrationRepository,
+ OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository
+ ) {
+ OAuth2AuthorizedClientProvider provider = OAuth2AuthorizedClientProviderBuilder
+ .builder()
+ .clientCredentials() // Service-to-service flow
+ .refreshToken() // Auto token refresh
+ .build();
 
-        DefaultOAuth2AuthorizedClientManager manager =
-            new DefaultOAuth2AuthorizedClientManager(
-                clientRegistrationRepository,
-                oAuth2AuthorizedClientRepository
-            );
-        manager.setAuthorizedClientProvider(provider);
-        return manager;
-    }
+ DefaultOAuth2AuthorizedClientManager manager =
+ new DefaultOAuth2AuthorizedClientManager(
+ clientRegistrationRepository,
+ oAuth2AuthorizedClientRepository
+ );
+ manager.setAuthorizedClientProvider(provider);
+ return manager;
+ }
 }
 ```
 
@@ -135,29 +135,29 @@ public class OrderServiceApplication {
 @Service
 public class OrderServiceImpl implements OrderService {
 
-    @Autowired
-    private RestTemplate restTemplate;  // Pre-configured with OAuth2
+ @Autowired
+ private RestTemplate restTemplate; // Pre-configured with OAuth2
 
-    @Override
-    public OrderResponse getOrderDetails(long orderId) {
-        // Using RestTemplate for read operations
-        ProductResponse productResponse = restTemplate.getForObject(
-            "http://PRODUCT-SERVICE/product/" + order.getProductId(),
-            ProductResponse.class
-        );
+ @Override
+ public OrderResponse getOrderDetails(long orderId) {
+ // Using RestTemplate for read operations
+ ProductResponse productResponse = restTemplate.getForObject(
+ "http://PRODUCT-SERVICE/product/" + order.getProductId(),
+ ProductResponse.class
+ );
 
-        PaymentResponse paymentResponse = restTemplate.getForObject(
-            "http://PAYMENT-SERVICE/payment/order/" + order.getId(),
-            PaymentResponse.class
-        );
+ PaymentResponse paymentResponse = restTemplate.getForObject(
+ "http://PAYMENT-SERVICE/payment/order/" + order.getId(),
+ PaymentResponse.class
+ );
 
-        // Build composite response
-        return OrderResponse.builder()
-            .orderId(order.getId())
-            .productDetails(productDetails)
-            .paymentDetails(paymentDetails)
-            .build();
-    }
+ // Build composite response
+ return OrderResponse.builder()
+ .orderId(order.getId())
+ .productDetails(productDetails)
+ .paymentDetails(paymentDetails)
+ .build();
+ }
 }
 ```
 
@@ -170,42 +170,42 @@ public class OrderServiceImpl implements OrderService {
 @Log4j2
 public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
 
-    private final OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
+ private final OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
 
-    public RestTemplateInterceptor(OAuth2AuthorizedClientManager manager) {
-        this.oAuth2AuthorizedClientManager = manager;
-    }
+ public RestTemplateInterceptor(OAuth2AuthorizedClientManager manager) {
+ this.oAuth2AuthorizedClientManager = manager;
+ }
 
-    @Override
-    public ClientHttpResponse intercept(
-        HttpRequest request,
-        byte[] body,
-        ClientHttpRequestExecution execution
-    ) throws IOException {
+ @Override
+ public ClientHttpResponse intercept(
+ HttpRequest request,
+ byte[] body,
+ ClientHttpRequestExecution execution
+ ) throws IOException {
 
-        // Request OAuth2 token using Client Credentials flow
-        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
-            .withClientRegistrationId("internal-client")
-            .principal("internal")
-            .build();
+ // Request OAuth2 token using Client Credentials flow
+ OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
+ .withClientRegistrationId("internal-client")
+ .principal("internal")
+ .build();
 
-        OAuth2AuthorizedClient authorizedClient =
-            oAuth2AuthorizedClientManager.authorize(authorizeRequest);
+ OAuth2AuthorizedClient authorizedClient =
+ oAuth2AuthorizedClientManager.authorize(authorizeRequest);
 
-        if (authorizedClient != null && authorizedClient.getAccessToken() != null) {
-            String accessToken = authorizedClient.getAccessToken().getTokenValue();
-            request.getHeaders().add("Authorization", "Bearer " + accessToken);
-            log.debug("Successfully added OAuth2 access token to request");
-        } else {
-            log.error("Failed to obtain OAuth2 access token");
-            throw new OAuth2AuthenticationException(
-                new OAuth2Error("access_token_unavailable",
-                    "Unable to obtain access token", null)
-            );
-        }
+ if (authorizedClient != null && authorizedClient.getAccessToken() != null) {
+ String accessToken = authorizedClient.getAccessToken().getTokenValue();
+ request.getHeaders().add("Authorization", "Bearer " + accessToken);
+ log.debug("Successfully added OAuth2 access token to request");
+ } else {
+ log.error("Failed to obtain OAuth2 access token");
+ throw new OAuth2AuthenticationException(
+ new OAuth2Error("access_token_unavailable",
+ "Unable to obtain access token", null)
+ );
+ }
 
-        return execution.execute(request, body);
-    }
+ return execution.execute(request, body);
+ }
 }
 ```
 
@@ -216,41 +216,41 @@ OpenFeign uses the same OAuth2 configuration automatically through Spring Securi
 **application.yml**:
 ```yaml
 spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          internal-client:
-            provider: auth0
-            client-id: ${AUTH0_M2M_CLIENT_ID}
-            client-secret: ${AUTH0_M2M_CLIENT_SECRET}
-            authorization-grant-type: client_credentials
-            scope: read:products,write:products,read:payments,write:payments
-        provider:
-          auth0:
-            issuer-uri: https://${AUTH0_DOMAIN}/
+ security:
+ oauth2:
+ client:
+ registration:
+ internal-client:
+ provider: auth0
+ client-id: ${AUTH0_M2M_CLIENT_ID}
+ client-secret: ${AUTH0_M2M_CLIENT_SECRET}
+ authorization-grant-type: client_credentials
+ scope: read:products,write:products,read:payments,write:payments
+ provider:
+ auth0:
+ issuer-uri: https://${AUTH0_DOMAIN}/
 ```
 
 ## How It Works
 
 ```
 OrderService
-    │
-    ├─ Place Order (Write)
-    │   ├─ OpenFeign → ProductService.reduceQuantity()
-    │   │   └─ Auto OAuth2 token injection
-    │   │   └─ PUT /product/reduceQuantity/123
-    │   │
-    │   └─ OpenFeign → PaymentService.doPayment()
-    │       └─ Auto OAuth2 token injection
-    │       └─ POST /payment
-    │
-    └─ Get Order Details (Read)
-        ├─ RestTemplate → GET /product/123
-        │   └─ RestTemplateInterceptor adds Bearer token
-        │
-        └─ RestTemplate → GET /payment/order/456
-            └─ RestTemplateInterceptor adds Bearer token
+ │
+ ├─ Place Order (Write)
+ │ ├─ OpenFeign → ProductService.reduceQuantity()
+ │ │ └─ Auto OAuth2 token injection
+ │ │ └─ PUT /product/reduceQuantity/123
+ │ │
+ │ └─ OpenFeign → PaymentService.doPayment()
+ │ └─ Auto OAuth2 token injection
+ │ └─ POST /payment
+ │
+ └─ Get Order Details (Read)
+ ├─ RestTemplate → GET /product/123
+ │ └─ RestTemplateInterceptor adds Bearer token
+ │
+ └─ RestTemplate → GET /payment/order/456
+ └─ RestTemplateInterceptor adds Bearer token
 ```
 
 ## Service Discovery Integration
@@ -259,7 +259,7 @@ Both approaches use **@LoadBalanced** with Eureka:
 
 ```java
 @Bean
-@LoadBalanced  // Enables service name resolution
+@LoadBalanced // Enables service name resolution
 public RestTemplate restTemplate() { ... }
 ```
 
@@ -282,12 +282,12 @@ public RestTemplate restTemplate() { ... }
 
 ## Benefits
 
-✅ **Automatic OAuth2 token management** - No manual token handling
-✅ **Service discovery** - Use service names, not IPs
-✅ **Load balancing** - Automatic distribution across instances
-✅ **Type safety** - Compile-time checking with Feign
-✅ **Flexibility** - Choose the right tool for each scenario
-✅ **Token refresh** - Automatic renewal before expiration
+ **Automatic OAuth2 token management** - No manual token handling
+ **Service discovery** - Use service names, not IPs
+ **Load balancing** - Automatic distribution across instances
+ **Type safety** - Compile-time checking with Feign
+ **Flexibility** - Choose the right tool for each scenario
+ **Token refresh** - Automatic renewal before expiration
 
 ## Troubleshooting
 

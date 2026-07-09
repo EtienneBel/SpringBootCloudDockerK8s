@@ -15,37 +15,37 @@ Externalized Configuration is a pattern where application configuration is store
 
 ```
 ┌─────────────────────────────┐
-│   Git Repository            │
-│   (Configuration Files)     │
-│   - application.yml         │
-│   - product-service-dev.yml │
-│   - order-service-prod.yml  │
+│ Git Repository │
+│ (Configuration Files) │
+│ - application.yml │
+│ - product-service-dev.yml │
+│ - order-service-prod.yml │
 └──────────┬──────────────────┘
-           │ (1) Pulls config on startup
-           ▼
+ │ (1) Pulls config on startup
+ ▼
 ┌─────────────────────────────┐
-│   Config Server (9296)      │
-│   - Serves configuration    │
-│   - Caches configs          │
-│   - Encrypts secrets        │
+│ Config Server (9296) │
+│ - Serves configuration │
+│ - Caches configs │
+│ - Encrypts secrets │
 └──────────┬──────────────────┘
-           │ (2) Requests config
-           ▼
+ │ (2) Requests config
+ ▼
 ┌─────────────────────────────┐
-│   Microservices             │
-│   - ProductService          │
-│   - OrderService            │
-│   - PaymentService          │
+│ Microservices │
+│ - ProductService │
+│ - OrderService │
+│ - PaymentService │
 └─────────────────────────────┘
 ```
 
 ## Benefits
 
-✅ **Centralized Management** - All configs in one place
-✅ **Environment-Specific** - Different configs for dev/prod
-✅ **Version Control** - Git tracks all changes
-✅ **Dynamic Refresh** - Update without restart
-✅ **Encryption** - Secure sensitive data
+ **Centralized Management** - All configs in one place
+ **Environment-Specific** - Different configs for dev/prod
+ **Version Control** - Git tracks all changes
+ **Dynamic Refresh** - Update without restart
+ **Encryption** - Secure sensitive data
 
 ## Implementation
 
@@ -54,8 +54,8 @@ Externalized Configuration is a pattern where application configuration is store
 **pom.xml**:
 ```xml
 <dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-config-server</artifactId>
+ <groupId>org.springframework.cloud</groupId>
+ <artifactId>spring-cloud-config-server</artifactId>
 </dependency>
 ```
 
@@ -64,27 +64,27 @@ Externalized Configuration is a pattern where application configuration is store
 @SpringBootApplication
 @EnableConfigServer
 public class ConfigServerApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(ConfigServerApplication.class, args);
-    }
+ public static void main(String[] args) {
+ SpringApplication.run(ConfigServerApplication.class, args);
+ }
 }
 ```
 
 **application.yml**:
 ```yaml
 server:
-  port: 9296
+ port: 9296
 
 spring:
-  application:
-    name: CONFIG-SERVER
-  cloud:
-    config:
-      server:
-        git:
-          uri: https://github.com/your-org/config-repo
-          clone-on-start: true
-          default-label: main
+ application:
+ name: CONFIG-SERVER
+ cloud:
+ config:
+ server:
+ git:
+ uri: https://github.com/your-org/config-repo
+ clone-on-start: true
+ default-label: main
 ```
 
 ### Client Configuration
@@ -92,37 +92,37 @@ spring:
 **application.yml**:
 ```yaml
 spring:
-  application:
-    name: product-service
-  config:
-    import: configserver:http://configserver:9296
-  cloud:
-    config:
-      fail-fast: true
-      retry:
-        max-attempts: 6
+ application:
+ name: product-service
+ config:
+ import: configserver:http://configserver:9296
+ cloud:
+ config:
+ fail-fast: true
+ retry:
+ max-attempts: 6
 ```
 
 ## Configuration Files Structure
 
 ```
 config-repo/
-├── application.yml              # Common to all services
-├── application-dev.yml          # Common dev config
-├── application-prod.yml         # Common prod config
-├── product-service.yml          # ProductService specific
-├── product-service-dev.yml      # ProductService dev
-├── product-service-prod.yml     # ProductService prod
-└── order-service.yml            # OrderService specific
+├── application.yml # Common to all services
+├── application-dev.yml # Common dev config
+├── application-prod.yml # Common prod config
+├── product-service.yml # ProductService specific
+├── product-service-dev.yml # ProductService dev
+├── product-service-prod.yml # ProductService prod
+└── order-service.yml # OrderService specific
 ```
 
 ## Best Practices
 
-✅ **Use Git for Configuration**
-✅ **Encrypt Sensitive Data**
-✅ **Environment-Specific Files**
-✅ **Version Control Everything**
-✅ **Test Configuration Changes**
+ **Use Git for Configuration**
+ **Encrypt Sensitive Data**
+ **Environment-Specific Files**
+ **Version Control Everything**
+ **Test Configuration Changes**
 
 ## References
 
